@@ -94,25 +94,33 @@ const Footer = () => {
             {/* Social Links */}
             <div className="flex space-x-4">
               <a 
-                href="#" 
+                href="https://www.facebook.com/aacharitiwari" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-all duration-300 hover:scale-110"
               >
                 <Facebook className="h-5 w-5" />
               </a>
               <a 
-                href="#" 
+                href="https://www.instagram.com/aacharitiwari/" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-all duration-300 hover:scale-110"
               >
                 <Instagram className="h-5 w-5" />
               </a>
               <a 
-                href="#" 
+                href="https://x.com/AachariTiwari" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-all duration-300 hover:scale-110"
               >
                 <Twitter className="h-5 w-5" />
               </a>
               <a 
-                href="#" 
+                href="https://www.youtube.com/@Aacharitiwari" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-all duration-300 hover:scale-110"
               >
                 <Youtube className="h-5 w-5" />
