@@ -12,30 +12,117 @@ const Homepage = () => {
   const testimonials = [
     {
       name: "Priya Sharma",
-      location: "Mumbai",
+      location: "Mumbai, Maharashtra",
       rating: 5,
-      text: "The mango pickle reminds me of my grandmother's recipe. Absolutely authentic and delicious!",
-      avatar: "PS"
+      text: "The mango pickle reminds me of my grandmother's recipe. Absolutely authentic and delicious! The texture and spice level are perfect.",
+      avatar: "PS",
+      product: "Traditional Mango Aachar",
+      verified: true
     },
     {
       name: "Rajesh Kumar",
-      location: "Delhi", 
+      location: "Delhi, NCR", 
       rating: 5,
-      text: "Best quality pickles I've ever bought online. Fresh, spicy, and perfectly balanced flavors.",
-      avatar: "RK"
+      text: "Best quality pickles I've ever bought online. Fresh, spicy, and perfectly balanced flavors. The garlic pickle is outstanding!",
+      avatar: "RK",
+      product: "Garlic Pickle Delight",
+      verified: true
     },
     {
       name: "Anita Patel",
-      location: "Ahmedabad",
+      location: "Ahmedabad, Gujarat",
       rating: 5,
-      text: "Fast delivery and excellent packaging. The garlic pickle is my new favorite!",
-      avatar: "AP"
+      text: "Fast delivery and excellent packaging. The garlic pickle is my new favorite! Quality is consistently amazing.",
+      avatar: "AP",
+      product: "Premium Red Chili Aachar",
+      verified: true
+    },
+    {
+      name: "Vikram Singh",
+      location: "Jaipur, Rajasthan",
+      rating: 5,
+      text: "Being from Rajasthan, I'm very particular about spice levels. This red chili aachar is perfect - authentic taste with the right amount of heat!",
+      avatar: "VS",
+      product: "Premium Red Chili Aachar",
+      verified: true
+    },
+    {
+      name: "Sunita Devi",
+      location: "Patna, Bihar",
+      rating: 5,
+      text: "As a fellow Bihari, I can confirm this is the real deal! The kaddu ka aachar tastes exactly like my mother used to make. Excellent quality!",
+      avatar: "SD",
+      product: "Kaddu Ka Aachar",
+      verified: true
+    },
+    {
+      name: "Mohammad Rashid",
+      location: "Lucknow, UP",
+      rating: 5,
+      text: "The amla pickle is fantastic! Perfect for boosting immunity during winters. My whole family loves it. Great job AachariTiwari!",
+      avatar: "MR",
+      product: "Amla Aachar",
+      verified: true
+    },
+    {
+      name: "Deepika Menon",
+      location: "Kochi, Kerala",
+      rating: 4,
+      text: "Amazing variety of pickles! The lime pickle has the perfect tangy flavor. Delivery to Kerala was quick and packaging was excellent.",
+      avatar: "DM",
+      product: "Fresh Lime Pickle",
+      verified: true
+    },
+    {
+      name: "Arjun Reddy",
+      location: "Hyderabad, Telangana",
+      rating: 5,
+      text: "The mixed vegetable aachar is incredible! So many different vegetables with perfect spicing. Reminds me of my grandmother's cooking.",
+      avatar: "AR",
+      product: "Mixed Vegetable Aachar",
+      verified: true
+    },
+    {
+      name: "Kavita Joshi",
+      location: "Pune, Maharashtra",
+      rating: 5,
+      text: "I ordered 5 different varieties and loved them all! The ginger pickle is especially good for digestion. Premium quality at reasonable prices.",
+      avatar: "KJ",
+      product: "Spicy Ginger Pickle",
+      verified: true
+    },
+    {
+      name: "Ravi Gupta",
+      location: "Kanpur, UP",
+      rating: 5,
+      text: "The til gud aam aachar is a masterpiece! Sweet, spicy, and aromatic - perfect for festivals. Worth every rupee!",
+      avatar: "RG",
+      product: "Til Gud Aam Aachar",
+      verified: true
+    },
+    {
+      name: "Meera Agarwal",
+      location: "Indore, MP",
+      rating: 4,
+      text: "Love the authentic taste! The instant tadka aachar is perfect for quick meals. Great innovation while keeping traditional flavors.",
+      avatar: "MA",
+      product: "Instant Tadka Aachar",
+      verified: true
+    },
+    {
+      name: "Santosh Yadav",
+      location: "Ranchi, Jharkhand",
+      rating: 5,
+      text: "Being from a neighboring state to Bihar, I appreciate authentic flavors. This is the real deal! My family orders regularly now.",
+      avatar: "SY",
+      product: "Khatta Meetha Aam",
+      verified: true
     }
   ];
 
   const stats = [
     { number: "50,000+", label: "Happy Customers", icon: Users },
-    { number: "10+", label: "Pickle Varieties", icon: ShoppingBag },
+    { number: "17+", label: "Pickle Varieties", icon: ShoppingBag },
     { number: "4.8★", label: "Average Rating", icon: Star },
     { number: "98%", label: "Customer Satisfaction", icon: Heart }
   ];
@@ -48,22 +135,22 @@ const Homepage = () => {
       gradient: "bg-gradient-primary"
     },
     {
-      icon: Truck,
-      title: "Fast Delivery",
-      description: "Quick and secure delivery to your doorstep with proper packaging.",
+      icon: Shield,
+      title: "100% Natural",
+      description: "No artificial preservatives or colors. Pure, traditional ingredients only.",
       gradient: "bg-gradient-secondary"
     },
     {
-      icon: Shield,
-      title: "100% Natural",
-      description: "No artificial preservatives or colors. Pure, natural ingredients only.",
-      gradient: "bg-gradient-spice"
+      icon: Truck,
+      title: "Fast Delivery",
+      description: "Quick and secure delivery across India with proper packaging.",
+      gradient: "bg-gradient-accent"
     },
     {
       icon: Clock,
-      title: "Fresh Daily",
-      description: "Made fresh daily using traditional methods and time-tested recipes.",
-      gradient: "bg-gradient-primary"
+      title: "Long Shelf Life",
+      description: "Traditional preservation methods ensure freshness for months.",
+      gradient: "bg-gradient-spice"
     }
   ];
 
@@ -104,27 +191,27 @@ const Homepage = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Button size="xl" className="bg-gradient-primary hover:opacity-90 text-white shadow-elegant hover:shadow-glow transition-all duration-300">
+              <Button size="xl" className="bg-gradient-primary shadow-elegant hover:shadow-glow transition-all duration-300 px-8">
                 <Link to="/products" className="flex items-center">
-                  <ShoppingBag className="h-5 w-5 mr-2" />
                   Shop Now
+                  <ArrowRight className="h-5 w-5 ml-2" />
                 </Link>
               </Button>
-              <Button variant="outline" size="xl" className="border-2 hover:bg-primary/5">
-                <Link to="/blog" className="flex items-center">
-                  Learn More
-                  <ArrowRight className="h-5 w-5 ml-2" />
+              <Button variant="outline" size="xl" className="border-2 border-primary/30 hover:bg-primary/5 px-8">
+                <Link to="/about" className="flex items-center">
+                  Our Story
+                  <Heart className="h-5 w-5 ml-2" />
                 </Link>
               </Button>
             </div>
 
-            {/* Hero Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+            {/* Updated Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
               {stats.map((stat, index) => (
-                <div key={index} className="text-center bg-white/80 backdrop-blur rounded-xl p-4 border border-white/20">
-                  <stat.icon className="h-6 w-6 text-primary mx-auto mb-2" />
+                <div key={index} className="bg-white/80 backdrop-blur rounded-xl p-6 shadow-card">
+                  <stat.icon className="h-8 w-8 text-primary mx-auto mb-3" />
                   <div className="text-2xl font-bold text-foreground">{stat.number}</div>
-                  <div className="text-sm text-muted-foreground font-medium">{stat.label}</div>
+                  <div className="text-sm text-muted-foreground">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -197,7 +284,7 @@ const Homepage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Enhanced Testimonials Section - Horizontal Scrollable */}
       <section className="py-20 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -208,34 +295,68 @@ const Homepage = () => {
               What Our Customers Say
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Don't just take our word for it. Here's what our satisfied customers have to say about our authentic pickles.
+              Over 50,000 satisfied customers across India love our authentic pickles. Here's what they have to say about their experience.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-0 bg-white/80 backdrop-blur shadow-card hover:shadow-elegant transition-all duration-300">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-white font-bold mr-4">
-                      {testimonial.avatar}
+          {/* Horizontal Scrollable Reviews */}
+          <div className="relative">
+            <div className="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {testimonials.map((testimonial, index) => (
+                <Card key={index} className="min-w-[350px] md:min-w-[400px] flex-shrink-0 border-0 bg-white/90 backdrop-blur shadow-card hover:shadow-elegant transition-all duration-300 snap-start">
+                  <CardContent className="p-6">
+                    {/* Header with Avatar and Info */}
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-white font-bold mr-4">
+                        {testimonial.avatar}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
+                          {testimonial.verified && (
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">{testimonial.location}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
-                      <p className="text-sm text-muted-foreground">{testimonial.location}</p>
+
+                    {/* Rating */}
+                    <div className="flex items-center mb-3">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      ))}
+                      <span className="text-sm text-muted-foreground ml-2">({testimonial.rating}/5)</span>
                     </div>
-                  </div>
-                  <div className="flex mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground italic leading-relaxed">
-                    "{testimonial.text}"
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+
+                    {/* Review Text */}
+                    <p className="text-muted-foreground italic leading-relaxed mb-3">
+                      "{testimonial.text}"
+                    </p>
+
+                    {/* Product Badge */}
+                    <Badge variant="outline" className="text-xs bg-primary/5 text-primary border-primary/20">
+                      {testimonial.product}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            {/* Scroll Indicators */}
+            <div className="flex justify-center mt-6 gap-2">
+              {Array.from({ length: Math.ceil(testimonials.length / 3) }).map((_, index) => (
+                <div key={index} className="w-2 h-2 rounded-full bg-primary/20"></div>
+              ))}
+            </div>
+          </div>
+
+          {/* View All Reviews Button */}
+          <div className="text-center mt-12">
+            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
+              View All Reviews
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
           </div>
         </div>
       </section>

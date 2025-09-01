@@ -80,8 +80,8 @@ const ContactUs = () => {
                 <h3 className="text-lg font-semibold">Phone</h3>
               </div>
               <div className="space-y-2 text-muted-foreground">
-                <p>+91 98765 43210</p>
-                <p>+91 87654 32109</p>
+                <p>+91 70704 14390</p>
+                <p>+91 9801232419</p>
               </div>
             </Card>
 
@@ -91,8 +91,8 @@ const ContactUs = () => {
                 <h3 className="text-lg font-semibold">Email</h3>
               </div>
               <div className="space-y-2 text-muted-foreground">
-                <p>info@aacharitiwari.com</p>
-                <p>support@aacharitiwari.com</p>
+                <p>aacharitiwari@gmail.com</p>
+                <p>aacharitiwari@gmail.com</p>
               </div>
             </Card>
 

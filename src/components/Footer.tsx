@@ -188,7 +188,7 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-primary" />
                 <div>
-                  <p className="text-gray-300 text-sm">+91 98765 43210</p>
+                  <p className="text-gray-300 text-sm">+917973070600</p>
                   <p className="text-gray-400 text-xs">Mon-Sat 9AM-7PM</p>
                 </div>
               </div>
@@ -196,7 +196,7 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-primary" />
                 <div>
-                  <p className="text-gray-300 text-sm">info@aacharitiwari.com</p>
+                  <p className="text-gray-300 text-sm">aacharitiwari@gmail.com</p>
                   <p className="text-gray-400 text-xs">24/7 Support</p>
                 </div>
               </div>

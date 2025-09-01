@@ -39,7 +39,7 @@ const Header = () => {
             </div>
             <div className="flex items-center space-x-2">
               <Mail className="h-3 w-3" />
-              <span> contact@aacharitiwari.com</span>
+              <span>aacharitiwari@gmail.com</span>
             </div>
            
           </div>

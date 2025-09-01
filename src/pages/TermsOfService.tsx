@@ -95,8 +95,8 @@ const TermsOfService = () => {
                 For questions about these Terms of Service, please contact us at:
               </p>
               <div className="mt-4 text-muted-foreground">
-                <p>Email: legal@aacharitiwari.com</p>
-                <p>Phone: +91 98765 43210</p>
+                <p>Email: aacharitiwari@gmail.com</p>
+                <p>Phone: +917973070600</p>
                 <p>Address: Saket, New Delhi</p>
               </div>
             </section>

@@ -107,8 +107,8 @@ const AboutUs = () => {
               </div>
               <div className="space-y-2 text-muted-foreground mb-6">
                 <p><strong>Address:</strong> Saket, New Delhi</p>
-                <p><strong>Phone:</strong> +91 98765 43210</p>
-                <p><strong>Email:</strong> corporate@aacharitiwari.com</p>
+                <p><strong>Phone:</strong> +917973070600</p>
+                <p><strong>Email:</strong> aacharitiwari@gmail.com</p>
                 <p><strong>Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM</p>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -126,7 +126,7 @@ const AboutUs = () => {
               <div className="space-y-2 text-muted-foreground mb-6">
                 <p><strong>Address:</strong> VPO Maksudpur, P.O. Sasamusa, Gopalganj, Bihar</p>
                 <p><strong>Phone:</strong> +91 87654 32109</p>
-                <p><strong>Email:</strong> production@aacharitiwari.com</p>
+                <p><strong>Email:</strong> aacharitiwari@gmail.com</p>
                 <p><strong>Hours:</strong> Monday - Saturday, 6:00 AM - 6:00 PM</p>
               </div>
               <p className="text-sm text-muted-foreground">

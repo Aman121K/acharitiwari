@@ -80,7 +80,7 @@ const RefundPolicy = () => {
               <h2 className="text-2xl font-semibold mb-4">Return Process</h2>
               <ol className="list-decimal list-inside text-muted-foreground space-y-3">
                 <li>
-                  <strong>Contact Customer Support:</strong> Email us at returns@aacharitiwari.com or call +91 98765 43210 
+                  <strong>Contact Customer Support:</strong> Email us at aacharitiwari@gmail.com or call +917973070600 
                   within 7 days of delivery.
                 </li>
                 <li>
@@ -188,8 +188,8 @@ const RefundPolicy = () => {
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p><strong>Email:</strong> returns@aacharitiwari.com</p>
-                    <p><strong>Phone:</strong> +91 98765 43210</p>
+                    <p><strong>Email:</strong> aacharitiwari@gmail.com</p>
+                    <p><strong>Phone:</strong> +917973070600</p>
                   </div>
                   <div>
                     <p><strong>Hours:</strong> Monday to Saturday, 9 AM - 7 PM</p>
