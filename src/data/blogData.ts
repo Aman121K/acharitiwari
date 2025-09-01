@@ -1,3 +1,11 @@
+// Import blog images
+import spiceMarketHero from '@/assets/spice-market-hero.jpg';
+import redChiliAachar from '@/assets/red-chili-aachar.jpg';
+import mixedAacharCollection from '@/assets/mixed-aachar-collection.jpg';
+import limePickle from '@/assets/lime-pickle.jpg';
+import mangoAachar from '@/assets/mango-aachar.jpg';
+import garlicPickle from '@/assets/garlic-pickle.jpg';
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -47,7 +55,7 @@ export const blogPosts: BlogPost[] = [
       <p>Modern food science has validated what our ancestors knew intuitively. The combination of salt, acid, and oil creates an environment hostile to harmful bacteria while promoting beneficial fermentation. The spices used not only enhance flavor but also provide additional antimicrobial protection.</p>
       
       <h3>Preserving Tradition in Modern Times</h3>
-      <p>At Aachar Bazaar, we honor these ancient traditions while adapting to modern food safety standards. Our manufacturing process maintains the authenticity of traditional recipes while ensuring consistent quality and safety for our customers.</p>
+      <p>At AachariTiwari, we honor these ancient traditions while adapting to modern food safety standards. Our manufacturing process maintains the authenticity of traditional recipes while ensuring consistent quality and safety for our customers.</p>
       
       <p>Every jar of our aachar represents centuries of culinary wisdom, passed down through generations of expert pickle makers. When you taste our products, you're not just enjoying a condiment – you're experiencing a piece of India's rich cultural heritage.</p>
     `,
@@ -55,7 +63,7 @@ export const blogPosts: BlogPost[] = [
     date: '2024-01-15',
     readTime: '8 min read',
     category: 'Traditional Recipes',
-    image: '/api/placeholder/800/400',
+    image: spiceMarketHero,
     likes: 245,
     tags: ['tradition', 'history', 'pickle making', 'indian cuisine', 'heritage']
   },
@@ -107,14 +115,14 @@ export const blogPosts: BlogPost[] = [
         <li>Look for pickles made with minimal additives</li>
       </ul>
       
-      <h3>The Aachar Bazaar Difference</h3>
+      <h3>The AachariTiwari Difference</h3>
       <p>Our traditional fermentation process ensures that our pickles retain maximum probiotic benefits while delivering authentic flavors. We use time-tested methods that promote beneficial bacterial growth while maintaining food safety standards.</p>
     `,
     author: 'Dr. Amit Gupta',
     date: '2024-01-12',
     readTime: '7 min read',
     category: 'Health & Nutrition',
-    image: '/api/placeholder/800/400',
+    image: garlicPickle,
     likes: 189,
     tags: ['health', 'probiotics', 'nutrition', 'fermentation', 'gut health']
   },
@@ -166,13 +174,13 @@ export const blogPosts: BlogPost[] = [
       </ul>
       
       <h3>Fusion Cooking Philosophy</h3>
-      <p>The key to successful fusion cooking with aachar is respecting both the traditional flavors and the modern techniques. At Aachar Bazaar, we encourage culinary creativity while honoring the authentic taste that makes our pickles special.</p>
+      <p>The key to successful fusion cooking with aachar is respecting both the traditional flavors and the modern techniques. At AachariTiwari, we encourage culinary creativity while honoring the authentic taste that makes our pickles special.</p>
     `,
     author: 'Chef Rakesh Kumar',
     date: '2024-01-10',
     readTime: '6 min read',
     category: 'Cooking Tips',
-    image: '/api/placeholder/800/400',
+    image: mixedAacharCollection,
     likes: 156,
     tags: ['cooking', 'fusion', 'recipes', 'creative', 'modern']
   },
@@ -252,7 +260,7 @@ export const blogPosts: BlogPost[] = [
         <li><strong>Winter:</strong> Hearty vegetables to provide sustenance</li>
       </ul>
       
-      <h3>Aachar Bazaar's Seasonal Approach</h3>
+      <h3>AachariTiwari's Seasonal Approach</h3>
       <p>We work closely with local farmers to source the finest seasonal produce. Our pickle calendar ensures that each product is made when its primary ingredients are at their absolute best, resulting in superior flavor and nutritional value.</p>
       
       <p>By choosing seasonal pickles, you're not just enjoying better taste – you're participating in a sustainable food system that honors traditional wisdom while supporting local communities.</p>
@@ -261,7 +269,7 @@ export const blogPosts: BlogPost[] = [
     date: '2024-01-08',
     readTime: '5 min read',
     category: 'Seasonal Cooking',
-    image: '/api/placeholder/800/400',
+    image: limePickle,
     likes: 203,
     tags: ['seasonal', 'fresh produce', 'sustainability', 'local', 'traditional']
   },
@@ -352,7 +360,7 @@ export const blogPosts: BlogPost[] = [
       <p>Initial exposure helps establish beneficial bacteria, but prolonged exposure can lead to unwanted oxidation.</p>
       
       <h3>Quality Control Through Science</h3>
-      <p>At Aachar Bazaar, we use scientific principles to ensure consistent quality:</p>
+      <p>At AachariTiwari, we use scientific principles to ensure consistent quality:</p>
       <ul>
         <li>pH monitoring throughout fermentation</li>
         <li>Temperature-controlled fermentation chambers</li>
@@ -382,7 +390,7 @@ export const blogPosts: BlogPost[] = [
     date: '2024-01-05',
     readTime: '10 min read',
     category: 'Food Science',
-    image: '/api/placeholder/800/400',
+    image: mangoAachar,
     likes: 178,
     tags: ['science', 'fermentation', 'microbiology', 'food safety', 'technical']
   },
@@ -512,7 +520,7 @@ export const blogPosts: BlogPost[] = [
       </ul>
       
       <h3>Preserving Regional Traditions</h3>
-      <p>At Aachar Bazaar, we celebrate this incredible diversity by:</p>
+      <p>At AachariTiwari, we celebrate this incredible diversity by:</p>
       <ul>
         <li>Sourcing recipes from traditional families across regions</li>
         <li>Using region-specific ingredients and techniques</li>
@@ -526,7 +534,7 @@ export const blogPosts: BlogPost[] = [
     date: '2024-01-03',
     readTime: '9 min read',
     category: 'Regional Cuisine',
-    image: '/api/placeholder/800/400',
+    image: redChiliAachar,
     likes: 267,
     tags: ['regional', 'diversity', 'culture', 'traditional', 'indian cuisine']
   }

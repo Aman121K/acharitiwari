@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,9 @@ import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ContactUs = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
@@ -88,8 +91,8 @@ const ContactUs = () => {
                 <h3 className="text-lg font-semibold">Email</h3>
               </div>
               <div className="space-y-2 text-muted-foreground">
-                <p>info@aacharbazaar.com</p>
-                <p>support@aacharbazaar.com</p>
+                <p>info@aacharitiwari.com</p>
+                <p>support@aacharitiwari.com</p>
               </div>
             </Card>
 

@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Truck, Clock, MapPin, Package } from 'lucide-react';
 
 const ShippingPolicy = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -144,7 +147,7 @@ const ShippingPolicy = () => {
               <div className="bg-muted/50 p-4 rounded-lg">
                 <p className="text-muted-foreground">
                   <strong>Customer Support:</strong><br />
-                  Email: shipping@aacharbazaar.com<br />
+                  Email: shipping@aacharitiwari.com<br />
                   Phone: +91 98765 43210<br />
                   Hours: Monday to Saturday, 9 AM - 7 PM
                 </p>

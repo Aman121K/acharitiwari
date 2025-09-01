@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
 const TermsOfService = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -15,7 +18,7 @@ const TermsOfService = () => {
             <section>
               <h2 className="text-2xl font-semibold mb-4">Agreement to Terms</h2>
               <p className="text-muted-foreground">
-                By accessing and using Aachar Bazaar, you accept and agree to be bound by the terms 
+                By accessing and using AachariTiwari, you accept and agree to be bound by the terms 
                 and provision of this agreement. If you do not agree to abide by the above, please 
                 do not use this service.
               </p>
@@ -24,7 +27,7 @@ const TermsOfService = () => {
             <section>
               <h2 className="text-2xl font-semibold mb-4">Products and Services</h2>
               <p className="text-muted-foreground mb-4">
-                Aachar Bazaar provides authentic Indian pickles and related products. We strive to 
+                AachariTiwari provides authentic Indian pickles and related products. We strive to 
                 provide accurate product descriptions and pricing information.
               </p>
               <ul className="list-disc list-inside text-muted-foreground space-y-2">
@@ -81,7 +84,7 @@ const TermsOfService = () => {
             <section>
               <h2 className="text-2xl font-semibold mb-4">Limitation of Liability</h2>
               <p className="text-muted-foreground">
-                Aachar Bazaar shall not be liable for any indirect, incidental, special, consequential, 
+                AachariTiwari shall not be liable for any indirect, incidental, special, consequential, 
                 or punitive damages resulting from your use of our service or products.
               </p>
             </section>
@@ -92,7 +95,7 @@ const TermsOfService = () => {
                 For questions about these Terms of Service, please contact us at:
               </p>
               <div className="mt-4 text-muted-foreground">
-                <p>Email: legal@aacharbazaar.com</p>
+                <p>Email: legal@aacharitiwari.com</p>
                 <p>Phone: +91 98765 43210</p>
                 <p>Address: Saket, New Delhi</p>
               </div>

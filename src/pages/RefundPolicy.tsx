@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { RefreshCw, Shield, Clock, CheckCircle } from 'lucide-react';
 
 const RefundPolicy = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -77,7 +80,7 @@ const RefundPolicy = () => {
               <h2 className="text-2xl font-semibold mb-4">Return Process</h2>
               <ol className="list-decimal list-inside text-muted-foreground space-y-3">
                 <li>
-                  <strong>Contact Customer Support:</strong> Email us at returns@aacharbazaar.com or call +91 98765 43210 
+                  <strong>Contact Customer Support:</strong> Email us at returns@aacharitiwari.com or call +91 98765 43210 
                   within 7 days of delivery.
                 </li>
                 <li>
@@ -185,7 +188,7 @@ const RefundPolicy = () => {
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p><strong>Email:</strong> returns@aacharbazaar.com</p>
+                    <p><strong>Email:</strong> returns@aacharitiwari.com</p>
                     <p><strong>Phone:</strong> +91 98765 43210</p>
                   </div>
                   <div>

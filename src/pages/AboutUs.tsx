@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Users, Award, Heart } from 'lucide-react';
 
 const AboutUs = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            About <span className="bg-gradient-spice bg-clip-text text-transparent">Aachar Bazaar</span>
+            About <span className="bg-gradient-spice bg-clip-text text-transparent">AachariTiwari</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             Preserving the authentic taste of traditional Indian pickles for over three generations. 
@@ -48,7 +52,7 @@ const AboutUs = () => {
             <h2 className="text-3xl font-bold mb-6">Our Story</h2>
             <div className="space-y-4 text-muted-foreground">
               <p>
-                Aachar Bazaar began as a small family business in the heart of Bihar, where our grandmother 
+                AachariTiwari began as a small family business in the heart of Bihar, where our grandmother 
                 first started making traditional pickles using recipes passed down through generations. 
                 What started in a humble kitchen has now grown into a beloved brand that serves authentic 
                 Indian pickles across the country.
@@ -85,7 +89,7 @@ const AboutUs = () => {
               <h3 className="text-xl font-semibold mb-3">Our Values</h3>
               <p className="text-muted-foreground">
                 Authenticity, Quality, Tradition, and Customer Satisfaction guide everything 
-                we do at Aachar Bazaar.
+                we do at AachariTiwari.
               </p>
             </Card>
           </div>
@@ -104,7 +108,7 @@ const AboutUs = () => {
               <div className="space-y-2 text-muted-foreground mb-6">
                 <p><strong>Address:</strong> Saket, New Delhi</p>
                 <p><strong>Phone:</strong> +91 98765 43210</p>
-                <p><strong>Email:</strong> corporate@aacharbazaar.com</p>
+                <p><strong>Email:</strong> corporate@aacharitiwari.com</p>
                 <p><strong>Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM</p>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -122,7 +126,7 @@ const AboutUs = () => {
               <div className="space-y-2 text-muted-foreground mb-6">
                 <p><strong>Address:</strong> VPO Maksudpur, P.O. Sasamusa, Gopalganj, Bihar</p>
                 <p><strong>Phone:</strong> +91 87654 32109</p>
-                <p><strong>Email:</strong> production@aacharbazaar.com</p>
+                <p><strong>Email:</strong> production@aacharitiwari.com</p>
                 <p><strong>Hours:</strong> Monday - Saturday, 6:00 AM - 6:00 PM</p>
               </div>
               <p className="text-sm text-muted-foreground">

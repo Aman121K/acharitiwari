@@ -1,73 +1,89 @@
-# Welcome to your Lovable project
+# AachariTiwari - Authentic Indian Pickles & Traditional Spices
 
-## Project info
+## Project Overview
 
-**URL**: https://lovable.dev/projects/16cce1a9-a2f8-4ca1-8649-432883052b5b
+AachariTiwari is a modern e-commerce platform dedicated to bringing authentic Indian pickles (aachar) and traditional spices to customers worldwide. Built with cutting-edge web technologies, our platform offers a seamless shopping experience for lovers of traditional Indian flavors.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **Product Catalog**: Browse our extensive collection of authentic Indian pickles and spices
+- **Shopping Cart**: Easy-to-use cart functionality with secure checkout
+- **Blog Section**: Traditional recipes, cooking tips, and spice knowledge
+- **Mobile Responsive**: Optimized for all devices and screen sizes
+- **SEO Optimized**: Built with search engine optimization in mind
+- **Fast Performance**: Lightning-fast loading with modern web technologies
 
-**Use Lovable**
+## Technologies Used
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/16cce1a9-a2f8-4ca1-8649-432883052b5b) and start prompting.
+This project is built with modern web technologies:
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Vite** - Fast build tool and development server
+- **TypeScript** - Type-safe JavaScript development
+- **React** - Modern UI library with hooks
+- **React Router** - Client-side routing
+- **Tailwind CSS** - Utility-first CSS framework
+- **shadcn/ui** - High-quality UI components
+- **Lucide React** - Beautiful icon library
 
-**Use your preferred IDE**
+## Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js (v16 or higher)
+- npm or yarn package manager
 
-Follow these steps:
+### Installation
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. Clone the repository:
+```bash
+git clone <your-repository-url>
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. Navigate to the project directory:
+```bash
+cd spicy-spreads-hub
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. Install dependencies:
+```bash
+npm install
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+4. Start the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+5. Open your browser and visit `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Available Scripts
 
-**Use GitHub Codespaces**
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build locally
+- `npm run lint` - Run ESLint for code quality
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Project Structure
 
-## What technologies are used for this project?
+```
+src/
+├── components/        # Reusable UI components
+├── pages/            # Route components
+├── contexts/         # React context providers
+├── data/            # Static data and mock APIs
+├── hooks/           # Custom React hooks
+├── lib/             # Utility functions
+└── assets/          # Static assets (images, etc.)
+```
 
-This project is built with:
+## Contributing
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+We welcome contributions! Please feel free to submit issues and pull requests.
 
-## How can I deploy this project?
+## License
 
-Simply open [Lovable](https://lovable.dev/projects/16cce1a9-a2f8-4ca1-8649-432883052b5b) and click on Share -> Publish.
+This project is licensed under the MIT License.
 
-## Can I connect a custom domain to my Lovable project?
+## Contact
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+For questions or support, please contact us through our website's contact form.

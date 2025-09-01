@@ -1,0 +1,37 @@
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Wooden Spoon Handle -->
+  <path d="M300 100 L450 220 C465 230 465 245 450 255 L300 375 C290 380 275 375 270 365 L150 245 C145 235 150 220 165 215 L300 100 Z" fill="#8B4513" stroke="#654321" stroke-width="3"/>
+  
+  <!-- Spoon Bowl -->
+  <ellipse cx="200" cy="300" rx="120" ry="80" fill="#A0522D" stroke="#654321" stroke-width="3"/>
+  <ellipse cx="200" cy="300" rx="110" ry="70" fill="#CD853F"/>
+  
+  <!-- Raw Mango -->
+  <ellipse cx="160" cy="280" rx="25" ry="35" fill="#90EE90" stroke="#228B22" stroke-width="2"/>
+  <path d="M160 250 Q165 245 170 250" stroke="#228B22" stroke-width="2" fill="none"/>
+  
+  <!-- Garlic -->
+  <ellipse cx="220" cy="290" rx="18" ry="22" fill="#FFF8DC" stroke="#DDD" stroke-width="1"/>
+  <path d="M220 270 L225 275 L220 280 L215 275 Z" fill="#F5F5DC"/>
+  
+  <!-- Red Chili -->
+  <path d="M240 270 Q250 265 260 270 Q265 275 260 285 Q250 290 240 285 Q235 280 240 270 Z" fill="#FF4500" stroke="#DC143C" stroke-width="2"/>
+  <path d="M240 270 Q245 265 250 268" stroke="#228B22" stroke-width="2" fill="none"/>
+  
+  <!-- Turmeric/Ginger piece -->
+  <ellipse cx="180" cy="320" rx="15" ry="10" fill="#FFD700" stroke="#FFA500" stroke-width="1"/>
+  
+  <!-- Spice Seeds -->
+  <circle cx="190" cy="305" r="3" fill="#8B4513"/>
+  <circle cx="210" cy="315" r="3" fill="#654321"/>
+  <circle cx="230" cy="305" r="3" fill="#A0522D"/>
+  
+  <!-- Leaves -->
+  <ellipse cx="140" cy="290" rx="8" ry="15" fill="#228B22" transform="rotate(-20 140 290)"/>
+  <ellipse cx="250" cy="285" rx="6" ry="12" fill="#32CD32" transform="rotate(30 250 285)"/>
+  
+  <!-- Star Anise -->
+  <g transform="translate(200,270)">
+    <path d="M0,-8 L2,-2 L8,-2 L3,1 L5,7 L0,4 L-5,7 L-3,1 L-8,-2 L-2,-2 Z" fill="#8B4513"/>
+  </g>
+</svg>
