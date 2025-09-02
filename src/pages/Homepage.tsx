@@ -269,7 +269,7 @@ const Homepage = () => {
               <Card key={index} className="group border-0 bg-gradient-to-br from-white to-gray-50/50 shadow-card hover:shadow-elegant transition-all duration-300 hover:-translate-y-2">
                 <CardContent className="p-8 text-center">
                   <div className={`w-20 h-20 ${benefit.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-elegant group-hover:shadow-glow transition-all duration-300 group-hover:scale-110`}>
-                    <benefit.icon className="h-10 w-10 text-white" />
+                    <benefit.icon className="h-10 w-10 text-white drop-shadow-sm" />
                   </div>
                   <h3 className="text-xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">
                     {benefit.title}

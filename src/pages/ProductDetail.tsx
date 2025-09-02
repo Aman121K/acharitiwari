@@ -7,11 +7,13 @@ import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { getProductById } from '@/data/products';
+import { useGlobalToast } from '@/contexts/ToastContext';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { dispatch } = useCart();
   const { toast } = useToast();
+  const { showToast } = useGlobalToast();
   const [quantity, setQuantity] = useState(1);
 
   const product = id ? getProductById(id) : null;
@@ -33,10 +35,7 @@ const ProductDetail = () => {
     for (let i = 0; i < quantity; i++) {
       dispatch({ type: 'ADD_TO_CART', product });
     }
-    toast({
-      title: "Added to Cart",
-      description: `${quantity} ${product.name}(s) added to your cart.`,
-    });
+    showToast(product, quantity);
   };
 
   return (

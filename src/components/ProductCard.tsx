@@ -6,6 +6,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCart, Product } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
+import { useGlobalToast } from '@/contexts/ToastContext';
 
 interface ProductCardProps {
   product: Product;
@@ -14,15 +15,13 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { dispatch } = useCart();
   const { toast } = useToast();
+  const { showToast } = useGlobalToast();
   const [isLiked, setIsLiked] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleAddToCart = () => {
     dispatch({ type: 'ADD_TO_CART', product });
-    toast({
-      title: "Added to Cart",
-      description: `${product.name} has been added to your cart.`,
-    });
+    showToast(product, 1);
   };
 
   const handleLike = () => {

@@ -475,3 +475,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Toast progress bar animation */
+  @keyframes progress {
+    from {
+      width: 100%;
+    }
+    to {
+      width: 0%;
+    }
+  }
+  
+  .animate-progress {
+    animation: progress 4s linear;
+  }
+}
