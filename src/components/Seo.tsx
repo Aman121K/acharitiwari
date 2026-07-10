@@ -1,0 +1,123 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { blogPosts } from "@/data/blogData";
+import { getProductById } from "@/data/products";
+import socialImage from "@/assets/spice-market-hero.jpg";
+
+const SITE_NAME = "AachariTiwari";
+const SITE_URL = (import.meta.env.VITE_SITE_URL || "https://www.aacharitiwari.com").replace(/\/$/, "");
+const DEFAULT_IMAGE = new URL(socialImage, `${SITE_URL}/`).href;
+
+const pages: Record<string, { title: string; description: string; noindex?: boolean }> = {
+  "/": {
+    title: "Authentic Indian Pickles & Aachar Online | AachariTiwari",
+    description: "Shop 17+ varieties of authentic Indian aachar, including mango, lime, garlic and chilli pickles, made with traditional recipes and delivered across India.",
+  },
+  "/products": {
+    title: "Buy Indian Pickles Online | AachariTiwari",
+    description: "Explore traditional Indian pickles made with quality ingredients, aromatic spices and time-honoured recipes. Order aachar online across India.",
+  },
+  "/blog": {
+    title: "Aachar Recipes, Stories & Food Guides | AachariTiwari",
+    description: "Read traditional pickle recipes, Indian food stories, preservation tips and guides to enjoying authentic homemade aachar.",
+  },
+  "/about": {
+    title: "About AachariTiwari | Traditional Indian Aachar",
+    description: "Learn how AachariTiwari preserves regional Indian pickle-making traditions through authentic recipes, quality ingredients and careful preparation.",
+  },
+  "/contact": {
+    title: "Contact AachariTiwari",
+    description: "Contact AachariTiwari for product questions, order support, delivery information or feedback about our authentic Indian pickles.",
+  },
+  "/privacy-policy": { title: "Privacy Policy | AachariTiwari", description: "Read the AachariTiwari privacy policy and learn how we collect, use and protect your personal information." },
+  "/terms-of-service": { title: "Terms of Service | AachariTiwari", description: "Read the terms that apply when using the AachariTiwari website and purchasing our products." },
+  "/shipping-policy": { title: "Shipping Policy | AachariTiwari", description: "Learn about AachariTiwari order processing, shipping coverage, delivery estimates and packaging." },
+  "/refund-policy": { title: "Refund Policy | AachariTiwari", description: "Review the AachariTiwari refund and replacement policy for damaged, incorrect or quality-affected orders." },
+  "/cart": { title: "Shopping Cart | AachariTiwari", description: "Review the authentic Indian pickles in your AachariTiwari shopping cart.", noindex: true },
+  "/checkout": { title: "Secure Checkout | AachariTiwari", description: "Complete your AachariTiwari order securely.", noindex: true },
+  "/search": { title: "Search | AachariTiwari", description: "Search AachariTiwari products and articles.", noindex: true },
+};
+
+function setMeta(selector: string, attributes: Record<string, string>) {
+  let element = document.head.querySelector<HTMLMetaElement>(selector);
+  if (!element) {
+    element = document.createElement("meta");
+    document.head.appendChild(element);
+  }
+  Object.entries(attributes).forEach(([name, value]) => element!.setAttribute(name, value));
+}
+
+export default function Seo() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const productMatch = pathname.match(/^\/product\/([^/]+)$/);
+    const articleMatch = pathname.match(/^\/blog\/([^/]+)$/);
+    const product = productMatch ? getProductById(productMatch[1]) : undefined;
+    const article = articleMatch ? blogPosts.find((post) => post.id === articleMatch[1]) : undefined;
+    const staticPage = pages[pathname];
+    const title = product
+      ? `${product.name} – Buy Online | ${SITE_NAME}`
+      : article
+        ? `${article.title} | ${SITE_NAME}`
+        : staticPage?.title || `Page Not Found | ${SITE_NAME}`;
+    const description = product?.description || article?.excerpt || staticPage?.description || "The requested page could not be found.";
+    const image = product?.image || article?.image || DEFAULT_IMAGE;
+    const canonical = `${SITE_URL}${pathname === "/" ? "/" : pathname}`;
+    const noindex = staticPage?.noindex || (!staticPage && !product && !article);
+    const type = product ? "product" : article ? "article" : "website";
+
+    document.title = title;
+    setMeta('meta[name="description"]', { name: "description", content: description });
+    setMeta('meta[name="robots"]', { name: "robots", content: noindex ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" });
+    setMeta('meta[property="og:title"]', { property: "og:title", content: title });
+    setMeta('meta[property="og:description"]', { property: "og:description", content: description });
+    setMeta('meta[property="og:type"]', { property: "og:type", content: type });
+    setMeta('meta[property="og:url"]', { property: "og:url", content: canonical });
+    setMeta('meta[property="og:image"]', { property: "og:image", content: image });
+    setMeta('meta[name="twitter:title"]', { name: "twitter:title", content: title });
+    setMeta('meta[name="twitter:description"]', { name: "twitter:description", content: description });
+    setMeta('meta[name="twitter:image"]', { name: "twitter:image", content: image });
+
+    let canonicalLink = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonicalLink) {
+      canonicalLink = document.createElement("link");
+      canonicalLink.rel = "canonical";
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.href = canonical;
+
+    document.getElementById("route-structured-data")?.remove();
+    if (product || article) {
+      const schema = product
+        ? {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: product.name,
+            image: [image],
+            description: product.description,
+            sku: product.id,
+            brand: { "@type": "Brand", name: SITE_NAME },
+            offers: { "@type": "Offer", url: canonical, priceCurrency: "INR", price: product.price, availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" },
+          }
+        : {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: article!.title,
+            description: article!.excerpt,
+            image: [image],
+            datePublished: article!.date,
+            author: { "@type": "Person", name: article!.author },
+            publisher: { "@type": "Organization", name: SITE_NAME },
+            mainEntityOfPage: canonical,
+          };
+      const script = document.createElement("script");
+      script.id = "route-structured-data";
+      script.type = "application/ld+json";
+      script.text = JSON.stringify(schema);
+      document.head.appendChild(script);
+    }
+  }, [pathname]);
+
+  return null;
+}

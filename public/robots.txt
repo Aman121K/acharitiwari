@@ -12,3 +12,9 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Disallow: /cart
+Disallow: /checkout
+Disallow: /search
+
+Sitemap: https://www.aacharitiwari.com/sitemap.xml
