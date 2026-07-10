@@ -130,27 +130,35 @@ const Homepage = () => {
   const benefits = [
     {
       icon: Award,
+      step: "01",
       title: "Premium Quality",
       description: "Made with finest ingredients and traditional recipes for authentic taste.",
-      gradient: "bg-gradient-primary"
+      iconStyle: "bg-primary text-primary-foreground",
+      nodeStyle: "bg-primary"
     },
     {
       icon: Shield,
+      step: "02",
       title: "100% Natural",
       description: "No artificial preservatives or colors. Pure, traditional ingredients only.",
-      gradient: "bg-gradient-secondary"
+      iconStyle: "bg-secondary text-secondary-foreground",
+      nodeStyle: "bg-secondary"
     },
     {
       icon: Truck,
+      step: "03",
       title: "Fast Delivery",
       description: "Quick and secure delivery across India with proper packaging.",
-      gradient: "bg-gradient-accent"
+      iconStyle: "bg-accent text-accent-foreground",
+      nodeStyle: "bg-accent"
     },
     {
       icon: Clock,
+      step: "04",
       title: "Long Shelf Life",
       description: "Traditional preservation methods ensure freshness for months.",
-      gradient: "bg-gradient-spice"
+      iconStyle: "bg-red-800 text-white",
+      nodeStyle: "bg-red-800"
     }
   ];
 
@@ -253,39 +261,65 @@ const Homepage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+      <section className="relative overflow-hidden border-y border-border/60 bg-gradient-to-b from-background via-secondary/[0.06] to-primary/[0.04] py-12 md:py-14">
+        <div aria-hidden="true" className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-secondary/10 blur-3xl" />
+        <div aria-hidden="true" className="absolute -bottom-32 -left-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+        <div className="container relative mx-auto px-4">
+          <div className="mx-auto mb-9 max-w-3xl text-center md:mb-10">
+            <Badge className="mb-4 border-primary/20 bg-primary/10 text-primary hover:bg-primary/10">
+              Our quality promise
+            </Badge>
+            <h2 className="mb-4 text-3xl font-bold text-foreground sm:text-4xl md:text-5xl">
               Why Choose AachariTiwari?
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="mx-auto max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
               We're committed to bringing you the finest traditional Indian pickles with modern convenience and quality assurance.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {benefits.map((benefit, index) => (
-              <Card key={index} className="group border-0 bg-gradient-to-br from-white to-gray-50/50 shadow-card hover:shadow-elegant transition-all duration-300 hover:-translate-y-2">
-                <CardContent className="p-8 text-center">
-                  <div className={`w-20 h-20 ${benefit.gradient} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-elegant group-hover:shadow-glow transition-all duration-300 group-hover:scale-110`}>
-                    <benefit.icon className="h-10 w-10 text-white drop-shadow-sm" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">
-                    {benefit.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {benefit.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="relative overflow-hidden rounded-3xl border border-primary/15 bg-card/60 px-4 py-5 shadow-[0_18px_50px_-36px_hsl(var(--primary))] backdrop-blur-sm sm:px-6 md:px-3 md:py-7 lg:px-6">
+            <div aria-hidden="true" className="absolute bottom-12 left-[2.15rem] top-12 w-px bg-gradient-to-b from-primary via-secondary to-red-800 md:hidden" />
+            <div aria-hidden="true" className="absolute left-[12.5%] right-[12.5%] top-[3.35rem] hidden h-px bg-gradient-to-r from-primary via-secondary to-red-800 md:block" />
+            <div className="relative grid grid-cols-1 gap-1 md:grid-cols-4 md:gap-0">
+              {benefits.map((benefit, index) => (
+                <Card key={benefit.title} className="group h-full border-0 bg-transparent shadow-none">
+                  <CardContent className="relative flex h-full gap-4 px-2 py-4 text-left md:flex-col md:items-center md:gap-0 md:px-3 md:py-0 md:text-center lg:px-6">
+                    <div className="relative z-10 shrink-0 md:mb-5">
+                      <div className={`flex h-12 w-12 items-center justify-center rounded-xl ring-4 ring-card transition-transform duration-300 group-hover:-translate-y-0.5 motion-reduce:transform-none motion-reduce:transition-none ${benefit.iconStyle}`}>
+                        <benefit.icon aria-hidden="true" strokeWidth={2.25} className="h-6 w-6" />
+                      </div>
+                      <span aria-hidden="true" className={`absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-card ${benefit.nodeStyle}`} />
+                    </div>
+                    <div className="min-w-0 pt-0.5 md:pt-0">
+                      <span className="mb-1.5 block font-mono text-[10px] font-bold tracking-[0.2em] text-muted-foreground/70 md:mb-2">
+                        PROMISE {benefit.step}
+                      </span>
+                      <h3 className="mb-1.5 text-base font-bold text-foreground transition-colors group-hover:text-primary lg:text-lg">
+                        {benefit.title}
+                      </h3>
+                      <p className="text-sm leading-relaxed text-muted-foreground md:text-xs lg:text-sm">
+                        {benefit.description}
+                      </p>
+                    </div>
+                    {index < benefits.length - 1 && (
+                      <span aria-hidden="true" className="absolute bottom-2 right-0 top-2 hidden w-px bg-border/70 md:block" />
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-center justify-center gap-3 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground md:mt-7 md:text-xs">
+            <span className="h-px w-8 bg-primary/30" />
+            From our kitchen to your table
+            <span className="h-px w-8 bg-primary/30" />
           </div>
         </div>
       </section>
 
       {/* Enhanced Testimonials Section - Horizontal Scrollable */}
-      <section className="py-20 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5">
+      <section className="bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 py-14 md:py-16 lg:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-secondary/10 text-secondary border-secondary/20">
