@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -27,20 +27,15 @@ const CheckoutPage = () => {
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleNext = () => {
-    setStep(step + 1);
-  };
+  const handleNext = () => setStep(step + 1);
 
   const handlePlaceOrder = () => {
     toast({
-      title: "Order Placed Successfully!",
-      description: "Thank you for your order. You will receive a confirmation email shortly.",
+      title: 'Order placed successfully!',
+      description: 'Thank you for your order. We will send a confirmation email shortly.',
     });
     dispatch({ type: 'CLEAR_CART' });
     setStep(4);
@@ -50,337 +45,236 @@ const CheckoutPage = () => {
 
   if (state.items.length === 0 && step < 4) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">No Items in Cart</h1>
-          <Link to="/products">
-            <Button variant="default">Continue Shopping</Button>
-          </Link>
+      <div className="flex min-h-screen items-center justify-center px-4 py-16">
+        <div className="section-shell max-w-md text-center">
+          <h1 className="mb-3 text-2xl font-semibold text-foreground">Your cart is empty</h1>
+          <p className="mb-6 text-muted-foreground">Add some premium pickles to your cart before checking out.</p>
+          <Button asChild>
+            <Link to="/products">Continue shopping</Link>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* Back Button */}
+    <div className="min-h-screen px-4 py-8 sm:py-10">
+      <div className="container mx-auto max-w-6xl">
         <div className="mb-6">
-          <Link to="/cart" className="inline-flex items-center text-muted-foreground hover:text-primary transition-smooth">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Cart
+          <Link to="/cart" className="inline-flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to cart
           </Link>
         </div>
 
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-8 overflow-hidden rounded-3xl border border-border/70 bg-white/80 p-4 shadow-card sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             {[
               { num: 1, title: 'Delivery' },
               { num: 2, title: 'Payment' },
               { num: 3, title: 'Review' },
-              { num: 4, title: 'Confirmation' },
+              { num: 4, title: 'Done' },
             ].map((stepItem) => (
-              <div key={stepItem.num} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  step >= stepItem.num ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                }`}>
+              <div key={stepItem.num} className="flex items-center gap-3">
+                <div className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold ${step >= stepItem.num ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
                   {step > stepItem.num ? <CheckCircle className="h-4 w-4" /> : stepItem.num}
                 </div>
-                <span className="ml-2 text-sm font-medium">{stepItem.title}</span>
-                {stepItem.num < 4 && <div className="w-16 h-px bg-border ml-4" />}
+                <span className="text-sm font-medium text-foreground">{stepItem.title}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Step 1: Delivery Information */}
         {step === 1 && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Truck className="h-5 w-5 mr-2" />
-                    Delivery Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        placeholder="First name"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        placeholder="Last name"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="address">Address</Label>
-                    <Input
-                      id="address"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      placeholder="Street address"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="city">City</Label>
-                      <Input
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        placeholder="City"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="state">State</Label>
-                      <Input
-                        id="state"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleInputChange}
-                        placeholder="State"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="pincode">Pincode</Label>
-                      <Input
-                        id="pincode"
-                        name="pincode"
-                        value={formData.pincode}
-                        onChange={handleInputChange}
-                        placeholder="Pincode"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      placeholder="Phone number"
-                    />
-                  </div>
-
-                  <Button onClick={handleNext} className="w-full" size="lg">
-                    Continue to Payment
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Order Summary */}
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {state.items.map((item) => (
-                      <div key={item.id} className="flex justify-between text-sm">
-                        <span>{item.name} x {item.quantity}</span>
-                        <span>₹{item.price * item.quantity}</span>
-                      </div>
-                    ))}
-                    <Separator />
-                    <div className="flex justify-between font-semibold">
-                      <span>Total</span>
-                      <span>₹{total}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Payment */}
-        {step === 2 && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <CreditCard className="h-5 w-5 mr-2" />
-                    Payment Method
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <RadioGroup value={formData.paymentMethod} onValueChange={(value) => setFormData({...formData, paymentMethod: value})}>
-                    <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                      <RadioGroupItem value="card" id="card" />
-                      <Label htmlFor="card" className="flex-1">Credit/Debit Card</Label>
-                      <CreditCard className="h-4 w-4" />
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                      <RadioGroupItem value="upi" id="upi" />
-                      <Label htmlFor="upi" className="flex-1">UPI Payment</Label>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                      <RadioGroupItem value="cod" id="cod" />
-                      <Label htmlFor="cod" className="flex-1">Cash on Delivery</Label>
-                    </div>
-                  </RadioGroup>
-
-                  <div className="mt-6 space-y-2">
-                    <Button onClick={handleNext} className="w-full" size="lg">
-                      Continue to Review
-                    </Button>
-                    <Button onClick={() => setStep(1)} variant="outline" className="w-full">
-                      Back to Delivery
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span>Subtotal</span>
-                      <span>₹{state.total}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Tax</span>
-                      <span>₹{Math.round(state.total * 0.05)}</span>
-                    </div>
-                    <Separator />
-                    <div className="flex justify-between font-semibold text-lg">
-                      <span>Total</span>
-                      <span>₹{total}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Review Order */}
-        {step === 3 && (
-          <div>
-            <Card>
+          <div className="grid gap-8 lg:grid-cols-[1.45fr_0.8fr]">
+            <Card className="border-border/70 bg-white/90 shadow-card">
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Shield className="h-5 w-5 mr-2" />
-                  Review Your Order
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Truck className="h-5 w-5 text-primary" /> Delivery details
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4">
                 <div>
-                  <h3 className="font-semibold mb-2">Delivery Address</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {formData.firstName} {formData.lastName}<br />
-                    {formData.address}<br />
-                    {formData.city}, {formData.state} {formData.pincode}<br />
-                    {formData.phone}
-                  </p>
+                  <Label htmlFor="email">Email address</Label>
+                  <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="your@email.com" />
                 </div>
-
-                <div>
-                  <h3 className="font-semibold mb-2">Payment Method</h3>
-                  <p className="text-sm text-muted-foreground capitalize">
-                    {formData.paymentMethod === 'card' ? 'Credit/Debit Card' : 
-                     formData.paymentMethod === 'upi' ? 'UPI Payment' : 'Cash on Delivery'}
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold mb-2">Order Items</h3>
-                  <div className="space-y-2">
-                    {state.items.map((item) => (
-                      <div key={item.id} className="flex justify-between text-sm">
-                        <span>{item.name} x {item.quantity}</span>
-                        <span>₹{item.price * item.quantity}</span>
-                      </div>
-                    ))}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label htmlFor="firstName">First name</Label>
+                    <Input id="firstName" name="firstName" value={formData.firstName} onChange={handleInputChange} placeholder="First name" />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName">Last name</Label>
+                    <Input id="lastName" name="lastName" value={formData.lastName} onChange={handleInputChange} placeholder="Last name" />
                   </div>
                 </div>
+                <div>
+                  <Label htmlFor="address">Street address</Label>
+                  <Input id="address" name="address" value={formData.address} onChange={handleInputChange} placeholder="House no., street, locality" />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div>
+                    <Label htmlFor="city">City</Label>
+                    <Input id="city" name="city" value={formData.city} onChange={handleInputChange} placeholder="City" />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">State</Label>
+                    <Input id="state" name="state" value={formData.state} onChange={handleInputChange} placeholder="State" />
+                  </div>
+                  <div>
+                    <Label htmlFor="pincode">Pincode</Label>
+                    <Input id="pincode" name="pincode" value={formData.pincode} onChange={handleInputChange} placeholder="Pincode" />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="phone">Phone number</Label>
+                  <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleInputChange} placeholder="Phone number" />
+                </div>
+                <Button onClick={handleNext} size="lg" className="w-full">
+                  Continue to payment
+                </Button>
+              </CardContent>
+            </Card>
 
+            <Card className="border-border/70 bg-gradient-to-br from-primary/5 to-secondary/5 shadow-card">
+              <CardHeader>
+                <CardTitle>Order summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {state.items.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between text-sm">
+                    <span>{item.name} × {item.quantity}</span>
+                    <span className="font-medium text-foreground">₹{item.price * item.quantity}</span>
+                  </div>
+                ))}
                 <Separator />
-
-                <div className="flex justify-between text-lg font-semibold">
-                  <span>Total Amount</span>
+                <div className="flex items-center justify-between font-semibold text-foreground">
+                  <span>Total</span>
                   <span>₹{total}</span>
                 </div>
-
-                <div className="space-y-2">
-                  <Button onClick={handlePlaceOrder} variant="spice" size="lg" className="w-full">
-                    Place Order
-                  </Button>
-                  <Button onClick={() => setStep(2)} variant="outline" className="w-full">
-                    Back to Payment
-                  </Button>
+                <div className="rounded-2xl border border-primary/15 bg-white/70 p-4 text-sm text-muted-foreground">
+                  <div className="mb-2 flex items-center gap-2 font-medium text-foreground"><Sparkles className="h-4 w-4 text-accent" /> Fast delivery promise</div>
+                  Your order ships within 24 hours and arrives in 2–5 business days.
                 </div>
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* Step 4: Confirmation */}
-        {step === 4 && (
-          <div className="text-center">
-            <Card className="max-w-md mx-auto">
-              <CardContent className="p-8">
-                <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold mb-2">Order Confirmed!</h2>
-                <p className="text-muted-foreground mb-6">
-                  Your order has been placed successfully. You will receive an email confirmation shortly.
-                </p>
-                <div className="space-y-2">
-                  <Button variant="spice" size="lg" className="w-full" asChild>
-                    <Link to="/products">Continue Shopping</Link>
-                  </Button>
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link to="/">Back to Home</Link>
-                  </Button>
+        {step === 2 && (
+          <div className="grid gap-8 lg:grid-cols-[1.45fr_0.8fr]">
+            <Card className="border-border/70 bg-white/90 shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <CreditCard className="h-5 w-5 text-primary" /> Payment method
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <RadioGroup value={formData.paymentMethod} onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })} className="space-y-3">
+                  <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
+                    <RadioGroupItem value="card" id="card" />
+                    <Label htmlFor="card" className="flex-1">Credit / Debit card</Label>
+                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
+                    <RadioGroupItem value="upi" id="upi" />
+                    <Label htmlFor="upi" className="flex-1">UPI</Label>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
+                    <RadioGroupItem value="cod" id="cod" />
+                    <Label htmlFor="cod" className="flex-1">Cash on delivery</Label>
+                  </div>
+                </RadioGroup>
+                <div className="mt-6 space-y-3">
+                  <Button onClick={handleNext} size="lg" className="w-full">Review order</Button>
+                  <Button onClick={() => setStep(1)} variant="outline" size="lg" className="w-full">Back</Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/70 bg-white/90 shadow-card">
+              <CardHeader>
+                <CardTitle>Payment summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Subtotal</span>
+                  <span className="font-medium text-foreground">₹{state.total}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Estimated tax</span>
+                  <span className="font-medium text-foreground">₹{Math.round(state.total * 0.05)}</span>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between text-lg font-semibold text-foreground">
+                  <span>Total</span>
+                  <span>₹{total}</span>
                 </div>
               </CardContent>
             </Card>
           </div>
+        )}
+
+        {step === 3 && (
+          <Card className="border-border/70 bg-white/90 shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-primary" /> Review your order
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="rounded-2xl border border-border/70 bg-muted/40 p-4">
+                <h3 className="mb-2 font-semibold text-foreground">Delivery address</h3>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {formData.firstName} {formData.lastName}<br />
+                  {formData.address}<br />
+                  {formData.city}, {formData.state} {formData.pincode}<br />
+                  {formData.phone}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-border/70 bg-muted/40 p-4">
+                <h3 className="mb-2 font-semibold text-foreground">Payment method</h3>
+                <p className="text-sm text-muted-foreground">{formData.paymentMethod === 'card' ? 'Credit / Debit card' : formData.paymentMethod === 'upi' ? 'UPI' : 'Cash on delivery'}</p>
+              </div>
+              <div className="rounded-2xl border border-border/70 bg-muted/40 p-4">
+                <h3 className="mb-2 font-semibold text-foreground">Items</h3>
+                {state.items.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between py-1 text-sm text-muted-foreground">
+                    <span>{item.name} × {item.quantity}</span>
+                    <span className="font-medium text-foreground">₹{item.price * item.quantity}</span>
+                  </div>
+                ))}
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between text-lg font-semibold text-foreground">
+                <span>Total</span>
+                <span>₹{total}</span>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button onClick={handlePlaceOrder} size="lg" className="flex-1">Place order</Button>
+                <Button onClick={() => setStep(2)} variant="outline" size="lg" className="flex-1">Back</Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {step === 4 && (
+          <Card className="border-border/70 bg-white/90 shadow-card">
+            <CardContent className="px-6 py-12 text-center">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                <CheckCircle className="h-8 w-8" />
+              </div>
+              <h2 className="mb-3 text-3xl font-semibold text-foreground">Order confirmed</h2>
+              <p className="mx-auto mb-8 max-w-xl text-muted-foreground">Your order is on its way. A confirmation email with tracking details will arrive shortly.</p>
+              <div className="flex flex-col justify-center gap-3 sm:flex-row">
+                <Button asChild>
+                  <Link to="/products">Continue shopping</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link to="/">Go home</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

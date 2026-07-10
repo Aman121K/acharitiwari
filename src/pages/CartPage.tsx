@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, Shield, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -19,17 +19,17 @@ const CartPage = () => {
 
   if (state.items.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-          <h1 className="text-2xl font-bold text-foreground mb-4">Your Cart is Empty</h1>
-          <p className="text-muted-foreground mb-8">
-            Looks like you haven't added any items to your cart yet.
-          </p>
-          <Button variant="spice" size="lg" asChild>
+      <div className="flex min-h-screen items-center justify-center px-4 py-16">
+        <div className="section-shell max-w-xl text-center">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <ShoppingBag className="h-8 w-8" />
+          </div>
+          <h1 className="mb-3 text-3xl font-semibold text-foreground">Your cart feels a little empty</h1>
+          <p className="mb-8 text-muted-foreground">Add a few jars of your favorite pickles and we’ll get your order ready in no time.</p>
+          <Button asChild variant="spice" size="lg">
             <Link to="/products">
-              Continue Shopping
-              <ArrowRight className="h-5 w-5 ml-2" />
+              Continue shopping
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
         </div>
@@ -38,60 +38,52 @@ const CartPage = () => {
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-foreground mb-8">Shopping Cart</h1>
+    <div className="min-h-screen px-4 py-8 sm:py-10">
+      <div className="container mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-col gap-2">
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-primary">Shopping bag</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Your curated order</h1>
+          <p className="text-muted-foreground">Great taste, secure delivery, and premium packaging.</p>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
+        <div className="grid gap-8 lg:grid-cols-[1.6fr_0.9fr]">
+          <div className="space-y-4">
             {state.items.map((item) => (
-              <Card key={item.id} className="p-4">
-                <CardContent className="p-0">
-                  <div className="flex items-center space-x-4">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
-                    
+              <Card key={item.id} className="overflow-hidden border-border/70 bg-white/85 shadow-card">
+                <CardContent className="p-4 sm:p-5">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <img src={item.image} alt={item.name} className="h-24 w-full rounded-2xl object-cover sm:h-24 sm:w-24" />
+
                     <div className="flex-1 space-y-2">
-                      <h3 className="font-semibold text-lg">{item.name}</h3>
-                      <p className="text-sm text-muted-foreground">{item.category}</p>
-                      <p className="text-lg font-bold text-primary">₹{item.price}</p>
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="text-lg font-semibold text-foreground">{item.name}</h3>
+                          <p className="text-sm text-muted-foreground">{item.category}</p>
+                        </div>
+                        <div className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">₹{item.price}</div>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Sparkles className="h-4 w-4 text-accent" />
+                        {item.weight} • {item.shelfLife}
+                      </div>
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        disabled={item.quantity <= 1}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      
-                      <span className="w-12 text-center font-medium">{item.quantity}</span>
-                      
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    <div className="text-right">
-                      <p className="font-semibold text-lg">₹{item.price * item.quantity}</p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
+                      <div className="flex items-center rounded-full border border-border bg-background p-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="min-w-8 text-center text-sm font-semibold">{item.quantity}</span>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-semibold text-foreground">₹{item.price * item.quantity}</p>
+                        <Button variant="ghost" size="sm" onClick={() => removeFromCart(item.id)} className="text-destructive hover:text-destructive">
+                          <Trash2 className="mr-1 h-4 w-4" /> Remove
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -99,58 +91,52 @@ const CartPage = () => {
             ))}
           </div>
 
-          {/* Order Summary */}
-          <div className="space-y-6">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-              
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span>Subtotal ({state.itemCount} items)</span>
-                  <span>₹{state.total}</span>
+          <div className="space-y-4">
+            <Card className="border-border/70 bg-white/90 shadow-card">
+              <CardContent className="p-6">
+                <h2 className="mb-5 text-xl font-semibold text-foreground">Order summary</h2>
+                <div className="space-y-3 text-sm text-muted-foreground">
+                  <div className="flex justify-between">
+                    <span>Subtotal ({state.itemCount} items)</span>
+                    <span className="font-medium text-foreground">₹{state.total}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Shipping</span>
+                    <span className="font-medium text-emerald-600">Free</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Estimated tax</span>
+                    <span className="font-medium text-foreground">₹{Math.round(state.total * 0.05)}</span>
+                  </div>
                 </div>
-                
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span className="text-green-600">Free</span>
-                </div>
-                
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Tax</span>
-                  <span>₹{Math.round(state.total * 0.05)}</span>
-                </div>
-                
-                <Separator />
-                
-                <div className="flex justify-between text-lg font-bold">
+                <Separator className="my-5" />
+                <div className="flex items-center justify-between text-lg font-semibold text-foreground">
                   <span>Total</span>
                   <span>₹{state.total + Math.round(state.total * 0.05)}</span>
                 </div>
-              </div>
-
-              <div className="mt-6 space-y-3">
-                <Button variant="spice" size="lg" className="w-full" asChild>
-                  <Link to="/checkout">
-                    Proceed to Checkout
-                    <ArrowRight className="h-5 w-5 ml-2" />
-                  </Link>
-                </Button>
-                
-                <Button variant="outline" size="lg" className="w-full" asChild>
-                  <Link to="/products">Continue Shopping</Link>
-                </Button>
-              </div>
+                <div className="mt-6 space-y-3">
+                  <Button asChild variant="spice" size="lg" className="w-full">
+                    <Link to="/checkout">
+                      Proceed to checkout
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg" className="w-full">
+                    <Link to="/products">Continue shopping</Link>
+                  </Button>
+                </div>
+              </CardContent>
             </Card>
 
-            {/* Delivery Info */}
-            <Card className="p-6 bg-muted/50">
-              <h3 className="font-semibold mb-3">Delivery Information</h3>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p>🚛 Free delivery on orders above ₹500</p>
-                <p>📦 Secure packaging guaranteed</p>
-                <p>⏱️ Delivery in 2-5 business days</p>
-                <p>🔄 Easy returns within 7 days</p>
-              </div>
+            <Card className="border-border/70 bg-gradient-to-br from-primary/5 to-secondary/5 shadow-card">
+              <CardContent className="p-6">
+                <h3 className="mb-4 font-semibold text-foreground">Why shoppers love us</h3>
+                <div className="space-y-3 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-3"><Truck className="h-4 w-4 text-primary" /> Fast delivery across India</div>
+                  <div className="flex items-center gap-3"><Shield className="h-4 w-4 text-primary" /> Secure and sealed packaging</div>
+                  <div className="flex items-center gap-3"><Sparkles className="h-4 w-4 text-primary" /> Freshly prepared with authentic spice blends</div>
+                </div>
+              </CardContent>
             </Card>
           </div>
         </div>

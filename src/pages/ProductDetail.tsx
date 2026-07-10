@@ -15,6 +15,7 @@ const ProductDetail = () => {
   const { toast } = useToast();
   const { showToast } = useGlobalToast();
   const [quantity, setQuantity] = useState(1);
+  const [isLiked, setIsLiked] = useState(false);
 
   const product = id ? getProductById(id) : null;
 
@@ -36,6 +37,43 @@ const ProductDetail = () => {
       dispatch({ type: 'ADD_TO_CART', product });
     }
     showToast(product, quantity);
+  };
+
+  const handleLike = () => {
+    setIsLiked(!isLiked);
+    toast({
+      title: isLiked ? 'Removed from Wishlist' : 'Added to Wishlist',
+      description: isLiked ? `${product.name} removed from your wishlist.` : `${product.name} added to your wishlist.`,
+    });
+  };
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/product/${product.id}`;
+    const shareData = {
+      title: product.name,
+      text: product.description,
+      url: shareUrl,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        toast({
+          title: 'Link Copied',
+          description: 'Product link copied to clipboard!',
+        });
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name !== 'AbortError') {
+        toast({
+          title: 'Error',
+          description: 'Failed to share. Please try again.',
+        });
+      }
+    }
   };
 
   return (
@@ -143,19 +181,27 @@ const ProductDetail = () => {
 
               <div className="flex space-x-4">
                 <Button
-                  variant="cart"
-                  size="lg"
-                  className="flex-1"
                   onClick={handleAddToCart}
                   disabled={!product.inStock}
+                  className="flex-1 bg-gradient-primary text-white shadow-lg hover:shadow-glow text-base py-6 font-semibold"
                 >
                   <ShoppingCart className="h-5 w-5 mr-2" />
                   Add to Cart
                 </Button>
-                <Button variant="outline" size="lg">
-                  <Heart className="h-5 w-5" />
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="border-2"
+                  onClick={handleLike}
+                >
+                  <Heart className={`h-5 w-5 ${isLiked ? 'fill-current text-red-500' : ''}`} />
                 </Button>
-                <Button variant="outline" size="lg">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="border-2"
+                  onClick={handleShare}
+                >
                   <Share2 className="h-5 w-5" />
                 </Button>
               </div>
