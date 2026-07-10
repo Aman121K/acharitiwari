@@ -14,34 +14,74 @@ const CheckoutPage = () => {
   const { state, dispatch } = useCart();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [orderNumber, setOrderNumber] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
     lastName: '',
     address: '',
+    address2: '',
     city: '',
     state: '',
     pincode: '',
     phone: '',
-    paymentMethod: 'card',
+    paymentMethod: 'cod',
+    notes: '',
+    marketingAccepted: false,
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    setFormData({ ...formData, [e.target.name]: value });
+    setError('');
   };
 
-  const handleNext = () => setStep(step + 1);
-
-  const handlePlaceOrder = () => {
-    toast({
-      title: 'Order placed successfully!',
-      description: 'Thank you for your order. We will send a confirmation email shortly.',
-    });
-    dispatch({ type: 'CLEAR_CART' });
-    setStep(4);
+  const handleNext = () => {
+    if (step === 1) {
+      if (!/^\S+@\S+\.\S+$/.test(formData.email)) return setError('Enter a valid email address.');
+      if (!formData.firstName.trim() || !formData.lastName.trim()) return setError('Enter your full name.');
+      if (!formData.address.trim() || !formData.city.trim() || !formData.state.trim()) return setError('Enter your complete delivery address.');
+      if (!/^\d{6}$/.test(formData.pincode)) return setError('Enter a valid 6-digit Indian pincode.');
+      if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/\D/g, '').slice(-10))) return setError('Enter a valid 10-digit mobile number.');
+    }
+    setError('');
+    setStep(step + 1);
   };
 
-  const total = state.total + Math.round(state.total * 0.05);
+  const handlePlaceOrder = async () => {
+    setSubmitting(true);
+    setError('');
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${apiUrl}/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer: { name: `${formData.firstName} ${formData.lastName}`.trim(), email: formData.email, phone: formData.phone },
+          shippingAddress: { street: formData.address, line2: formData.address2, city: formData.city, state: formData.state, zipCode: formData.pincode, country: 'India' },
+          items: state.items.map((item) => ({ productId: item.id, name: item.name, price: item.price, quantity: item.quantity, image: item.image })),
+          paymentMethod: formData.paymentMethod === 'upi' ? 'upi' : 'cash_on_delivery',
+          notes: formData.notes,
+          marketingAccepted: formData.marketingAccepted,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || result.message || 'Unable to place your order.');
+      setOrderNumber(result.order.orderNumber);
+      dispatch({ type: 'CLEAR_CART' });
+      setStep(4);
+      toast({ title: 'Order placed successfully!', description: `Order ${result.order.orderNumber} is confirmed.` });
+    } catch (orderError) {
+      setError(orderError instanceof Error ? orderError.message : 'Unable to place your order. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const shipping = state.total >= 699 ? 0 : 79;
+  const total = state.total + shipping;
 
   if (state.items.length === 0 && step < 4) {
     return (
@@ -95,7 +135,8 @@ const CheckoutPage = () => {
               <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="email">Email address</Label>
-                  <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="your@email.com" />
+                  <Input id="email" name="email" type="email" autoComplete="email" required value={formData.email} onChange={handleInputChange} placeholder="your@email.com" />
+                  <label className="mt-3 flex items-center gap-2 text-sm text-muted-foreground"><input name="marketingAccepted" type="checkbox" checked={formData.marketingAccepted} onChange={handleInputChange} /> Email me offers and new product updates</label>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
@@ -110,6 +151,10 @@ const CheckoutPage = () => {
                 <div>
                   <Label htmlFor="address">Street address</Label>
                   <Input id="address" name="address" value={formData.address} onChange={handleInputChange} placeholder="House no., street, locality" />
+                </div>
+                <div>
+                  <Label htmlFor="address2">Apartment, suite, etc. (optional)</Label>
+                  <Input id="address2" name="address2" value={formData.address2} onChange={handleInputChange} placeholder="Apartment, landmark or floor" />
                 </div>
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div>
@@ -129,6 +174,7 @@ const CheckoutPage = () => {
                   <Label htmlFor="phone">Phone number</Label>
                   <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleInputChange} placeholder="Phone number" />
                 </div>
+                {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
                 <Button onClick={handleNext} size="lg" className="w-full">
                   Continue to payment
                 </Button>
@@ -171,13 +217,8 @@ const CheckoutPage = () => {
               <CardContent>
                 <RadioGroup value={formData.paymentMethod} onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })} className="space-y-3">
                   <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card" className="flex-1">Credit / Debit card</Label>
-                    <CreditCard className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
                     <RadioGroupItem value="upi" id="upi" />
-                    <Label htmlFor="upi" className="flex-1">UPI</Label>
+                    <Label htmlFor="upi" className="flex-1">UPI (payment link after confirmation)</Label>
                   </div>
                   <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
                     <RadioGroupItem value="cod" id="cod" />
@@ -201,8 +242,8 @@ const CheckoutPage = () => {
                   <span className="font-medium text-foreground">₹{state.total}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>Estimated tax</span>
-                  <span className="font-medium text-foreground">₹{Math.round(state.total * 0.05)}</span>
+                  <span>Shipping</span>
+                  <span className="font-medium text-foreground">{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between text-lg font-semibold text-foreground">
@@ -233,7 +274,7 @@ const CheckoutPage = () => {
               </div>
               <div className="rounded-2xl border border-border/70 bg-muted/40 p-4">
                 <h3 className="mb-2 font-semibold text-foreground">Payment method</h3>
-                <p className="text-sm text-muted-foreground">{formData.paymentMethod === 'card' ? 'Credit / Debit card' : formData.paymentMethod === 'upi' ? 'UPI' : 'Cash on delivery'}</p>
+                <p className="text-sm text-muted-foreground">{formData.paymentMethod === 'upi' ? 'UPI' : 'Cash on delivery'}</p>
               </div>
               <div className="rounded-2xl border border-border/70 bg-muted/40 p-4">
                 <h3 className="mb-2 font-semibold text-foreground">Items</h3>
@@ -244,15 +285,20 @@ const CheckoutPage = () => {
                   </div>
                 ))}
               </div>
+              <div>
+                <Label htmlFor="notes">Order notes (optional)</Label>
+                <Input id="notes" name="notes" value={formData.notes} onChange={handleInputChange} placeholder="Delivery instructions or a gift note" />
+              </div>
               <Separator />
               <div className="flex items-center justify-between text-lg font-semibold text-foreground">
                 <span>Total</span>
                 <span>₹{total}</span>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Button onClick={handlePlaceOrder} size="lg" className="flex-1">Place order</Button>
+                <Button onClick={handlePlaceOrder} disabled={submitting} size="lg" className="flex-1">{submitting ? 'Placing order…' : `Place order · ₹${total}`}</Button>
                 <Button onClick={() => setStep(2)} variant="outline" size="lg" className="flex-1">Back</Button>
               </div>
+              {error && <p role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
             </CardContent>
           </Card>
         )}
@@ -264,7 +310,8 @@ const CheckoutPage = () => {
                 <CheckCircle className="h-8 w-8" />
               </div>
               <h2 className="mb-3 text-3xl font-semibold text-foreground">Order confirmed</h2>
-              <p className="mx-auto mb-8 max-w-xl text-muted-foreground">Your order is on its way. A confirmation email with tracking details will arrive shortly.</p>
+              <p className="mx-auto mb-3 max-w-xl text-muted-foreground">Thank you, {formData.firstName}. Your guest order has been received.</p>
+              <div className="mx-auto mb-8 inline-flex rounded-full bg-muted px-4 py-2 font-mono text-sm font-semibold text-foreground">Order {orderNumber}</div>
               <div className="flex flex-col justify-center gap-3 sm:flex-row">
                 <Button asChild>
                   <Link to="/products">Continue shopping</Link>

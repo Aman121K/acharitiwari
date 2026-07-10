@@ -1,231 +1,173 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, Heart, Share2, Star, Truck, Shield, Award } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import {
+  ArrowLeft, Award, Check, ChevronRight, Clock3, Heart, Leaf, Minus, PackageCheck,
+  Plus, Share2, ShieldCheck, ShoppingBag, Sparkles, Star, Truck, UtensilsCrossed,
+} from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
+import { useGlobalToast } from '@/contexts/ToastContext';
 import { useToast } from '@/hooks/use-toast';
 import { getProductById } from '@/data/products';
-import { useGlobalToast } from '@/contexts/ToastContext';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { dispatch } = useCart();
   const { toast } = useToast();
   const { showToast } = useGlobalToast();
   const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
-
+  const [pincode, setPincode] = useState('');
+  const [deliveryMessage, setDeliveryMessage] = useState('');
   const product = id ? getProductById(id) : null;
 
   if (!product) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Product Not Found</h1>
-          <Link to="/products">
-            <Button variant="default">Back to Products</Button>
-          </Link>
-        </div>
-      </div>
-    );
+    return <main className="min-h-[65vh] grid place-items-center px-4"><div className="text-center"><p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Nothing in this jar</p><h1 className="mt-3 text-3xl font-bold">Product not found</h1><Button asChild className="mt-6"><Link to="/products"><ArrowLeft className="mr-2 h-4 w-4" />Back to products</Link></Button></div></main>;
   }
 
-  const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      dispatch({ type: 'ADD_TO_CART', product });
-    }
-    showToast(product, quantity);
+  const mrp = Math.ceil((product.price * 1.18) / 10) * 10;
+  const savings = mrp - product.price;
+  const addSelectedQuantity = () => {
+    for (let i = 0; i < quantity; i += 1) dispatch({ type: 'ADD_TO_CART', product });
   };
-
+  const handleAddToCart = () => { addSelectedQuantity(); showToast(product, quantity); };
+  const handleBuyNow = () => { addSelectedQuantity(); navigate('/checkout'); };
   const handleLike = () => {
-    setIsLiked(!isLiked);
-    toast({
-      title: isLiked ? 'Removed from Wishlist' : 'Added to Wishlist',
-      description: isLiked ? `${product.name} removed from your wishlist.` : `${product.name} added to your wishlist.`,
-    });
+    setIsLiked((liked) => !liked);
+    toast({ title: isLiked ? 'Removed from wishlist' : 'Saved to wishlist', description: `${product.name} ${isLiked ? 'was removed.' : 'is saved for later.'}` });
   };
-
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/product/${product.id}`;
-    const shareData = {
-      title: product.name,
-      text: product.description,
-      url: shareUrl,
-    };
-
+    const url = `${window.location.origin}/product/${product.id}`;
     try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(shareUrl);
-        toast({
-          title: 'Link Copied',
-          description: 'Product link copied to clipboard!',
-        });
-      }
+      if (navigator.share) await navigator.share({ title: product.name, text: product.description, url });
+      else { await navigator.clipboard.writeText(url); toast({ title: 'Link copied', description: 'Share it with someone who loves a good achar.' }); }
     } catch (error) {
-      if (error instanceof Error && error.name !== 'AbortError') {
-        toast({
-          title: 'Error',
-          description: 'Failed to share. Please try again.',
-        });
-      }
+      if (error instanceof Error && error.name !== 'AbortError') toast({ title: 'Could not share', description: 'Please try again.' });
     }
   };
+  const checkDelivery = () => {
+    if (!/^\d{6}$/.test(pincode)) { setDeliveryMessage('Enter a valid 6-digit Indian pincode.'); return; }
+    setDeliveryMessage('Delivery available · Estimated in 2–5 business days');
+  };
+
+  const facts = [
+    { icon: PackageCheck, label: product.weight, note: 'Net weight' },
+    { icon: Clock3, label: product.shelfLife, note: 'Shelf life' },
+    { icon: Leaf, label: 'Natural', note: 'Traditional ingredients' },
+  ];
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto px-4">
-        {/* Breadcrumb */}
-        <div className="mb-6">
-          <Link to="/products" className="inline-flex items-center text-muted-foreground hover:text-primary transition-smooth">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Products
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Image */}
-          <div className="space-y-4">
-            <div className="aspect-square overflow-hidden rounded-lg bg-muted">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-
-          {/* Product Info */}
-          <div className="space-y-6">
-            <div>
-              <Badge className="mb-4">{product.category}</Badge>
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                {product.name}
-              </h1>
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                  ))}
-                  <span className="ml-2 text-sm text-muted-foreground">(128 reviews)</span>
-                </div>
-              </div>
-              <p className="text-2xl font-bold text-primary mb-6">₹{product.price}</p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Description</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {product.description}
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Product Details</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-medium text-foreground">Weight:</span>
-                  <span className="text-muted-foreground ml-2">{product.weight}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-foreground">Shelf Life:</span>
-                  <span className="text-muted-foreground ml-2">{product.shelfLife}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-foreground">Category:</span>
-                  <span className="text-muted-foreground ml-2">{product.category}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-foreground">Stock:</span>
-                  <span className={product.inStock ? "text-green-600" : "text-red-600"}>
-                    {product.inStock ? "In Stock" : "Out of Stock"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Ingredients</h3>
-              <div className="flex flex-wrap gap-2">
-                {product.ingredients.map((ingredient, index) => (
-                  <Badge key={index} variant="outline">{ingredient}</Badge>
-                ))}
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Add to Cart */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <label htmlFor="quantity" className="text-sm font-medium">
-                  Quantity:
-                </label>
-                <select
-                  id="quantity"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="px-3 py-2 border border-input rounded-md bg-background"
-                >
-                  {[...Array(10)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex space-x-4">
-                <Button
-                  onClick={handleAddToCart}
-                  disabled={!product.inStock}
-                  className="flex-1 bg-gradient-primary text-white shadow-lg hover:shadow-glow text-base py-6 font-semibold"
-                >
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  Add to Cart
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="border-2"
-                  onClick={handleLike}
-                >
-                  <Heart className={`h-5 w-5 ${isLiked ? 'fill-current text-red-500' : ''}`} />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="border-2"
-                  onClick={handleShare}
-                >
-                  <Share2 className="h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Features */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t">
-              <div className="text-center">
-                <Truck className="h-6 w-6 mx-auto mb-2 text-primary" />
-                <p className="text-xs text-muted-foreground">Fast Delivery</p>
-              </div>
-              <div className="text-center">
-                <Shield className="h-6 w-6 mx-auto mb-2 text-primary" />
-                <p className="text-xs text-muted-foreground">100% Natural</p>
-              </div>
-              <div className="text-center">
-                <Award className="h-6 w-6 mx-auto mb-2 text-primary" />
-                <p className="text-xs text-muted-foreground">Premium Quality</p>
-              </div>
-            </div>
-          </div>
-        </div>
+    <main className="bg-[#fcfaf5] pb-24 text-foreground md:pb-0">
+      <div className="border-b bg-background/80">
+        <nav aria-label="Breadcrumb" className="container mx-auto flex items-center gap-2 px-4 py-3 text-xs text-muted-foreground">
+          <Link to="/" className="hover:text-primary">Home</Link><ChevronRight className="h-3 w-3" /><Link to="/products" className="hover:text-primary">Pickles</Link><ChevronRight className="h-3 w-3" /><span className="truncate text-foreground">{product.name}</span>
+        </nav>
       </div>
-    </div>
+
+      <section className="container mx-auto px-4 py-7 lg:py-12">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(420px,.98fr)] lg:gap-14">
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <div className="relative overflow-hidden border border-[#e8dfd2] bg-[#f4eee3] shadow-[0_18px_60px_-38px_rgba(67,35,21,.45)]">
+              <img src={product.image} alt={`${product.name} jar`} className="aspect-square h-full w-full object-cover transition-transform duration-700 hover:scale-[1.025] motion-reduce:transition-none" />
+              <div className="absolute left-4 top-4 flex items-center gap-2 bg-[#fffaf0] px-3 py-2 text-xs font-bold text-primary shadow-sm"><Award className="h-4 w-4" /> Small-batch quality</div>
+            </div>
+            <button type="button" aria-label={`View ${product.name} image`} className="mt-3 h-20 w-20 overflow-hidden border-2 border-primary bg-muted p-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"><img src={product.image} alt="" className="h-full w-full object-cover" /></button>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-bold uppercase tracking-[.2em] text-primary">{product.category}</p>
+              <Badge variant="outline" className={product.inStock ? 'border-green-700/30 text-green-800' : 'border-destructive/30 text-destructive'}>{product.inStock ? 'In stock' : 'Out of stock'}</Badge>
+            </div>
+            <h1 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">{product.name}</h1>
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+              <div className="flex items-center gap-1 text-[#b86c00]" aria-label="Rated 4.8 out of 5"><Star className="h-4 w-4 fill-current" /><strong>4.8</strong></div>
+              <a href="#reviews" className="font-medium underline decoration-muted-foreground/40 underline-offset-4">128 verified reviews</a>
+              <span className="text-muted-foreground">Loved with dal, rice & paratha</span>
+            </div>
+            <p className="mt-6 text-lg leading-8 text-muted-foreground">{product.description}</p>
+
+            <div className="mt-6 flex flex-wrap items-end gap-3 border-y border-[#e8dfd2] py-5">
+              <span className="text-3xl font-bold text-primary">₹{product.price}</span>
+              <span className="pb-1 text-sm text-muted-foreground line-through">MRP ₹{mrp}</span>
+              <span className="mb-1 bg-[#f4e6c3] px-2 py-1 text-xs font-bold text-[#715008]">Save ₹{savings}</span>
+              <span className="w-full text-xs text-muted-foreground">Inclusive of all taxes</span>
+            </div>
+
+            <dl className="mt-6 grid grid-cols-3 divide-x border border-[#e8dfd2] bg-background">
+              {facts.map(({ icon: Icon, label, note }) => <div key={label} className="px-3 py-4 text-center"><Icon className="mx-auto h-5 w-5 text-primary" /><dt className="mt-2 text-sm font-bold">{label}</dt><dd className="mt-1 text-[11px] leading-tight text-muted-foreground">{note}</dd></div>)}
+            </dl>
+
+            <div className="mt-7">
+              <p className="mb-3 text-sm font-bold">Choose quantity</p>
+              <div className="flex h-11 w-36 items-center justify-between border border-input bg-background">
+                <button aria-label="Decrease quantity" type="button" disabled={quantity === 1} onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="grid h-full w-11 place-items-center hover:bg-muted disabled:opacity-30"><Minus className="h-4 w-4" /></button>
+                <span aria-live="polite" className="font-bold">{quantity}</span>
+                <button aria-label="Increase quantity" type="button" disabled={quantity === 10} onClick={() => setQuantity((q) => Math.min(10, q + 1))} className="grid h-full w-11 place-items-center hover:bg-muted disabled:opacity-30"><Plus className="h-4 w-4" /></button>
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-[1fr_1fr_auto_auto] gap-2">
+              <Button onClick={handleAddToCart} disabled={!product.inStock} size="lg" className="h-13 rounded-none text-base"><ShoppingBag className="mr-2 h-5 w-5" />Add to cart</Button>
+              <Button onClick={handleBuyNow} disabled={!product.inStock} size="lg" variant="outline" className="h-13 rounded-none border-primary text-base text-primary hover:bg-primary hover:text-primary-foreground">Buy now</Button>
+              <Button onClick={handleLike} variant="outline" size="icon" className="h-13 w-13 rounded-none" aria-label={isLiked ? 'Remove from wishlist' : 'Add to wishlist'}><Heart className={`h-5 w-5 ${isLiked ? 'fill-primary text-primary' : ''}`} /></Button>
+              <Button onClick={handleShare} variant="outline" size="icon" className="h-13 w-13 rounded-none" aria-label="Share product"><Share2 className="h-5 w-5" /></Button>
+            </div>
+
+            <div className="mt-7 border border-[#e8dfd2] bg-background p-5">
+              <div className="flex items-center gap-2 font-bold"><Truck className="h-5 w-5 text-primary" />Check delivery to your doorstep</div>
+              <div className="mt-3 flex"><input aria-label="Delivery pincode" inputMode="numeric" maxLength={6} value={pincode} onChange={(e) => { setPincode(e.target.value.replace(/\D/g, '')); setDeliveryMessage(''); }} placeholder="Enter 6-digit pincode" className="min-w-0 flex-1 border border-input bg-background px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring" /><Button onClick={checkDelivery} className="rounded-none">Check</Button></div>
+              {deliveryMessage && <p aria-live="polite" className={`mt-2 text-xs font-medium ${deliveryMessage.startsWith('Delivery') ? 'text-green-800' : 'text-destructive'}`}>{deliveryMessage}</p>}
+            </div>
+
+            <div className="mt-4 grid gap-3 bg-[#f6ead6] p-5 text-sm sm:grid-cols-2">
+              <p><strong>Free delivery</strong><br /><span className="text-muted-foreground">On orders above ₹699</span></p>
+              <p><strong>Easy payment</strong><br /><span className="text-muted-foreground">COD and UPI available</span></p>
+            </div>
+            <div className="mt-5 flex flex-wrap justify-between gap-3 border-t pt-5 text-xs font-semibold text-muted-foreground"><span className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" />Secure checkout</span><span className="flex items-center gap-1.5"><PackageCheck className="h-4 w-4 text-primary" />Careful packing</span><span className="flex items-center gap-1.5"><Sparkles className="h-4 w-4 text-primary" />Traditional recipe</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-[#e8dfd2] bg-background py-14">
+        <div className="container mx-auto grid gap-10 px-4 lg:grid-cols-[.7fr_1.3fr]">
+          <div><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">Inside the jar</p><h2 className="mt-3 text-3xl font-bold">Everything you want to know</h2><p className="mt-4 leading-7 text-muted-foreground">Simple ingredients, familiar flavours and practical care instructions—clearly shared.</p></div>
+          <Accordion type="single" collapsible defaultValue="ingredients" className="border-t">
+            <AccordionItem value="ingredients"><AccordionTrigger className="text-left text-base hover:no-underline">Ingredients</AccordionTrigger><AccordionContent><div className="flex flex-wrap gap-2">{product.ingredients.map((item) => <Badge key={item} variant="secondary">{item}</Badge>)}</div></AccordionContent></AccordionItem>
+            <AccordionItem value="taste"><AccordionTrigger className="text-left text-base hover:no-underline">Taste & pairing</AccordionTrigger><AccordionContent className="leading-6 text-muted-foreground">A bright, savoury pickle with layered spice. Serve a small spoonful with dal-chawal, stuffed parathas, khichdi, curd rice or everyday thalis.</AccordionContent></AccordionItem>
+            <AccordionItem value="storage"><AccordionTrigger className="text-left text-base hover:no-underline">Storage</AccordionTrigger><AccordionContent className="leading-6 text-muted-foreground">Store tightly closed in a cool, dry place. Always use a clean, dry spoon and keep moisture away from the jar. Refrigerate after opening for best quality.</AccordionContent></AccordionItem>
+            <AccordionItem value="details"><AccordionTrigger className="text-left text-base hover:no-underline">Product details</AccordionTrigger><AccordionContent><dl className="grid grid-cols-2 gap-4 text-sm"><div><dt className="text-muted-foreground">Net weight</dt><dd className="font-semibold">{product.weight}</dd></div><div><dt className="text-muted-foreground">Shelf life</dt><dd className="font-semibold">{product.shelfLife}</dd></div><div><dt className="text-muted-foreground">Category</dt><dd className="font-semibold">{product.category}</dd></div><div><dt className="text-muted-foreground">Availability</dt><dd className="font-semibold">{product.inStock ? 'In stock' : 'Out of stock'}</dd></div></dl></AccordionContent></AccordionItem>
+          </Accordion>
+        </div>
+      </section>
+
+      <section className="overflow-hidden bg-[#7e241d] py-16 text-[#fff9ed]">
+        <div className="container mx-auto px-4"><div className="max-w-xl"><p className="text-xs font-bold uppercase tracking-[.2em] text-[#f7c96a]">From our kitchen to your table</p><h2 className="mt-3 text-3xl font-bold md:text-4xl">Crafted slowly. Relished instantly.</h2></div>
+          <ol className="relative mt-10 grid gap-8 md:grid-cols-4 md:gap-4 before:absolute before:left-[12%] before:right-[12%] before:top-6 before:hidden before:border-t before:border-dashed before:border-[#f7c96a]/50 md:before:block">
+            {[['01', Leaf, 'Ingredients selected', 'Fresh produce and aromatic spices are carefully chosen.'], ['02', UtensilsCrossed, 'Recipe prepared', 'Ingredients are mixed in balanced, traditional proportions.'], ['03', Clock3, 'Flavours matured', 'The achar is given time to develop its full character.'], ['04', PackageCheck, 'Packed with care', 'Each jar is closed securely before it begins its journey.']].map(([num, Icon, title, copy]) => { const ProcessIcon = Icon as typeof Leaf; return <li key={String(num)} className="relative"><span className="relative z-10 grid h-12 w-12 place-items-center border border-[#f7c96a]/50 bg-[#7e241d]"><ProcessIcon className="h-5 w-5 text-[#f7c96a]" /></span><p className="mt-5 text-xs font-bold tracking-[.18em] text-[#f7c96a]">STEP {num as string}</p><h3 className="mt-2 text-lg font-bold">{title as string}</h3><p className="mt-2 max-w-xs text-sm leading-6 text-[#fff9ed]/75">{copy as string}</p></li>; })}
+          </ol>
+        </div>
+      </section>
+
+      <section className="container mx-auto grid gap-12 px-4 py-16 lg:grid-cols-2">
+        <div><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">Good to know</p><h2 className="mt-3 text-3xl font-bold">Frequently asked</h2><Accordion type="single" collapsible className="mt-7 border-t">{[
+          ['How should I store the pickle?', 'Keep the lid tightly closed, use only a clean dry spoon, and refrigerate after opening for best quality.'],
+          ['Is oil separation normal?', 'Yes. Natural settling and a layer of oil can occur in traditionally prepared pickles. Stir gently with a clean, dry spoon.'],
+          ['When will my order arrive?', 'Most serviceable pincodes receive orders in 2–5 business days after dispatch.'],
+          ['Does it contain preservatives?', `The full ingredient list is shown above. Please review it carefully; this recipe contains: ${product.ingredients.join(', ')}.`],
+        ].map(([q, a], index) => <AccordionItem key={q} value={`faq-${index}`}><AccordionTrigger className="text-left hover:no-underline">{q}</AccordionTrigger><AccordionContent className="leading-6 text-muted-foreground">{a}</AccordionContent></AccordionItem>)}</Accordion></div>
+
+        <div id="reviews" className="scroll-mt-24"><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">Customer confidence</p><div className="mt-3 flex items-end gap-4"><span className="text-6xl font-bold">4.8</span><div className="pb-1"><div className="flex text-[#b86c00]">{[0,1,2,3,4].map((n) => <Star key={n} className="h-4 w-4 fill-current" />)}</div><p className="mt-1 text-sm text-muted-foreground">Based on 128 reviews</p></div></div><div className="mt-8 grid gap-4 sm:grid-cols-2">{[
+          ['Neha S.', 'A proper homemade taste', 'The spice is balanced and the jar arrived neatly packed. It pairs beautifully with parathas.'],
+          ['Rohit K.', 'Fresh and flavourful', 'Loved the texture and aroma. The ingredient and storage details made ordering feel easy.'],
+        ].map(([name, title, copy]) => <article key={name} className="border border-[#e8dfd2] bg-background p-5"><div className="flex items-center gap-2 text-xs font-semibold text-green-800"><Check className="h-4 w-4" />Verified buyer</div><h3 className="mt-4 font-bold">“{title}”</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{copy}</p><p className="mt-4 text-xs font-bold">{name}</p></article>)}</div><p className="mt-3 text-xs text-muted-foreground">Sample customer feedback shown for presentation.</p></div>
+      </section>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background p-3 shadow-[0_-8px_25px_rgba(0,0,0,.08)] md:hidden"><div className="mx-auto flex max-w-lg items-center gap-4"><div className="min-w-[84px]"><p className="text-xs text-muted-foreground">Total</p><p className="text-lg font-bold text-primary">₹{product.price * quantity}</p></div><Button onClick={handleAddToCart} disabled={!product.inStock} className="h-12 flex-1 rounded-none"><ShoppingBag className="mr-2 h-5 w-5" />Add {quantity} to cart</Button></div></div>
+    </main>
   );
 };
 

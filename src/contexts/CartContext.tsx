@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useReducer, ReactNode } from 'react';
 
 export interface Product {
   id: string;
@@ -121,8 +121,22 @@ const initialState: CartState = {
   itemCount: 0,
 };
 
+const getInitialState = (): CartState => {
+  if (typeof window === 'undefined') return initialState;
+  try {
+    const saved = window.localStorage.getItem('achari-cart');
+    return saved ? JSON.parse(saved) : initialState;
+  } catch {
+    return initialState;
+  }
+};
+
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(cartReducer, initialState);
+  const [state, dispatch] = useReducer(cartReducer, undefined, getInitialState);
+
+  useEffect(() => {
+    window.localStorage.setItem('achari-cart', JSON.stringify(state));
+  }, [state]);
 
   return (
     <CartContext.Provider value={{ state, dispatch }}>
