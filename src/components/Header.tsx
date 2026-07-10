@@ -56,15 +56,15 @@ const Header = () => {
       </div>
 
       <header className={`sticky top-0 z-50 border-b border-secondary/30 transition-all duration-300 ${isScrolled ? 'bg-[#fff8ed]/95 shadow-elegant backdrop-blur-xl' : 'bg-[#fff8ed]'}`}>
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-3">
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-lg border border-secondary/40 bg-[#fff8ed] shadow-card">
+        <div className="container mx-auto px-3 py-2.5 sm:px-4 sm:py-3">
+          <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-3">
+            <Link to="/" className="group flex min-w-0 flex-1 items-center gap-2 min-[380px]:gap-2.5 sm:gap-3" aria-label="Achari Tiwari home">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-secondary/40 bg-[#fff8ed] shadow-card min-[380px]:h-14 min-[380px]:w-14 sm:h-16 sm:w-16">
                 <img src="/brand/achari-tiwari-logo.png" alt="Achari Tiwari" className="h-full w-full object-contain" />
               </div>
-              <div className="flex flex-col">
-                <span className={`font-bold tracking-tight text-foreground transition-all ${isScrolled ? 'text-xl' : 'text-2xl'}`}>Achari <span className="text-accent">Tiwari</span></span>
-                <p className="flex items-center gap-1 text-sm text-muted-foreground">
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate text-base font-bold leading-tight tracking-tight text-foreground min-[350px]:text-lg sm:text-2xl">Achari <span className="text-accent">Tiwari</span></span>
+                <p className="hidden items-center gap-1 text-sm text-muted-foreground min-[390px]:flex">
                   <Sparkles className="h-3.5 w-3.5 text-accent" />
                   Taste of tradition
                 </p>
@@ -83,7 +83,7 @@ const Header = () => {
               ))}
             </nav>
 
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-0.5 sm:gap-2">
               <Button asChild variant="ghost" size="icon" className="hidden sm:flex hover:bg-primary/10 hover:text-primary">
                 <Link to="/search">
                   <Search className="h-4 w-4" />
@@ -93,9 +93,9 @@ const Header = () => {
                 <Heart className="h-4 w-4" />
               </Button>
               <Button asChild variant="ghost" size="icon" className="hidden sm:flex hover:bg-primary/10 hover:text-primary"><Link to="/account" aria-label="Account"><UserRound className="h-4 w-4" /></Link></Button>
-              <Button asChild variant="ghost" size="icon" className="relative hover:bg-primary/10 hover:text-primary">
-                <Link to="/cart">
-                  <ShoppingCart className="h-4 w-4" />
+              <Button asChild variant="ghost" size="icon" className="relative h-11 w-11 hover:bg-primary/10 hover:text-primary">
+                <Link to="/cart" aria-label={`Cart with ${state.itemCount} items`}>
+                  <ShoppingCart className="h-5 w-5" />
                   {state.itemCount > 0 && (
                     <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
                       {state.itemCount}
@@ -103,8 +103,8 @@ const Header = () => {
                   )}
                 </Link>
               </Button>
-              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-                {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              <Button variant="ghost" size="icon" className="h-11 w-11 lg:hidden" aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'} aria-expanded={isMobileMenuOpen} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </div>
           </div>
@@ -115,7 +115,7 @@ const Header = () => {
             <div className="container mx-auto px-4 py-4">
               <nav className="flex flex-col gap-2">
                 {navItems.map((item) => (
-                  <Link key={item.name} to={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`rounded-xl px-4 py-3 text-sm font-medium transition-all ${item.active ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted hover:text-primary'}`}>
+                  <Link key={item.name} to={item.href} onClick={() => setIsMobileMenuOpen(false)} className={`flex min-h-12 items-center rounded-xl px-4 py-3 text-base font-medium transition-all ${item.active ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted hover:text-primary'}`}>
                     {item.name}
                   </Link>
                 ))}

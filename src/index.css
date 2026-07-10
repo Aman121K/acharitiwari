@@ -44,6 +44,8 @@
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    scroll-padding-top: 6rem;
   }
 
   body {
@@ -51,7 +53,14 @@
     font-feature-settings: "ss01", "ss02";
     background-color: #fff8ed;
     background-image: radial-gradient(circle at top left, rgb(170 106 22 / 0.09), transparent 28%), radial-gradient(circle at bottom right, rgb(23 50 13 / 0.06), transparent 24%);
+    overflow-x: hidden;
+    overflow-wrap: anywhere;
   }
+
+  #root { width: 100%; max-width: 100%; min-width: 0; overflow-x: clip; }
+  main, section, header, footer, nav, form { min-width: 0; max-width: 100%; }
+  img, video { max-width: 100%; height: auto; }
+  [id] { scroll-margin-top: 6rem; }
 
   ::selection {
     @apply bg-primary/20 text-foreground;
@@ -86,7 +95,7 @@
   }
 
   .section-shell {
-    @apply rounded-[2rem] border border-border/70 bg-white/70 p-6 shadow-card backdrop-blur sm:p-8;
+    @apply rounded-2xl border border-border/70 bg-white/70 p-4 shadow-card backdrop-blur sm:rounded-[2rem] sm:p-8;
   }
 
   .glass-effect {

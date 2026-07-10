@@ -39,7 +39,7 @@ const ProductsPage = () => {
 
   return (
     <div className="min-h-screen py-8">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto min-w-0 px-3 sm:px-4">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -51,16 +51,16 @@ const ProductsPage = () => {
         </div>
 
         {/* Filters */}
-        <div className="mb-8 bg-card rounded-lg p-6 shadow-card">
+        <div className="mb-8 min-w-0 rounded-lg bg-card p-4 shadow-card sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
-            <div className="relative">
+            <div className="relative min-w-0">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="min-w-0 pl-10 text-base"
               />
             </div>
 
@@ -68,7 +68,7 @@ const ProductsPage = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-input rounded-md bg-background text-foreground"
+              className="min-h-12 min-w-0 max-w-full rounded-md border border-input bg-background px-3 py-2 text-base text-foreground"
             >
               <option value="name">Sort by Name</option>
               <option value="price-low">Price: Low to High</option>
@@ -85,7 +85,7 @@ const ProductsPage = () => {
           {/* Categories */}
           <div className="mt-6">
             <h3 className="text-sm font-medium text-foreground mb-3">Categories</h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex min-w-0 flex-wrap gap-2">
               <Badge
                 variant={selectedCategory === 'All' ? 'default' : 'outline'}
                 className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-smooth"
@@ -114,7 +114,7 @@ const ProductsPage = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

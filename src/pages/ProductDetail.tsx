@@ -75,7 +75,7 @@ const ProductDetail = () => {
         </nav>
       </div>
 
-      <section className="container mx-auto px-4 py-7 lg:py-12">
+      <section className="container mx-auto min-w-0 px-3 py-7 sm:px-4 lg:py-12">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(420px,.98fr)] lg:gap-14">
           <div className="lg:sticky lg:top-24 lg:self-start">
             <div className="relative overflow-hidden border border-[#e8dfd2] bg-[#f4eee3] shadow-[0_18px_60px_-38px_rgba(67,35,21,.45)]">
@@ -85,7 +85,7 @@ const ProductDetail = () => {
             <button type="button" aria-label={`View ${product.name} image`} className="mt-3 h-20 w-20 overflow-hidden border-2 border-primary bg-muted p-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"><img src={product.image} alt="" className="h-full w-full object-cover" /></button>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-bold uppercase tracking-[.2em] text-primary">{product.category}</p>
               <Badge variant="outline" className={product.inStock ? 'border-green-700/30 text-green-800' : 'border-destructive/30 text-destructive'}>{product.inStock ? 'In stock' : 'Out of stock'}</Badge>
@@ -118,7 +118,7 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            <div className="mt-5 grid grid-cols-[1fr_1fr_auto_auto] gap-2">
+            <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_auto_auto]">
               <Button onClick={handleAddToCart} disabled={!product.inStock} size="lg" className="h-13 rounded-none text-base"><ShoppingBag className="mr-2 h-5 w-5" />Add to cart</Button>
               <Button onClick={handleBuyNow} disabled={!product.inStock} size="lg" variant="outline" className="h-13 rounded-none border-primary text-base text-primary hover:bg-primary hover:text-primary-foreground">Buy now</Button>
               <Button onClick={handleLike} variant="outline" size="icon" className="h-13 w-13 rounded-none" aria-label={isLiked ? 'Remove from wishlist' : 'Add to wishlist'}><Heart className={`h-5 w-5 ${isLiked ? 'fill-primary text-primary' : ''}`} /></Button>
@@ -171,7 +171,7 @@ const ProductDetail = () => {
         <div id="reviews" className="scroll-mt-24"><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">Customer confidence</p><div className="mt-3 flex items-end gap-4"><span className="text-6xl font-bold">{rating?rating.toFixed(1):'—'}</span><div className="pb-1"><div className="flex text-[#b86c00]">{[0,1,2,3,4].map((n) => <Star key={n} className="h-4 w-4 fill-current" />)}</div><p className="mt-1 text-sm text-muted-foreground">Based on {reviews.length} approved reviews</p></div></div><div className="mt-6 space-y-3">{reviews.slice(0,4).map((review:any)=><article key={review._id} className="border border-[#e8dfd2] bg-background p-4"><div className="flex text-[#b86c00]">{Array.from({length:review.rating}).map((_,n)=><Star key={n} className="h-3.5 w-3.5 fill-current"/>)}</div><p className="mt-2 text-sm leading-6 text-muted-foreground">{review.comment}</p><p className="mt-2 text-xs font-bold">{review.name}</p></article>)}</div><form onSubmit={submitReview} className="mt-7 grid gap-3 border border-[#e8dfd2] bg-background p-5 sm:grid-cols-2"><h3 className="font-bold sm:col-span-2">Share your experience</h3><Input required placeholder="Your name" value={reviewForm.name} onChange={e=>setReviewForm({...reviewForm,name:e.target.value})}/><Input type="email" placeholder="Email (not published)" value={reviewForm.email} onChange={e=>setReviewForm({...reviewForm,email:e.target.value})}/><select className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={reviewForm.rating} onChange={e=>setReviewForm({...reviewForm,rating:Number(e.target.value)})}>{[5,4,3,2,1].map(value=><option key={value} value={value}>{value} stars</option>)}</select><Input required minLength={5} placeholder="Write your review" value={reviewForm.comment} onChange={e=>setReviewForm({...reviewForm,comment:e.target.value})}/><Button className="sm:col-span-2">Submit for review</Button>{reviewMessage&&<p className="text-sm text-muted-foreground sm:col-span-2">{reviewMessage}</p>}</form></div>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background p-3 shadow-[0_-8px_25px_rgba(0,0,0,.08)] md:hidden"><div className="mx-auto flex max-w-lg items-center gap-4"><div className="min-w-[84px]"><p className="text-xs text-muted-foreground">Total</p><p className="text-lg font-bold text-primary">₹{product.price * quantity}</p></div><Button onClick={handleAddToCart} disabled={!product.inStock} className="h-12 flex-1 rounded-none"><ShoppingBag className="mr-2 h-5 w-5" />Add {quantity} to cart</Button></div></div>
+      <div className="fixed inset-x-0 bottom-0 z-40 max-w-full border-t bg-background p-2.5 shadow-[0_-8px_25px_rgba(0,0,0,.08)] md:hidden"><div className="mx-auto grid w-full min-w-0 max-w-lg grid-cols-[72px_minmax(0,1fr)] items-center gap-2"><div className="min-w-0"><p className="text-xs text-muted-foreground">Total</p><p className="truncate text-lg font-bold text-primary">₹{product.price * quantity}</p></div><Button onClick={handleAddToCart} disabled={!product.inStock} className="h-12 min-w-0 rounded-none px-2 text-sm"><ShoppingBag className="mr-1.5 h-5 w-5 shrink-0" /><span className="truncate">Add {quantity} to cart</span></Button></div></div>
     </main>
   );
 };

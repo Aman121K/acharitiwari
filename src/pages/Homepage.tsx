@@ -173,7 +173,7 @@ const Homepage = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="hero-section relative overflow-hidden py-14 lg:py-20">
+      <section className="hero-section relative w-full overflow-hidden py-8 sm:py-14 lg:py-20">
         <div className="absolute inset-0 z-0">
           <img
             src={heroBanner?.image || spiceMarketHero}
@@ -184,14 +184,14 @@ const Homepage = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent"></div>
         </div>
         
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:text-left">
-            <div className="mx-auto w-full max-w-[390px] border-y border-secondary/50 py-5">
-              <img src="/brand/achari-tiwari-logo.png" alt="Achari Tiwari — Taste of Tradition" className="aspect-square w-full object-contain drop-shadow-[0_20px_26px_rgba(90,43,12,0.22)]" />
+        <div className="container relative z-10 mx-auto w-full min-w-0 px-3 sm:px-4">
+          <div className="mx-auto grid min-w-0 max-w-6xl items-center gap-7 sm:gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:text-left">
+            <div className="mx-auto aspect-square w-full max-w-[280px] border-y border-secondary/50 py-3 sm:max-w-[390px] sm:py-5">
+              <img src="/brand/achari-tiwari-logo.png" alt="Achari Tiwari — Taste of Tradition" className="h-full w-full object-contain drop-shadow-[0_20px_26px_rgba(90,43,12,0.22)]" />
             </div>
-            <div className="text-center lg:text-left">
+            <div className="min-w-0 text-center lg:text-left">
             {/* Trust Badge */}
-            <div className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur rounded-full px-4 py-2 mb-6 border border-primary/20">
+            <div className="mb-5 inline-flex max-w-full flex-wrap items-center justify-center gap-1.5 rounded-xl border border-primary/20 bg-white/90 px-3 py-2 backdrop-blur sm:mb-6 sm:rounded-full">
               <CheckCircle className="h-4 w-4 text-green-600" />
               <span className="text-sm font-medium text-gray-700">Trusted by 50,000+ customers</span>
               <div className="flex">
@@ -201,21 +201,21 @@ const Homepage = () => {
               </div>
             </div>
 
-            <h1 className="mb-6 text-5xl font-bold leading-[0.98] text-foreground md:text-7xl">
+            <h1 className="mb-5 text-[clamp(2.1rem,11vw,3rem)] font-bold leading-[1.02] text-foreground sm:mb-6 md:text-7xl">
               {settings?.heroTitle || 'Ghar ka swaad, har bite mein pyaar.'}
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
+            <p className="mx-auto mb-7 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-xl md:text-2xl">
               {settings?.heroDescription || 'Discover the rich flavors of traditional Indian pickles, made with love and authentic recipes passed down through generations. Taste the heritage in every bite.'}
             </p>
             
             <div className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
-              <Button size="xl" className="bg-gradient-primary shadow-elegant hover:shadow-glow transition-all duration-300 px-8">
+              <Button size="xl" className="w-full bg-gradient-primary px-5 shadow-elegant transition-all duration-300 hover:shadow-glow sm:w-auto sm:px-8">
                 <Link to="/products" className="flex items-center">
                   Shop Now
                   <ArrowRight className="h-5 w-5 ml-2" />
                 </Link>
               </Button>
-              <Button variant="outline" size="xl" className="border-2 border-primary/30 hover:bg-primary/5 px-8">
+              <Button variant="outline" size="xl" className="w-full border-2 border-primary/30 px-5 hover:bg-primary/5 sm:w-auto sm:px-8">
                 <Link to="/about" className="flex items-center">
                   Our Story
                   <Heart className="h-5 w-5 ml-2" />
