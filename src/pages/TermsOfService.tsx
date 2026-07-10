@@ -96,7 +96,7 @@ const TermsOfService = () => {
               </p>
               <div className="mt-4 text-muted-foreground">
                 <p>Email: aacharitiwari@gmail.com</p>
-                <p>Phone: +917973070600</p>
+                <p>Phone: +919877031481</p>
                 <p>Address: Saket, New Delhi</p>
               </div>
             </section>

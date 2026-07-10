@@ -391,7 +391,7 @@ const AboutUs = () => {
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3">
                     <Phone className="h-4 w-4 text-primary" />
-                    <span className="text-muted-foreground">+917973070600</span>
+                    <span className="text-muted-foreground">+919877031481</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <Mail className="h-4 w-4 text-primary" />

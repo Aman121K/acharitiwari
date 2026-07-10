@@ -148,7 +148,7 @@ const ShippingPolicy = () => {
                 <p className="text-muted-foreground">
                   <strong>Customer Support:</strong><br />
                   Email: aacharitiwari@gmail.com<br />
-                  Phone: +917973070600<br />
+                  Phone: +919877031481<br />
                   Hours: Monday to Saturday, 9 AM - 7 PM
                 </p>
               </div>
