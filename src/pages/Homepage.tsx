@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import ProductCard from '@/components/ProductCard';
-import { featuredProducts } from '@/data/products';
+import { featuredProducts as fallbackFeaturedProducts } from '@/data/products';
+import { useBanners, useProducts, useReviews, useStoreSettings } from '@/hooks/useStoreData';
 import spiceMarketHero from '@/assets/spice-market-hero.jpg';
 
 const Homepage = () => {
-  const testimonials = [
+  const fallbackTestimonials = [
     {
       name: "Priya Sharma",
       location: "Mumbai, Maharashtra",
@@ -120,6 +121,13 @@ const Homepage = () => {
     }
   ];
 
+  const { products: featuredProducts } = useProducts(fallbackFeaturedProducts);
+  const { banners } = useBanners();
+  const { data: settings } = useStoreSettings();
+  const { reviews: apiReviews } = useReviews();
+  const testimonials = apiReviews.length ? apiReviews.map((review) => ({ name: review.name, location: 'Verified customer', rating: review.rating, text: review.comment, avatar: review.name.split(/\s+/).map((part) => part[0]).join('').slice(0,2).toUpperCase(), product: review.product, verified: true })) : fallbackTestimonials;
+  const heroBanner = banners.find((banner) => banner.displayLocation === 'home');
+
   const stats = [
     { number: "50,000+", label: "Happy Customers", icon: Users },
     { number: "17+", label: "Pickle Varieties", icon: ShoppingBag },
@@ -165,19 +173,23 @@ const Homepage = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="hero-section relative py-24 lg:py-32 overflow-hidden">
+      <section className="hero-section relative overflow-hidden py-14 lg:py-20">
         <div className="absolute inset-0 z-0">
           <img
-            src={spiceMarketHero}
+            src={heroBanner?.image || spiceMarketHero}
             alt="Spice Market"
-            className="w-full h-full object-cover opacity-30"
+            className="h-full w-full object-cover opacity-20"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/30"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-5xl mx-auto text-center">
+          <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:text-left">
+            <div className="mx-auto w-full max-w-[390px] border-y border-secondary/50 py-5">
+              <img src="/brand/achari-tiwari-logo.png" alt="Achari Tiwari — Taste of Tradition" className="aspect-square w-full object-contain drop-shadow-[0_20px_26px_rgba(90,43,12,0.22)]" />
+            </div>
+            <div className="text-center lg:text-left">
             {/* Trust Badge */}
             <div className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur rounded-full px-4 py-2 mb-6 border border-primary/20">
               <CheckCircle className="h-4 w-4 text-green-600" />
@@ -189,16 +201,14 @@ const Homepage = () => {
               </div>
             </div>
 
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-6 leading-tight">
-              Authentic
-              <span className="bg-gradient-spice bg-clip-text text-transparent block md:inline"> Aachar </span>
-              & Pickles
+            <h1 className="mb-6 text-5xl font-bold leading-[0.98] text-foreground md:text-7xl">
+              {settings?.heroTitle || 'Ghar ka swaad, har bite mein pyaar.'}
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
-              Discover the rich flavors of traditional Indian pickles, made with love and authentic recipes passed down through generations. Taste the heritage in every bite.
+              {settings?.heroDescription || 'Discover the rich flavors of traditional Indian pickles, made with love and authentic recipes passed down through generations. Taste the heritage in every bite.'}
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <div className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
               <Button size="xl" className="bg-gradient-primary shadow-elegant hover:shadow-glow transition-all duration-300 px-8">
                 <Link to="/products" className="flex items-center">
                   Shop Now
@@ -214,14 +224,15 @@ const Homepage = () => {
             </div>
 
             {/* Updated Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+            <div className="grid max-w-4xl grid-cols-2 gap-px overflow-hidden border border-secondary/30 bg-secondary/30 md:grid-cols-4">
               {stats.map((stat, index) => (
-                <div key={index} className="bg-white/80 backdrop-blur rounded-xl p-6 shadow-card">
+                <div key={index} className="bg-[#fff8ed]/95 p-5">
                   <stat.icon className="h-8 w-8 text-primary mx-auto mb-3" />
                   <div className="text-2xl font-bold text-foreground">{stat.number}</div>
                   <div className="text-sm text-muted-foreground">{stat.label}</div>
                 </div>
               ))}
+            </div>
             </div>
           </div>
         </div>
@@ -244,7 +255,7 @@ const Homepage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {featuredProducts.map((product) => (
+            {featuredProducts.slice(0, 8).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,10 +9,14 @@ import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { useStoreSettings } from '@/hooks/useStoreData';
 
 const CheckoutPage = () => {
   const { state, dispatch } = useCart();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { data: settings } = useStoreSettings();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -37,6 +41,10 @@ const CheckoutPage = () => {
     setFormData({ ...formData, [e.target.name]: value });
     setError('');
   };
+
+  useEffect(() => {
+    if (user) setFormData((current) => ({ ...current, email: current.email || user.email, firstName: current.firstName || user.name.split(' ')[0] || '', lastName: current.lastName || user.name.split(' ').slice(1).join(' '), phone: current.phone || user.phone || '' }));
+  }, [user]);
 
   const handleNext = () => {
     if (step === 1) {
@@ -80,7 +88,8 @@ const CheckoutPage = () => {
     }
   };
 
-  const shipping = state.total >= 699 ? 0 : 79;
+  const freeShippingThreshold = settings?.freeShippingThreshold ?? 699;
+  const shipping = state.total >= freeShippingThreshold ? 0 : 79;
   const total = state.total + shipping;
 
   if (state.items.length === 0 && step < 4) {
@@ -105,6 +114,7 @@ const CheckoutPage = () => {
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to cart
           </Link>
         </div>
+        <div className="mb-5 rounded-xl border border-secondary/30 bg-secondary/10 px-4 py-3 text-sm text-foreground">{user ? <>Checking out as <strong>{user.email}</strong>. You can still use the same streamlined checkout.</> : <>Guest checkout is active. Already registered? <Link className="font-semibold text-primary underline" to="/account">Sign in</Link> to prefill your contact details.</>}</div>
 
         <div className="mb-8 overflow-hidden rounded-3xl border border-border/70 bg-white/80 p-4 shadow-card sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -216,14 +226,14 @@ const CheckoutPage = () => {
               </CardHeader>
               <CardContent>
                 <RadioGroup value={formData.paymentMethod} onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })} className="space-y-3">
-                  <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
+                  {(settings?.acceptedPayments?.includes('upi') ?? true) && <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
                     <RadioGroupItem value="upi" id="upi" />
                     <Label htmlFor="upi" className="flex-1">UPI (payment link after confirmation)</Label>
-                  </div>
-                  <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
+                  </div>}
+                  {(settings?.acceptedPayments?.includes('cod') ?? true) && <div className="flex items-center gap-3 rounded-2xl border border-border p-4">
                     <RadioGroupItem value="cod" id="cod" />
                     <Label htmlFor="cod" className="flex-1">Cash on delivery</Label>
-                  </div>
+                  </div>}
                 </RadioGroup>
                 <div className="mt-6 space-y-3">
                   <Button onClick={handleNext} size="lg" className="w-full">Review order</Button>

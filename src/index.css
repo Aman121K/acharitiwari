@@ -4,34 +4,34 @@
 
 @layer base {
   :root {
-    --background: 45 23% 97%;
-    --foreground: 20 14% 20%;
+    --background: 38 100% 96%;
+    --foreground: 36 35% 9%;
     --card: 0 0% 100%;
     --card-foreground: 20 14% 20%;
     --popover: 0 0% 100%;
     --popover-foreground: 20 14% 20%;
-    --primary: 0 72% 51%;
+    --primary: 105 58% 12%;
     --primary-foreground: 0 0% 98%;
-    --primary-hover: 0 72% 45%;
-    --secondary: 45 93% 47%;
+    --primary-hover: 105 51% 19%;
+    --secondary: 36 77% 44%;
     --secondary-foreground: 20 14% 20%;
     --secondary-hover: 45 93% 40%;
     --muted: 45 15% 92%;
     --muted-foreground: 20 14% 45%;
-    --accent: 25 95% 53%;
+    --accent: 1 72% 32%;
     --accent-foreground: 0 0% 98%;
     --accent-hover: 25 95% 47%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 45 15% 88%;
-    --input: 45 15% 88%;
-    --ring: 0 72% 51%;
-    --radius: 0.9rem;
-    --gradient-primary: linear-gradient(135deg, hsl(0 72% 51%), hsl(15 82% 47%));
-    --gradient-secondary: linear-gradient(135deg, hsl(45 93% 47%), hsl(35 85% 50%));
-    --gradient-warm: linear-gradient(135deg, hsl(45 23% 97%), hsl(45 15% 92%));
-    --gradient-spice: linear-gradient(135deg, hsl(0 72% 51%), hsl(25 95% 53%), hsl(45 93% 47%));
-    --shadow-elegant: 0 20px 45px -20px hsl(0 72% 51% / 0.25);
+    --border: 35 34% 82%;
+    --input: 35 34% 82%;
+    --ring: 105 58% 12%;
+    --radius: 0.65rem;
+    --gradient-primary: linear-gradient(135deg, #17320d, #244a18);
+    --gradient-secondary: linear-gradient(135deg, #aa6a16, #c88a2b);
+    --gradient-warm: linear-gradient(135deg, #fff8ed, #f6ead8);
+    --gradient-spice: linear-gradient(135deg, #17320d 0%, #8f1715 58%, #aa6a16 100%);
+    --shadow-elegant: 0 20px 45px -20px rgb(90 43 12 / 0.28);
     --shadow-card: 0 10px 30px -12px hsl(20 14% 20% / 0.16);
     --shadow-glow: 0 0 40px hsl(0 72% 51% / 0.24);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -49,7 +49,8 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "ss01", "ss02";
-    background-image: radial-gradient(circle at top left, hsl(0 72% 51% / 0.06), transparent 28%), radial-gradient(circle at bottom right, hsl(45 93% 47% / 0.08), transparent 24%);
+    background-color: #fff8ed;
+    background-image: radial-gradient(circle at top left, rgb(170 106 22 / 0.09), transparent 28%), radial-gradient(circle at bottom right, rgb(23 50 13 / 0.06), transparent 24%);
   }
 
   ::selection {
@@ -69,7 +70,7 @@
   .transition-bounce { transition: var(--transition-bounce); }
 
   .product-card {
-    @apply rounded-2xl border border-border/70 bg-card shadow-card transition-all duration-500 hover:-translate-y-2 hover:shadow-elegant;
+    @apply rounded-xl border border-border/70 bg-card shadow-card transition-all duration-500 hover:-translate-y-1 hover:shadow-elegant;
   }
 
   .spice-badge {
@@ -77,7 +78,7 @@
   }
 
   .hero-section {
-    @apply relative overflow-hidden bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10;
+    @apply relative overflow-hidden bg-[#f6ead8];
   }
 
   .glass-panel {

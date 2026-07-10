@@ -24,11 +24,15 @@ import ShippingPolicy from "./pages/ShippingPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
 import NotFound from "./pages/NotFound";
 import Seo from "@/components/Seo";
+import AccountPage from "./pages/AccountPage";
+import { AuthProvider } from "@/contexts/AuthContext";
+import PolicyPage from "./pages/PolicyPage";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <AuthProvider>
     <TooltipProvider>
       <CartProvider>
         <ToastProvider>
@@ -48,12 +52,13 @@ const App = () => (
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:id" element={<BlogPost />} />
               <Route path="/search" element={<SearchPage />} />
+              <Route path="/account" element={<AccountPage />} />
               <Route path="/about" element={<AboutUs />} />
               <Route path="/contact" element={<ContactUs />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-of-service" element={<TermsOfService />} />
-              <Route path="/shipping-policy" element={<ShippingPolicy />} />
-              <Route path="/refund-policy" element={<RefundPolicy />} />
+              <Route path="/privacy-policy" element={<PolicyPage />} />
+              <Route path="/terms-of-service" element={<PolicyPage />} />
+              <Route path="/shipping-policy" element={<PolicyPage />} />
+              <Route path="/refund-policy" element={<PolicyPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
@@ -63,6 +68,7 @@ const App = () => (
         </ToastProvider>
       </CartProvider>
     </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

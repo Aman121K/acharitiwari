@@ -18,13 +18,12 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import logoSvg from '@/assets/logo.png';
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white mt-20">
+    <footer className="mt-20 bg-[#17320d] text-white">
       {/* Newsletter Section */}
-      <div className="bg-gradient-primary">
+      <div className="border-y border-[#c88a2b]/30 bg-[#8f1715]">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto text-center">
             <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
@@ -54,16 +53,16 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-glow">
+              <div className="h-24 w-24 overflow-hidden rounded-lg border border-[#c88a2b]/50 bg-[#fff8ed] shadow-glow">
                 <img 
-                  src={logoSvg} 
-                  alt="AachariTiwari Logo" 
-                  className="w-10 h-10 object-contain"
+                  src="/brand/achari-tiwari-logo.png" 
+                  alt="Achari Tiwari Logo" 
+                  className="h-full w-full object-contain"
                 />
               </div>
               <div className="flex flex-col">
-                <h3 className="text-2xl font-bold text-white">AachariTiwari</h3>
-                <p className="text-sm text-gray-400">✨ Authentic Indian Flavors ✨</p>
+                <h3 className="text-2xl font-bold text-white">Achari Tiwari</h3>
+                <p className="text-sm uppercase tracking-[0.18em] text-[#e7bd78]">Taste of tradition</p>
               </div>
             </div>
             
@@ -227,15 +226,8 @@ const Footer = () => {
         <div className="border-t border-gray-700 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-4">
-              <span className="text-gray-400 text-sm">We Accept:</span>
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-5 bg-blue-600 rounded flex items-center justify-center">
-                  <CreditCard className="h-3 w-3 text-white" />
-                </div>
-                <div className="w-8 h-5 bg-red-600 rounded"></div>
-                <div className="w-8 h-5 bg-yellow-500 rounded"></div>
-                <div className="w-8 h-5 bg-green-600 rounded"></div>
-              </div>
+              <span className="text-gray-300 text-sm">Payment options:</span>
+              <div className="flex items-center gap-2 text-sm font-semibold"><span className="rounded border border-[#c88a2b]/50 px-3 py-1">UPI</span><span className="rounded border border-[#c88a2b]/50 px-3 py-1">Cash on Delivery</span></div>
             </div>
             
             <div className="text-gray-400 text-sm">

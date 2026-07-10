@@ -5,9 +5,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { blogPosts } from '@/data/blogData';
+import { blogPosts as fallbackPosts } from '@/data/blogData';
+import { useBlogs } from '@/hooks/useStoreData';
 
 const BlogPost = () => {
+  const { posts: blogPosts } = useBlogs(fallbackPosts);
   const { id } = useParams();
   const { toast } = useToast();
   const [post, setPost] = useState(null);
@@ -23,7 +25,7 @@ const BlogPost = () => {
       const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
       setIsLiked(likedPosts.includes(id));
     }
-  }, [id]);
+  }, [id, blogPosts]);
 
   const handleLike = () => {
     const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');

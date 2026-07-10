@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { blogPosts } from "@/data/blogData";
-import { getProductById } from "@/data/products";
+import { blogPosts as fallbackPosts } from "@/data/blogData";
+import { products as fallbackProducts } from "@/data/products";
 import socialImage from "@/assets/spice-market-hero.jpg";
+import { useBlogs, useProducts, useStoreSettings } from "@/hooks/useStoreData";
 
 const SITE_NAME = "AachariTiwari";
 const SITE_URL = (import.meta.env.VITE_SITE_URL || "https://www.aacharitiwari.com").replace(/\/$/, "");
@@ -49,20 +50,25 @@ function setMeta(selector: string, attributes: Record<string, string>) {
 
 export default function Seo() {
   const { pathname } = useLocation();
+  const { data: storeSettings } = useStoreSettings();
+  const { products } = useProducts(fallbackProducts);
+  const { posts: blogPosts } = useBlogs(fallbackPosts);
 
   useEffect(() => {
     const productMatch = pathname.match(/^\/product\/([^/]+)$/);
     const articleMatch = pathname.match(/^\/blog\/([^/]+)$/);
-    const product = productMatch ? getProductById(productMatch[1]) : undefined;
+    const product = productMatch ? products.find((item) => item.id === productMatch[1]) : undefined;
     const article = articleMatch ? blogPosts.find((post) => post.id === articleMatch[1]) : undefined;
-    const staticPage = pages[pathname];
+    const adminSeo = storeSettings?.pageSeo?.[pathname];
+    const staticPage = adminSeo || (pathname === "/" && storeSettings ? { title: storeSettings.seoTitle, description: storeSettings.seoDescription } : pages[pathname]);
     const title = product
       ? `${product.name} – Buy Online | ${SITE_NAME}`
       : article
         ? `${article.title} | ${SITE_NAME}`
         : staticPage?.title || `Page Not Found | ${SITE_NAME}`;
     const description = product?.description || article?.excerpt || staticPage?.description || "The requested page could not be found.";
-    const image = product?.image || article?.image || DEFAULT_IMAGE;
+    const rawImage = product?.image || article?.image || DEFAULT_IMAGE;
+    const image = new URL(rawImage, `${SITE_URL}/`).href;
     const canonical = `${SITE_URL}${pathname === "/" ? "/" : pathname}`;
     const noindex = staticPage?.noindex || (!staticPage && !product && !article);
     const type = product ? "product" : article ? "article" : "website";
@@ -117,7 +123,7 @@ export default function Seo() {
       script.text = JSON.stringify(schema);
       document.head.appendChild(script);
     }
-  }, [pathname]);
+  }, [pathname, storeSettings, products, blogPosts]);
 
   return null;
 }

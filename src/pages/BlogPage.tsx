@@ -6,9 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-import { blogPosts, categories } from '@/data/blogData';
+import { blogPosts as fallbackPosts } from '@/data/blogData';
+import { useBlogs } from '@/hooks/useStoreData';
 
 const BlogPage = () => {
+  const { posts: blogPosts } = useBlogs(fallbackPosts);
+  const categories = Array.from(new Set(blogPosts.map((post) => post.category)));
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

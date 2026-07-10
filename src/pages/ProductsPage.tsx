@@ -4,9 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import ProductCard from '@/components/ProductCard';
-import { products, categories } from '@/data/products';
+import { products as fallbackProducts } from '@/data/products';
+import { useProducts } from '@/hooks/useStoreData';
 
 const ProductsPage = () => {
+  const { products } = useProducts(fallbackProducts);
+  const categories = Array.from(new Set(products.map((product) => product.category)));
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

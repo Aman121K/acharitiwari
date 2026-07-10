@@ -10,7 +10,10 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useGlobalToast } from '@/contexts/ToastContext';
 import { useToast } from '@/hooks/use-toast';
-import { getProductById } from '@/data/products';
+import { products as fallbackProducts } from '@/data/products';
+import { useProductReviews, useProducts } from '@/hooks/useStoreData';
+import { apiRequest } from '@/lib/api';
+import { Input } from '@/components/ui/input';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,7 +25,11 @@ const ProductDetail = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [pincode, setPincode] = useState('');
   const [deliveryMessage, setDeliveryMessage] = useState('');
-  const product = id ? getProductById(id) : null;
+  const [reviewForm,setReviewForm]=useState({name:'',email:'',rating:5,comment:''});
+  const [reviewMessage,setReviewMessage]=useState('');
+  const { products } = useProducts(fallbackProducts);
+  const product = id ? products.find((item) => item.id === id) : null;
+  const { reviews, rating, refresh: refreshReviews } = useProductReviews(product?.id);
 
   if (!product) {
     return <main className="min-h-[65vh] grid place-items-center px-4"><div className="text-center"><p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Nothing in this jar</p><h1 className="mt-3 text-3xl font-bold">Product not found</h1><Button asChild className="mt-6"><Link to="/products"><ArrowLeft className="mr-2 h-4 w-4" />Back to products</Link></Button></div></main>;
@@ -52,6 +59,7 @@ const ProductDetail = () => {
     if (!/^\d{6}$/.test(pincode)) { setDeliveryMessage('Enter a valid 6-digit Indian pincode.'); return; }
     setDeliveryMessage('Delivery available · Estimated in 2–5 business days');
   };
+  const submitReview=async(event:React.FormEvent)=>{event.preventDefault();if(!product)return;setReviewMessage('');try{const body=await apiRequest<{message:string}>(`/products/${product.id}/reviews`,{method:'POST',body:JSON.stringify(reviewForm)});setReviewMessage(body.message);setReviewForm({name:'',email:'',rating:5,comment:''});void refreshReviews();}catch(error){setReviewMessage(error instanceof Error?error.message:'Unable to submit review')}};
 
   const facts = [
     { icon: PackageCheck, label: product.weight, note: 'Net weight' },
@@ -84,8 +92,8 @@ const ProductDetail = () => {
             </div>
             <h1 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">{product.name}</h1>
             <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-              <div className="flex items-center gap-1 text-[#b86c00]" aria-label="Rated 4.8 out of 5"><Star className="h-4 w-4 fill-current" /><strong>4.8</strong></div>
-              <a href="#reviews" className="font-medium underline decoration-muted-foreground/40 underline-offset-4">128 verified reviews</a>
+              <div className="flex items-center gap-1 text-[#b86c00]" aria-label={`Rated ${rating || 4.8} out of 5`}><Star className="h-4 w-4 fill-current" /><strong>{rating ? rating.toFixed(1) : 'New'}</strong></div>
+              <a href="#reviews" className="font-medium underline decoration-muted-foreground/40 underline-offset-4">{reviews.length} verified reviews</a>
               <span className="text-muted-foreground">Loved with dal, rice & paratha</span>
             </div>
             <p className="mt-6 text-lg leading-8 text-muted-foreground">{product.description}</p>
@@ -160,10 +168,7 @@ const ProductDetail = () => {
           ['Does it contain preservatives?', `The full ingredient list is shown above. Please review it carefully; this recipe contains: ${product.ingredients.join(', ')}.`],
         ].map(([q, a], index) => <AccordionItem key={q} value={`faq-${index}`}><AccordionTrigger className="text-left hover:no-underline">{q}</AccordionTrigger><AccordionContent className="leading-6 text-muted-foreground">{a}</AccordionContent></AccordionItem>)}</Accordion></div>
 
-        <div id="reviews" className="scroll-mt-24"><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">Customer confidence</p><div className="mt-3 flex items-end gap-4"><span className="text-6xl font-bold">4.8</span><div className="pb-1"><div className="flex text-[#b86c00]">{[0,1,2,3,4].map((n) => <Star key={n} className="h-4 w-4 fill-current" />)}</div><p className="mt-1 text-sm text-muted-foreground">Based on 128 reviews</p></div></div><div className="mt-8 grid gap-4 sm:grid-cols-2">{[
-          ['Neha S.', 'A proper homemade taste', 'The spice is balanced and the jar arrived neatly packed. It pairs beautifully with parathas.'],
-          ['Rohit K.', 'Fresh and flavourful', 'Loved the texture and aroma. The ingredient and storage details made ordering feel easy.'],
-        ].map(([name, title, copy]) => <article key={name} className="border border-[#e8dfd2] bg-background p-5"><div className="flex items-center gap-2 text-xs font-semibold text-green-800"><Check className="h-4 w-4" />Verified buyer</div><h3 className="mt-4 font-bold">“{title}”</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{copy}</p><p className="mt-4 text-xs font-bold">{name}</p></article>)}</div><p className="mt-3 text-xs text-muted-foreground">Sample customer feedback shown for presentation.</p></div>
+        <div id="reviews" className="scroll-mt-24"><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">Customer confidence</p><div className="mt-3 flex items-end gap-4"><span className="text-6xl font-bold">{rating?rating.toFixed(1):'—'}</span><div className="pb-1"><div className="flex text-[#b86c00]">{[0,1,2,3,4].map((n) => <Star key={n} className="h-4 w-4 fill-current" />)}</div><p className="mt-1 text-sm text-muted-foreground">Based on {reviews.length} approved reviews</p></div></div><div className="mt-6 space-y-3">{reviews.slice(0,4).map((review:any)=><article key={review._id} className="border border-[#e8dfd2] bg-background p-4"><div className="flex text-[#b86c00]">{Array.from({length:review.rating}).map((_,n)=><Star key={n} className="h-3.5 w-3.5 fill-current"/>)}</div><p className="mt-2 text-sm leading-6 text-muted-foreground">{review.comment}</p><p className="mt-2 text-xs font-bold">{review.name}</p></article>)}</div><form onSubmit={submitReview} className="mt-7 grid gap-3 border border-[#e8dfd2] bg-background p-5 sm:grid-cols-2"><h3 className="font-bold sm:col-span-2">Share your experience</h3><Input required placeholder="Your name" value={reviewForm.name} onChange={e=>setReviewForm({...reviewForm,name:e.target.value})}/><Input type="email" placeholder="Email (not published)" value={reviewForm.email} onChange={e=>setReviewForm({...reviewForm,email:e.target.value})}/><select className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={reviewForm.rating} onChange={e=>setReviewForm({...reviewForm,rating:Number(e.target.value)})}>{[5,4,3,2,1].map(value=><option key={value} value={value}>{value} stars</option>)}</select><Input required minLength={5} placeholder="Write your review" value={reviewForm.comment} onChange={e=>setReviewForm({...reviewForm,comment:e.target.value})}/><Button className="sm:col-span-2">Submit for review</Button>{reviewMessage&&<p className="text-sm text-muted-foreground sm:col-span-2">{reviewMessage}</p>}</form></div>
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-background p-3 shadow-[0_-8px_25px_rgba(0,0,0,.08)] md:hidden"><div className="mx-auto flex max-w-lg items-center gap-4"><div className="min-w-[84px]"><p className="text-xs text-muted-foreground">Total</p><p className="text-lg font-bold text-primary">₹{product.price * quantity}</p></div><Button onClick={handleAddToCart} disabled={!product.inStock} className="h-12 flex-1 rounded-none"><ShoppingBag className="mr-2 h-5 w-5" />Add {quantity} to cart</Button></div></div>
