@@ -11,6 +11,13 @@ export interface Product {
   ingredients: string[];
   shelfLife: string;
   inStock: boolean;
+  slug?: string;
+  images?: string[];
+  subCategory?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string[];
+  sku?: string;
 }
 
 export interface CartItem extends Product {

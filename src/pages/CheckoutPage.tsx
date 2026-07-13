@@ -11,6 +11,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStoreSettings } from '@/hooks/useStoreData';
+import { apiRequest } from '@/lib/api';
 
 const CheckoutPage = () => {
   const { state, dispatch } = useCart();
@@ -62,10 +63,8 @@ const CheckoutPage = () => {
     setSubmitting(true);
     setError('');
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${apiUrl}/orders`, {
+      const result = await apiRequest<any>('/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customer: { name: `${formData.firstName} ${formData.lastName}`.trim(), email: formData.email, phone: formData.phone },
           shippingAddress: { street: formData.address, line2: formData.address2, city: formData.city, state: formData.state, zipCode: formData.pincode, country: 'India' },
@@ -75,8 +74,13 @@ const CheckoutPage = () => {
           marketingAccepted: formData.marketingAccepted,
         }),
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || result.message || 'Unable to place your order.');
+      if (result.guestAccessToken) {
+        const references = JSON.parse(localStorage.getItem('guestOrderReferences') || '[]');
+        localStorage.setItem('guestOrderReferences', JSON.stringify([
+          { orderNumber: result.order.orderNumber, token: result.guestAccessToken },
+          ...references.filter((ref: { orderNumber: string }) => ref.orderNumber !== result.order.orderNumber),
+        ].slice(0, 20)));
+      }
       setOrderNumber(result.order.orderNumber);
       dispatch({ type: 'CLEAR_CART' });
       setStep(4);
@@ -323,14 +327,14 @@ const CheckoutPage = () => {
                 <CheckCircle className="h-8 w-8" />
               </div>
               <h2 className="mb-3 text-3xl font-semibold text-foreground">Order confirmed</h2>
-              <p className="mx-auto mb-3 max-w-xl text-muted-foreground">Thank you, {formData.firstName}. Your guest order has been received.</p>
+              <p className="mx-auto mb-3 max-w-xl text-muted-foreground">Thank you, {formData.firstName}. Your order has been received and can be tracked from your account page.</p>
               <div className="mx-auto mb-8 inline-flex rounded-full bg-muted px-4 py-2 font-mono text-sm font-semibold text-foreground">Order {orderNumber}</div>
               <div className="flex flex-col justify-center gap-3 sm:flex-row">
                 <Button asChild>
                   <Link to="/products">Continue shopping</Link>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link to="/">Go home</Link>
+                  <Link to="/account">Track order</Link>
                 </Button>
               </div>
             </CardContent>

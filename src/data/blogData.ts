@@ -19,6 +19,8 @@ export interface BlogPost {
   likes: number;
   tags: string[];
   isLiked?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
 }
 
 export const blogPosts: BlogPost[] = [

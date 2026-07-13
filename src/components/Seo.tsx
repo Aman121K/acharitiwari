@@ -37,6 +37,7 @@ const pages: Record<string, { title: string; description: string; noindex?: bool
   "/cart": { title: "Shopping Cart | AachariTiwari", description: "Review the authentic Indian pickles in your AachariTiwari shopping cart.", noindex: true },
   "/checkout": { title: "Secure Checkout | AachariTiwari", description: "Complete your AachariTiwari order securely.", noindex: true },
   "/search": { title: "Search | AachariTiwari", description: "Search AachariTiwari products and articles.", noindex: true },
+  "/account": { title: "My Account | AachariTiwari", description: "Manage your AachariTiwari account and orders.", noindex: true },
 };
 
 function setMeta(selector: string, attributes: Record<string, string>) {
@@ -62,11 +63,11 @@ export default function Seo() {
     const adminSeo = storeSettings?.pageSeo?.[pathname];
     const staticPage = adminSeo || (pathname === "/" && storeSettings ? { title: storeSettings.seoTitle, description: storeSettings.seoDescription } : pages[pathname]);
     const title = product
-      ? `${product.name} – Buy Online | ${SITE_NAME}`
+      ? product.seoTitle || `${product.name} – Buy Online | ${SITE_NAME}`
       : article
-        ? `${article.title} | ${SITE_NAME}`
+        ? article.seoTitle || `${article.title} | ${SITE_NAME}`
         : staticPage?.title || `Page Not Found | ${SITE_NAME}`;
-    const description = product?.description || article?.excerpt || staticPage?.description || "The requested page could not be found.";
+    const description = product?.seoDescription || product?.description || article?.seoDescription || article?.excerpt || staticPage?.description || "The requested page could not be found.";
     const rawImage = product?.image || article?.image || DEFAULT_IMAGE;
     const image = new URL(rawImage, `${SITE_URL}/`).href;
     const canonical = `${SITE_URL}${pathname === "/" ? "/" : pathname}`;
@@ -81,9 +82,17 @@ export default function Seo() {
     setMeta('meta[property="og:type"]', { property: "og:type", content: type });
     setMeta('meta[property="og:url"]', { property: "og:url", content: canonical });
     setMeta('meta[property="og:image"]', { property: "og:image", content: image });
+    setMeta('meta[property="og:site_name"]', { property: "og:site_name", content: SITE_NAME });
+    setMeta('meta[property="og:locale"]', { property: "og:locale", content: "en_IN" });
+    setMeta('meta[name="twitter:card"]', { name: "twitter:card", content: "summary_large_image" });
     setMeta('meta[name="twitter:title"]', { name: "twitter:title", content: title });
     setMeta('meta[name="twitter:description"]', { name: "twitter:description", content: description });
     setMeta('meta[name="twitter:image"]', { name: "twitter:image", content: image });
+    if (product?.seoKeywords?.length || storeSettings?.seoKeywords?.length) setMeta('meta[name="keywords"]', { name: "keywords", content: (product?.seoKeywords || storeSettings?.seoKeywords || []).join(', ') });
+    if (product) {
+      setMeta('meta[property="product:price:amount"]', { property: "product:price:amount", content: String(product.price) });
+      setMeta('meta[property="product:price:currency"]', { property: "product:price:currency", content: "INR" });
+    }
 
     let canonicalLink = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!canonicalLink) {
@@ -102,7 +111,7 @@ export default function Seo() {
             name: product.name,
             image: [image],
             description: product.description,
-            sku: product.id,
+            sku: product.sku || product.id,
             brand: { "@type": "Brand", name: SITE_NAME },
             offers: { "@type": "Offer", url: canonical, priceCurrency: "INR", price: product.price, availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" },
           }
