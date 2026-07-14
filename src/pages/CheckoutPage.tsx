@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useCart } from '@/contexts/CartContext';
+import { getCartSessionId, useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStoreSettings } from '@/hooks/useStoreData';
@@ -47,6 +47,22 @@ const CheckoutPage = () => {
     if (user) setFormData((current) => ({ ...current, email: current.email || user.email, firstName: current.firstName || user.name.split(' ')[0] || '', lastName: current.lastName || user.name.split(' ').slice(1).join(' '), phone: current.phone || user.phone || '' }));
   }, [user]);
 
+  useEffect(() => {
+    if (!state.items.length || step >= 4) return;
+    const timer = window.setTimeout(() => {
+      void apiRequest('/cart', {
+        method: 'PUT',
+        body: JSON.stringify({
+          sessionId: getCartSessionId(),
+          checkoutStarted: true,
+          customer: { name: `${formData.firstName} ${formData.lastName}`.trim(), email: formData.email, phone: formData.phone },
+          items: state.items.map(item => ({ productId: item.id, name: item.name, price: item.price, quantity: item.quantity, image: item.image, sku: item.sku })),
+        }),
+      }).catch(() => undefined);
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [formData.email, formData.firstName, formData.lastName, formData.phone, state.items, step]);
+
   const handleNext = () => {
     if (step === 1) {
       if (!/^\S+@\S+\.\S+$/.test(formData.email)) return setError('Enter a valid email address.');
@@ -72,6 +88,7 @@ const CheckoutPage = () => {
           paymentMethod: formData.paymentMethod === 'upi' ? 'upi' : 'cash_on_delivery',
           notes: formData.notes,
           marketingAccepted: formData.marketingAccepted,
+          cartSessionId: getCartSessionId(),
         }),
       });
       if (result.guestAccessToken) {

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useReducer, ReactNode } from 'react';
+import { apiRequest } from '@/lib/api';
 
 export interface Product {
   id: string;
@@ -128,6 +129,16 @@ const initialState: CartState = {
   itemCount: 0,
 };
 
+export const getCartSessionId = () => {
+  const existing = window.localStorage.getItem('achari-cart-session');
+  if (existing) return existing;
+  const sessionId = typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+  window.localStorage.setItem('achari-cart-session', sessionId);
+  return sessionId;
+};
+
 const getInitialState = (): CartState => {
   if (typeof window === 'undefined') return initialState;
   try {
@@ -143,6 +154,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     window.localStorage.setItem('achari-cart', JSON.stringify(state));
+    const timer = window.setTimeout(() => {
+      void apiRequest('/cart', {
+        method: 'PUT',
+        body: JSON.stringify({
+          sessionId: getCartSessionId(),
+          items: state.items.map(item => ({ productId: item.id, name: item.name, price: item.price, quantity: item.quantity, image: item.image, sku: item.sku })),
+        }),
+      }).catch(() => undefined);
+    }, 600);
+    return () => window.clearTimeout(timer);
   }, [state]);
 
   return (
