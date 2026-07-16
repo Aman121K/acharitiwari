@@ -129,11 +129,34 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_auto_auto]">
-              <Button onClick={handleAddToCart} disabled={!product.inStock} size="lg" className="h-13 rounded-none text-base"><ShoppingBag className="mr-2 h-5 w-5" />Add to cart</Button>
-              <Button onClick={handleBuyNow} disabled={!product.inStock} size="lg" variant="outline" className="h-13 rounded-none border-primary text-base text-primary hover:bg-primary hover:text-primary-foreground">Buy now</Button>
-              <Button onClick={handleLike} variant="outline" size="icon" className="h-13 w-13 rounded-none" aria-label={isLiked ? 'Remove from wishlist' : 'Add to wishlist'}><Heart className={`h-5 w-5 ${isLiked ? 'fill-primary text-primary' : ''}`} /></Button>
-              <Button onClick={handleShare} variant="outline" size="icon" className="h-13 w-13 rounded-none" aria-label="Share product"><Share2 className="h-5 w-5" /></Button>
+            <div className="mt-5 border border-[#dfd3c2] bg-[#fffaf0] p-3 shadow-[0_14px_34px_-28px_rgba(67,35,21,.55)] sm:p-4">
+              <div className="grid gap-2 min-[380px]:grid-cols-2">
+                <Button onClick={handleAddToCart} disabled={!product.inStock} size="lg" className="h-14 rounded-sm px-4 text-base font-semibold shadow-[0_8px_20px_-14px_rgba(20,70,18,.9)]">
+                  <ShoppingBag className="mr-2 h-5 w-5 shrink-0" />
+                  <span>{product.inStock ? 'Add to cart' : 'Out of stock'}</span>
+                </Button>
+                <Button onClick={handleBuyNow} disabled={!product.inStock} size="lg" variant="outline" className="h-14 rounded-sm border-primary bg-background px-4 text-base font-semibold text-primary hover:bg-primary hover:text-primary-foreground">
+                  <span>Buy now</span>
+                  <ChevronRight className="ml-2 h-5 w-5 shrink-0" />
+                </Button>
+              </div>
+
+              <div className="mt-3 grid gap-2 border-t border-[#e8dfd2] pt-3 min-[380px]:grid-cols-2">
+                <Button
+                  onClick={handleLike}
+                  variant="outline"
+                  className={`h-12 min-w-0 rounded-sm border-[#dfd3c2] px-3 font-semibold ${isLiked ? 'border-primary/40 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary' : 'bg-background text-foreground hover:border-primary/40 hover:bg-[#f7efdf] hover:text-primary'}`}
+                  aria-label={isLiked ? 'Remove from wishlist' : 'Save product for later'}
+                  aria-pressed={isLiked}
+                >
+                  <Heart className={`mr-2 h-4.5 w-4.5 shrink-0 ${isLiked ? 'fill-primary text-primary' : 'text-primary'}`} />
+                  <span className="truncate">{isLiked ? 'Saved' : 'Save for later'}</span>
+                </Button>
+                <Button onClick={handleShare} variant="outline" className="h-12 min-w-0 rounded-sm border-[#dfd3c2] bg-background px-3 font-semibold text-foreground hover:border-primary/40 hover:bg-[#f7efdf] hover:text-primary" aria-label={`Share ${product.name}`}>
+                  <Share2 className="mr-2 h-4.5 w-4.5 shrink-0 text-primary" />
+                  <span>Share</span>
+                </Button>
+              </div>
             </div>
 
             <div className="mt-7 border border-[#e8dfd2] bg-background p-5">
@@ -182,7 +205,7 @@ const ProductDetail = () => {
         <div id="reviews" className="scroll-mt-24"><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">Customer confidence</p>{reviewsLoading ? <div className="mt-4" aria-label="Loading reviews" aria-busy="true"><div className="flex items-end gap-4"><Skeleton className="h-16 w-24"/><div className="space-y-2"><Skeleton className="h-4 w-28"/><Skeleton className="h-4 w-44"/></div></div><div className="mt-6 space-y-3">{Array.from({length:3}).map((_,index)=><div key={index} className="border bg-background p-4"><Skeleton className="h-4 w-24"/><Skeleton className="mt-3 h-4 w-full"/><Skeleton className="mt-2 h-4 w-3/4"/></div>)}</div></div> : reviewsError ? <LoadError title="Reviews are temporarily unavailable" message={reviewsError.message} onRetry={refreshReviews} className="mt-5" /> : <><div className="mt-3 flex items-end gap-4"><span className="text-6xl font-bold">{rating?rating.toFixed(1):'—'}</span><div className="pb-1">{rating > 0 && <div className="flex text-[#b86c00]">{[0,1,2,3,4].map((n) => <Star key={n} className="h-4 w-4 fill-current" />)}</div>}<p className="mt-1 text-sm text-muted-foreground">{reviews.length ? `Based on ${reviews.length} approved reviews` : 'Be the first to review this jar'}</p></div></div><div className="mt-6 space-y-3">{reviews.slice(0,4).map((review)=><article key={review._id} className="border border-[#e8dfd2] bg-background p-4"><div className="flex text-[#b86c00]">{Array.from({length:review.rating}).map((_,n)=><Star key={n} className="h-3.5 w-3.5 fill-current"/>)}</div><p className="mt-2 text-sm leading-6 text-muted-foreground">{review.comment}</p><p className="mt-2 text-xs font-bold">{review.name}</p></article>)}</div></>}{hasPersistedProduct&&<form onSubmit={submitReview} className="mt-7 grid gap-3 border border-[#e8dfd2] bg-background p-5 sm:grid-cols-2"><h3 className="font-bold sm:col-span-2">Share your experience</h3><Input required placeholder="Your name" value={reviewForm.name} onChange={e=>setReviewForm({...reviewForm,name:e.target.value})}/><Input type="email" placeholder="Email (not published)" value={reviewForm.email} onChange={e=>setReviewForm({...reviewForm,email:e.target.value})}/><select className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={reviewForm.rating} onChange={e=>setReviewForm({...reviewForm,rating:Number(e.target.value)})}>{[5,4,3,2,1].map(value=><option key={value} value={value}>{value} stars</option>)}</select><Input required minLength={5} placeholder="Write your review" value={reviewForm.comment} onChange={e=>setReviewForm({...reviewForm,comment:e.target.value})}/><Button className="sm:col-span-2">Submit for review</Button>{reviewMessage&&<p className="text-sm text-muted-foreground sm:col-span-2">{reviewMessage}</p>}</form>}</div>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 max-w-full border-t bg-background p-2.5 shadow-[0_-8px_25px_rgba(0,0,0,.08)] md:hidden"><div className="mx-auto grid w-full min-w-0 max-w-lg grid-cols-[72px_minmax(0,1fr)] items-center gap-2"><div className="min-w-0"><p className="text-xs text-muted-foreground">Total</p><p className="truncate text-lg font-bold text-primary">₹{product.price * quantity}</p></div><Button onClick={handleAddToCart} disabled={!product.inStock} className="h-12 min-w-0 rounded-none px-2 text-sm"><ShoppingBag className="mr-1.5 h-5 w-5 shrink-0" /><span className="truncate">Add {quantity} to cart</span></Button></div></div>
+      <div className="fixed inset-x-0 bottom-0 z-40 max-w-full border-t border-[#dfd3c2] bg-[#fffaf0] px-3 pb-[max(.625rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-10px_30px_rgba(67,35,21,.12)] md:hidden"><div className="mx-auto grid w-full min-w-0 max-w-lg grid-cols-[76px_minmax(0,1fr)] items-center gap-2.5"><div className="min-w-0"><p className="text-[11px] font-medium text-muted-foreground">Total</p><p className="truncate text-lg font-bold leading-tight text-primary">₹{product.price * quantity}</p></div><Button onClick={handleAddToCart} disabled={!product.inStock} className="h-12 min-w-0 rounded-sm px-3 text-sm font-semibold shadow-[0_8px_20px_-14px_rgba(20,70,18,.9)]"><ShoppingBag className="mr-1.5 h-5 w-5 shrink-0" /><span className="truncate">{product.inStock ? `Add ${quantity} to cart` : 'Out of stock'}</span></Button></div></div>
     </main>
   );
 };
