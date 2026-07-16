@@ -16,8 +16,7 @@ import {
   ArrowRight,
   Star
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import NewsletterSignup from '@/components/NewsletterSignup';
 
 const Footer = () => {
   return (
@@ -25,25 +24,12 @@ const Footer = () => {
       {/* Newsletter Section */}
       <div className="border-y border-[#c88a2b]/30 bg-[#8f1715]">
         <div className="container mx-auto px-4 py-12">
-          <div className="max-w-4xl mx-auto text-center">
-            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-              Stay Updated with Our Latest Offers
-            </h3>
-            <p className="text-white/90 mb-8 max-w-2xl mx-auto">
-              Subscribe to our newsletter and get exclusive discounts, new product updates, and traditional recipes delivered to your inbox.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <Input 
-                type="email" 
-                placeholder="Enter your email address"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/70 focus:bg-white/20"
-              />
-              <Button className="bg-white text-primary hover:bg-gray-100 font-semibold">
-                Subscribe
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </div>
-          </div>
+          <NewsletterSignup
+            source="footer"
+            variant="band"
+            title="Stay Updated with Our Latest Offers"
+            description="Get first taste of new jars, seasonal offers and traditional recipes delivered from our kitchen to your inbox."
+          />
         </div>
       </div>
 

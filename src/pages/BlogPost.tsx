@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useBlogs } from '@/hooks/useStoreData';
 import { ArticleSkeleton, LoadError } from '@/components/StorefrontStates';
+import NewsletterSignup from '@/components/NewsletterSignup';
 
 const BlogPost = () => {
   const { posts: blogPosts, loading, error, refetch } = useBlogs();
@@ -218,22 +219,13 @@ const BlogPost = () => {
         )}
 
         {/* Newsletter Signup */}
-        <Card className="bg-gradient-warm p-8 text-center mt-16">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
-            Enjoyed this article?
-          </h2>
-          <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Subscribe to our newsletter to get the latest stories, recipes, and insights about traditional Indian pickles delivered to your inbox.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-2 rounded-md border border-input bg-background"
-            />
-            <Button variant="spice">Subscribe</Button>
-          </div>
-        </Card>
+        <NewsletterSignup
+          source="blog"
+          variant="card"
+          title="Enjoyed this story?"
+          description="Join our pantry notes for new recipes, regional pickle stories and first access to every seasonal batch."
+          className="mt-16"
+        />
       </div>
     </div>
   );
