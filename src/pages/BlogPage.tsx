@@ -1,249 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, ArrowRight, User, Heart, Search } from 'lucide-react';
+import { ArrowRight, Calendar, Clock, Heart, Search, User } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
-import { blogPosts as fallbackPosts } from '@/data/blogData';
+import { BlogGridSkeleton, LoadError } from '@/components/StorefrontStates';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useBlogs } from '@/hooks/useStoreData';
 
 const BlogPage = () => {
-  const { posts: blogPosts } = useBlogs(fallbackPosts);
-  const categories = Array.from(new Set(blogPosts.map((post) => post.category)));
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  const { posts: blogPosts, loading, error, refetch } = useBlogs();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Posts');
-  const [likedPosts, setLikedPosts] = useState(() => {
-    const saved = localStorage.getItem('likedPosts');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [likedPosts, setLikedPosts] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem('likedPosts') || '[]'); } catch { return []; } });
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
-  const filteredPosts = blogPosts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesCategory = selectedCategory === 'All Posts' || post.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const categories = useMemo(() => Array.from(new Set(blogPosts.map((post) => post.category))), [blogPosts]);
+  const filteredPosts = useMemo(() => blogPosts.filter((post) => {
+    const query=searchQuery.trim().toLowerCase();
+    const matchesSearch=!query||post.title.toLowerCase().includes(query)||post.excerpt.toLowerCase().includes(query)||post.tags?.some((tag)=>tag.toLowerCase().includes(query));
+    return matchesSearch&&(selectedCategory==='All Posts'||post.category===selectedCategory);
+  }),[blogPosts,searchQuery,selectedCategory]);
 
-  const handleLike = (postId) => {
-    const updatedLikes = likedPosts.includes(postId)
-      ? likedPosts.filter(id => id !== postId)
-      : [...likedPosts, postId];
-    
-    setLikedPosts(updatedLikes);
-    localStorage.setItem('likedPosts', JSON.stringify(updatedLikes));
+  const handleLike = (postId:string) => {
+    const updated=likedPosts.includes(postId)?likedPosts.filter((id)=>id!==postId):[...likedPosts,postId];
+    setLikedPosts(updated);localStorage.setItem('likedPosts',JSON.stringify(updated));
   };
 
-  return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Aachar <span className="bg-gradient-spice bg-clip-text text-transparent">Chronicles</span>
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover the stories, traditions, and secrets behind India's most beloved pickles. 
-            From ancient recipes to modern innovations, explore the world of aachar with us.
-          </p>
-        </div>
+  const articleCard=(post:typeof blogPosts[number])=><Card key={post.id} className="group product-card overflow-hidden">
+    <div className="aspect-video overflow-hidden"><img src={post.image} alt={post.title} className="h-full w-full object-cover transition-smooth group-hover:scale-105" /></div>
+    <CardHeader className="pb-4"><Badge variant="outline" className="mb-2 w-fit">{post.category}</Badge><h3 className="line-clamp-2 text-lg font-semibold transition-smooth group-hover:text-primary">{post.title}</h3></CardHeader>
+    <CardContent className="pt-0"><p className="mb-4 line-clamp-3 text-sm text-muted-foreground">{post.excerpt}</p><div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground"><span className="flex items-center"><User className="mr-1 h-3 w-3"/>{post.author}</span><span className="flex items-center"><Calendar className="mr-1 h-3 w-3"/>{new Date(post.date).toLocaleDateString('en-IN')}</span><span className="flex items-center"><Clock className="mr-1 h-3 w-3"/>{post.readTime}</span></div><div className="flex items-center gap-2"><Button variant="outline" className="min-h-11 flex-1" asChild><Link to={`/blog/${post.id}`}>Read more<ArrowRight className="ml-2 h-4 w-4"/></Link></Button><Button aria-label={likedPosts.includes(post.id)?'Unlike article':'Like article'} variant="outline" className="min-h-11" onClick={()=>handleLike(post.id)}><Heart className={`h-4 w-4 ${likedPosts.includes(post.id)?'fill-accent text-accent':''}`}/></Button></div></CardContent>
+  </Card>;
 
-        {/* Search and Filters */}
-        <div className="mb-8 space-y-6">
-          {/* Search Bar */}
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search articles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+  return <main className="min-h-screen py-8 sm:py-12"><div className="container mx-auto px-4">
+    <header className="mx-auto mb-12 max-w-2xl text-center"><p className="text-xs font-bold uppercase tracking-[.22em] text-accent">Stories from the pantry</p><h1 className="mt-3 text-4xl font-bold md:text-5xl">Aachar <span className="text-primary">Chronicles</span></h1><p className="mt-4 text-lg leading-7 text-muted-foreground">Discover the stories, traditions and recipes behind India's most loved pickles.</p></header>
 
-          {/* Categories */}
-          <div>
-            <h2 className="text-lg font-semibold mb-4">Categories</h2>
-            <div className="flex flex-wrap gap-2">
-              <Badge 
-                variant={selectedCategory === 'All Posts' ? "default" : "outline"} 
-                className="cursor-pointer"
-                onClick={() => setSelectedCategory('All Posts')}
-              >
-                All Posts
-              </Badge>
-              {categories.map((category) => (
-                <Badge 
-                  key={category} 
-                  variant={selectedCategory === category ? "default" : "outline"} 
-                  className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-smooth"
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        </div>
+    <section aria-label="Article filters" className="mb-8 border-y border-border/70 py-5"><div className="grid gap-5 lg:grid-cols-[minmax(240px,390px)_1fr] lg:items-end"><label className="relative"><span className="sr-only">Search articles</span><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"/><Input value={searchQuery} onChange={(event)=>setSearchQuery(event.target.value)} placeholder="Search stories, recipes and traditions…" className="min-h-12 bg-white pl-10 text-base"/></label><div><p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">Categories</p><div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">{loading?Array.from({length:4}).map((_,index)=><Skeleton key={index} className="h-10 w-28 shrink-0"/>):['All Posts',...categories].map((category)=><button key={category} onClick={()=>setSelectedCategory(category)} className={`min-h-11 shrink-0 border px-4 text-sm font-semibold ${selectedCategory===category?'border-primary bg-primary text-white':'border-border bg-white hover:border-primary'}`}>{category}</button>)}</div></div></div></section>
 
-        {/* Results Count */}
-        {searchQuery && (
-          <div className="mb-6">
-            <p className="text-muted-foreground">
-              Found {filteredPosts.length} article{filteredPosts.length !== 1 ? 's' : ''} 
-              {searchQuery && ` for "${searchQuery}"`}
-            </p>
-          </div>
-        )}
-
-        {/* Featured Post */}
-        {!searchQuery && (
-          <div className="mb-12">
-            <Card className="overflow-hidden">
-              <div className="grid grid-cols-1 lg:grid-cols-2">
-                <div className="aspect-video lg:aspect-auto">
-                  <img
-                    src={blogPosts[0].image}
-                    alt={blogPosts[0].title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-8">
-                  <Badge className="mb-4">{blogPosts[0].category}</Badge>
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                    {blogPosts[0].title}
-                  </h2>
-                  <p className="text-muted-foreground mb-6 leading-relaxed">
-                    {blogPosts[0].excerpt}
-                  </p>
-                  
-                  <div className="flex items-center text-sm text-muted-foreground mb-6">
-                    <div className="flex items-center mr-6">
-                      <User className="h-4 w-4 mr-1" />
-                      <span>{blogPosts[0].author}</span>
-                    </div>
-                    <div className="flex items-center mr-6">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      <span>{new Date(blogPosts[0].date).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="h-4 w-4 mr-1" />
-                      <span>{blogPosts[0].readTime}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <Button variant="spice" asChild>
-                      <Link to={`/blog/${blogPosts[0].id}`}>
-                        Read Full Article
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleLike(blogPosts[0].id)}
-                      className="flex items-center gap-2"
-                    >
-                      <Heart className={`h-4 w-4 ${likedPosts.includes(blogPosts[0].id) ? 'fill-red-500 text-red-500' : ''}`} />
-                      {blogPosts[0].likes + (likedPosts.includes(blogPosts[0].id) ? 1 : 0)}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        )}
-
-        {/* Blog Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {(searchQuery ? filteredPosts : blogPosts.slice(1)).map((post) => (
-            <Card key={post.id} className="group product-card overflow-hidden">
-              <div className="aspect-video overflow-hidden">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-full object-cover transition-smooth group-hover:scale-105"
-                />
-              </div>
-              
-              <CardHeader className="pb-4">
-                <Badge variant="outline" className="w-fit mb-2">{post.category}</Badge>
-                <h3 className="text-lg font-semibold group-hover:text-primary transition-smooth line-clamp-2">
-                  {post.title}
-                </h3>
-              </CardHeader>
-
-              <CardContent className="pt-0">
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                  {post.excerpt}
-                </p>
-                
-                <div className="flex items-center text-xs text-muted-foreground mb-4">
-                  <div className="flex items-center mr-4">
-                    <User className="h-3 w-3 mr-1" />
-                    <span>{post.author}</span>
-                  </div>
-                  <div className="flex items-center mr-4">
-                    <Calendar className="h-3 w-3 mr-1" />
-                    <span>{new Date(post.date).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="h-3 w-3 mr-1" />
-                    <span>{post.readTime}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" className="flex-1" asChild>
-                    <Link to={`/blog/${post.id}`}>
-                      Read More
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Link>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleLike(post.id)}
-                    className="flex items-center gap-1"
-                  >
-                    <Heart className={`h-3 w-3 ${likedPosts.includes(post.id) ? 'fill-red-500 text-red-500' : ''}`} />
-                    {post.likes + (likedPosts.includes(post.id) ? 1 : 0)}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Newsletter Signup */}
-        <div className="mt-16">
-          <Card className="bg-gradient-warm p-8 text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-4">
-              Stay Updated with Aachar Chronicles
-            </h2>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Get the latest recipes, tips, and stories about traditional Indian pickles delivered to your inbox every week.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-2 rounded-md border border-input bg-background"
-              />
-              <Button variant="spice">Subscribe</Button>
-            </div>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
+    {loading ? <><div className="mb-12 grid overflow-hidden border border-border/60 bg-white/70 lg:grid-cols-2"><Skeleton className="aspect-video rounded-none lg:aspect-auto"/><div className="p-8"><Skeleton className="h-5 w-24"/><Skeleton className="mt-5 h-9 w-full"/><Skeleton className="mt-3 h-9 w-4/5"/><Skeleton className="mt-6 h-4 w-full"/><Skeleton className="mt-2 h-4 w-3/4"/><Skeleton className="mt-7 h-11 w-40 rounded-none"/></div></div><BlogGridSkeleton /></> : error ? <LoadError title="The chronicles could not be loaded" message={error.message} onRetry={refetch} className="mx-auto max-w-2xl"/> : blogPosts.length===0 ? <div className="border-y py-16 text-center"><p className="text-xs font-bold uppercase tracking-[.2em] text-accent">No stories published yet</p><h2 className="mt-3 text-2xl font-bold">Fresh notes from our kitchen are coming soon.</h2><p className="mt-2 text-muted-foreground">In the meantime, explore the jars in our pantry.</p><Button asChild className="mt-6 min-h-11 rounded-none"><Link to="/products">Browse products</Link></Button></div> : <>
+      {!searchQuery&&selectedCategory==='All Posts'&&<section className="mb-12 overflow-hidden border border-border bg-white shadow-card"><div className="grid lg:grid-cols-2"><div className="aspect-video lg:aspect-auto"><img src={blogPosts[0].image} alt={blogPosts[0].title} className="h-full w-full object-cover"/></div><div className="p-6 sm:p-8"><Badge className="mb-4">{blogPosts[0].category}</Badge><h2 className="text-2xl font-bold md:text-3xl">{blogPosts[0].title}</h2><p className="mt-4 leading-7 text-muted-foreground">{blogPosts[0].excerpt}</p><div className="mt-5 flex flex-wrap gap-4 text-sm text-muted-foreground"><span>{blogPosts[0].author}</span><span>{new Date(blogPosts[0].date).toLocaleDateString('en-IN')}</span><span>{blogPosts[0].readTime}</span></div><Button variant="spice" asChild className="mt-6 min-h-11"><Link to={`/blog/${blogPosts[0].id}`}>Read full article<ArrowRight className="ml-2 h-4 w-4"/></Link></Button></div></div></section>}
+      {filteredPosts.length?<><p className="mb-5 text-sm text-muted-foreground"><strong className="text-foreground">{filteredPosts.length}</strong> {filteredPosts.length===1?'story':'stories'} found</p><div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">{(searchQuery||selectedCategory!=='All Posts'?filteredPosts:blogPosts.slice(1)).map(articleCard)}</div></>:<div className="border-y py-14 text-center"><h2 className="text-2xl font-bold">No stories match your search.</h2><p className="mt-2 text-muted-foreground">Try a different phrase or category.</p><button onClick={()=>{setSearchQuery('');setSelectedCategory('All Posts')}} className="mt-5 min-h-11 font-bold text-primary underline underline-offset-4">Clear filters</button></div>}
+    </>}
+  </div></main>;
 };
 
 export default BlogPage;

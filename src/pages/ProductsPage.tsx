@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Check, RotateCcw, Search, ShieldCheck, SlidersHorizontal, Truck } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
-import { products as fallbackProducts } from '@/data/products';
 import { useProducts } from '@/hooks/useStoreData';
+import { LoadError, ProductGridSkeleton } from '@/components/StorefrontStates';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type SortMode = 'featured' | 'name' | 'price-low' | 'price-high';
 
 const ProductsPage = () => {
-  const { products, loading } = useProducts(fallbackProducts);
+  const { products, loading, error, refetch } = useProducts();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState<SortMode>('featured');
@@ -82,7 +83,7 @@ const ProductsPage = () => {
           </div>
           <nav aria-label="Product categories" className="mt-3 -mx-4 overflow-x-auto px-4 scrollbar-hide">
             <div className="flex min-w-max items-end gap-2 sm:min-w-0 sm:flex-wrap">
-              {[{ name: 'All', count: products.length }, ...categories].map((category) => {
+              {loading ? Array.from({length:4}).map((_,index)=><Skeleton key={index} className="h-11 w-28 rounded-none" />) : [{ name: 'All', count: products.length }, ...categories].map((category) => {
                 const selected = selectedCategory === category.name;
                 return <button key={category.name} type="button" aria-pressed={selected} onClick={() => setSelectedCategory(category.name)} className={`min-h-11 border px-3.5 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${selected ? 'border-primary bg-primary text-primary-foreground shadow-[inset_0_-3px_0_#aa6a16]' : 'border-border bg-[#fffdf8] text-foreground hover:border-primary'}`}><span className="text-sm font-bold">{category.name === 'All' ? 'All jars' : category.name}</span><span className={`ml-2 text-[10px] ${selected ? 'text-white/70' : 'text-muted-foreground'}`}>{category.count}</span></button>;
               })}
@@ -93,14 +94,14 @@ const ProductsPage = () => {
 
       <section className="container mx-auto px-4 pt-7" aria-live="polite">
         <div className="mb-5 flex min-h-10 flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
-          <p className="text-sm text-muted-foreground"><strong className="text-base text-foreground">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'jar' : 'jars'} found</p>
+          {loading ? <Skeleton className="h-5 w-28" /> : <p className="text-sm text-muted-foreground"><strong className="text-base text-foreground">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'jar' : 'jars'} found</p>}
           {hasFilters && <button onClick={resetFilters} className="flex min-h-10 items-center gap-2 text-sm font-bold text-accent underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><RotateCcw className="h-4 w-4" /> Reset filters</button>}
         </div>
 
-        {loading && products.length === 0 ? (
-          <div className="grid grid-cols-1 gap-x-5 gap-y-8 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-label="Loading products">
-            {Array.from({ length: 8 }).map((_, index) => <div key={index} className="animate-pulse"><div className="aspect-[4/3] bg-muted" /><div className="mt-4 h-3 w-24 bg-muted"/><div className="mt-3 h-6 w-3/4 bg-muted"/><div className="mt-5 h-11 bg-muted"/></div>)}
-          </div>
+        {loading ? (
+          <ProductGridSkeleton />
+        ) : error ? (
+          <LoadError title="The pantry could not be loaded" message={error.message} onRetry={refetch} className="mx-auto max-w-2xl" />
         ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 gap-x-5 gap-y-8 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredProducts.map((product) => <ProductCard key={product.id} product={product} />)}
@@ -108,9 +109,9 @@ const ProductsPage = () => {
         ) : (
           <div className="mx-auto max-w-xl border-y border-border py-16 text-center">
             <p className="text-xs font-bold uppercase tracking-[.2em] text-accent">Pantry shelf empty</p>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight">No aachar matches those filters.</h2>
-            <p className="mt-2 text-muted-foreground">Try a broader search or reset your filters to see the complete collection.</p>
-            <button onClick={resetFilters} className="mt-6 min-h-11 bg-primary px-6 font-bold text-primary-foreground hover:bg-primary/90">Show all products</button>
+            <h2 className="mt-3 text-2xl font-bold tracking-tight">{hasFilters ? 'No aachar matches those filters.' : 'Our next batch is on its way.'}</h2>
+            <p className="mt-2 text-muted-foreground">{hasFilters ? 'Try a broader search or reset your filters to see the complete collection.' : 'There are no products available right now. Please check back soon.'}</p>
+            {hasFilters && <button onClick={resetFilters} className="mt-6 min-h-11 bg-primary px-6 font-bold text-primary-foreground hover:bg-primary/90">Show all products</button>}
           </div>
         )}
       </section>

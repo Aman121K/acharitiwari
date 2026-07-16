@@ -5,27 +5,25 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { blogPosts as fallbackPosts } from '@/data/blogData';
 import { useBlogs } from '@/hooks/useStoreData';
+import { ArticleSkeleton, LoadError } from '@/components/StorefrontStates';
 
 const BlogPost = () => {
-  const { posts: blogPosts } = useBlogs(fallbackPosts);
+  const { posts: blogPosts, loading, error, refetch } = useBlogs();
   const { id } = useParams();
   const { toast } = useToast();
-  const [post, setPost] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const post = blogPosts.find((candidate) => candidate.id === id);
 
   useEffect(() => {
-    const foundPost = blogPosts.find(p => p.id === id);
-    if (foundPost) {
-      setPost(foundPost);
-      setLikeCount(foundPost.likes);
+    if (post) {
+      setLikeCount(post.likes);
       // Check if post is liked from localStorage
       const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
       setIsLiked(likedPosts.includes(id));
     }
-  }, [id, blogPosts]);
+  }, [id, post]);
 
   const handleLike = () => {
     const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
@@ -73,6 +71,10 @@ const BlogPost = () => {
       });
     }
   };
+
+  if (loading) return <ArticleSkeleton />;
+
+  if (error) return <main className="min-h-[65vh] px-4 py-16"><LoadError title="This story could not be loaded" message={error.message} onRetry={refetch} className="mx-auto max-w-xl"/></main>;
 
   if (!post) {
     return (

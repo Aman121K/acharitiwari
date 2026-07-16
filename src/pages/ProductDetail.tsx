@@ -10,10 +10,11 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useGlobalToast } from '@/contexts/ToastContext';
 import { useToast } from '@/hooks/use-toast';
-import { products as fallbackProducts } from '@/data/products';
 import { useProductReviews, useProducts } from '@/hooks/useStoreData';
 import { apiRequest } from '@/lib/api';
 import { Input } from '@/components/ui/input';
+import { LoadError } from '@/components/StorefrontStates';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,12 +28,20 @@ const ProductDetail = () => {
   const [deliveryMessage, setDeliveryMessage] = useState('');
   const [reviewForm,setReviewForm]=useState({name:'',email:'',rating:5,comment:''});
   const [reviewMessage,setReviewMessage]=useState('');
-  const { products } = useProducts(fallbackProducts);
+  const { products, loading: productLoading, error: productError, refetch: refetchProducts } = useProducts();
   const product = id ? products.find((item) => item.id === id || item.slug === id) : null;
   const hasPersistedProduct = Boolean(product && /^[a-f\d]{24}$/i.test(product.id));
   const [selectedImage,setSelectedImage]=useState('');
   useEffect(()=>setSelectedImage(product?.image||''),[product?.id,product?.image]);
-  const { reviews, rating, refresh: refreshReviews } = useProductReviews(hasPersistedProduct ? product?.id : undefined);
+  const { reviews, rating, loading: reviewsLoading, error: reviewsError, refresh: refreshReviews } = useProductReviews(hasPersistedProduct ? product?.id : undefined);
+
+  if (productLoading) {
+    return <main className="min-h-screen bg-[#fcfaf5]" aria-label="Loading product" aria-busy="true"><div className="container mx-auto grid gap-8 px-4 py-10 lg:grid-cols-2 lg:gap-14"><Skeleton className="aspect-square w-full rounded-none"/><div><Skeleton className="h-4 w-24"/><Skeleton className="mt-5 h-12 w-full"/><Skeleton className="mt-3 h-12 w-3/4"/><Skeleton className="mt-7 h-5 w-40"/><Skeleton className="mt-7 h-24 w-full"/><div className="mt-7 grid grid-cols-3 gap-px"><Skeleton className="h-28 rounded-none"/><Skeleton className="h-28 rounded-none"/><Skeleton className="h-28 rounded-none"/></div><Skeleton className="mt-8 h-14 w-full rounded-none"/><Skeleton className="mt-3 h-14 w-full rounded-none"/></div></div></main>;
+  }
+
+  if (productError) {
+    return <main className="min-h-[65vh] px-4 py-16"><LoadError title="This product could not be loaded" message={productError.message} onRetry={refetchProducts} className="mx-auto max-w-xl" /></main>;
+  }
 
   if (!product) {
     return <main className="min-h-[65vh] grid place-items-center px-4"><div className="text-center"><p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Nothing in this jar</p><h1 className="mt-3 text-3xl font-bold">Product not found</h1><Button asChild className="mt-6"><Link to="/products"><ArrowLeft className="mr-2 h-4 w-4" />Back to products</Link></Button></div></main>;
@@ -95,8 +104,7 @@ const ProductDetail = () => {
             </div>
             <h1 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">{product.name}</h1>
             <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-              <div className="flex items-center gap-1 text-[#b86c00]" aria-label={`Rated ${rating || 4.8} out of 5`}><Star className="h-4 w-4 fill-current" /><strong>{rating ? rating.toFixed(1) : 'New'}</strong></div>
-              <a href="#reviews" className="font-medium underline decoration-muted-foreground/40 underline-offset-4">{reviews.length} verified reviews</a>
+              {reviewsLoading ? <Skeleton className="h-5 w-32" /> : <><div className="flex items-center gap-1 text-[#b86c00]" aria-label={rating ? `Rated ${rating} out of 5` : 'Not yet rated'}><Star className="h-4 w-4 fill-current" /><strong>{rating ? rating.toFixed(1) : 'New'}</strong></div><a href="#reviews" className="font-medium underline decoration-muted-foreground/40 underline-offset-4">{reviews.length} verified reviews</a></>}
               <span className="text-muted-foreground">Loved with dal, rice & paratha</span>
             </div>
             <p className="mt-6 text-lg leading-8 text-muted-foreground">{product.description}</p>
@@ -171,7 +179,7 @@ const ProductDetail = () => {
           ['Does it contain preservatives?', `The full ingredient list is shown above. Please review it carefully; this recipe contains: ${product.ingredients.join(', ')}.`],
         ].map(([q, a], index) => <AccordionItem key={q} value={`faq-${index}`}><AccordionTrigger className="text-left hover:no-underline">{q}</AccordionTrigger><AccordionContent className="leading-6 text-muted-foreground">{a}</AccordionContent></AccordionItem>)}</Accordion></div>
 
-        <div id="reviews" className="scroll-mt-24"><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">Customer confidence</p><div className="mt-3 flex items-end gap-4"><span className="text-6xl font-bold">{rating?rating.toFixed(1):'—'}</span><div className="pb-1"><div className="flex text-[#b86c00]">{[0,1,2,3,4].map((n) => <Star key={n} className="h-4 w-4 fill-current" />)}</div><p className="mt-1 text-sm text-muted-foreground">Based on {reviews.length} approved reviews</p></div></div><div className="mt-6 space-y-3">{reviews.slice(0,4).map((review:any)=><article key={review._id} className="border border-[#e8dfd2] bg-background p-4"><div className="flex text-[#b86c00]">{Array.from({length:review.rating}).map((_,n)=><Star key={n} className="h-3.5 w-3.5 fill-current"/>)}</div><p className="mt-2 text-sm leading-6 text-muted-foreground">{review.comment}</p><p className="mt-2 text-xs font-bold">{review.name}</p></article>)}</div>{hasPersistedProduct&&<form onSubmit={submitReview} className="mt-7 grid gap-3 border border-[#e8dfd2] bg-background p-5 sm:grid-cols-2"><h3 className="font-bold sm:col-span-2">Share your experience</h3><Input required placeholder="Your name" value={reviewForm.name} onChange={e=>setReviewForm({...reviewForm,name:e.target.value})}/><Input type="email" placeholder="Email (not published)" value={reviewForm.email} onChange={e=>setReviewForm({...reviewForm,email:e.target.value})}/><select className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={reviewForm.rating} onChange={e=>setReviewForm({...reviewForm,rating:Number(e.target.value)})}>{[5,4,3,2,1].map(value=><option key={value} value={value}>{value} stars</option>)}</select><Input required minLength={5} placeholder="Write your review" value={reviewForm.comment} onChange={e=>setReviewForm({...reviewForm,comment:e.target.value})}/><Button className="sm:col-span-2">Submit for review</Button>{reviewMessage&&<p className="text-sm text-muted-foreground sm:col-span-2">{reviewMessage}</p>}</form>}</div>
+        <div id="reviews" className="scroll-mt-24"><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">Customer confidence</p>{reviewsLoading ? <div className="mt-4" aria-label="Loading reviews" aria-busy="true"><div className="flex items-end gap-4"><Skeleton className="h-16 w-24"/><div className="space-y-2"><Skeleton className="h-4 w-28"/><Skeleton className="h-4 w-44"/></div></div><div className="mt-6 space-y-3">{Array.from({length:3}).map((_,index)=><div key={index} className="border bg-background p-4"><Skeleton className="h-4 w-24"/><Skeleton className="mt-3 h-4 w-full"/><Skeleton className="mt-2 h-4 w-3/4"/></div>)}</div></div> : reviewsError ? <LoadError title="Reviews are temporarily unavailable" message={reviewsError.message} onRetry={refreshReviews} className="mt-5" /> : <><div className="mt-3 flex items-end gap-4"><span className="text-6xl font-bold">{rating?rating.toFixed(1):'—'}</span><div className="pb-1">{rating > 0 && <div className="flex text-[#b86c00]">{[0,1,2,3,4].map((n) => <Star key={n} className="h-4 w-4 fill-current" />)}</div>}<p className="mt-1 text-sm text-muted-foreground">{reviews.length ? `Based on ${reviews.length} approved reviews` : 'Be the first to review this jar'}</p></div></div><div className="mt-6 space-y-3">{reviews.slice(0,4).map((review)=><article key={review._id} className="border border-[#e8dfd2] bg-background p-4"><div className="flex text-[#b86c00]">{Array.from({length:review.rating}).map((_,n)=><Star key={n} className="h-3.5 w-3.5 fill-current"/>)}</div><p className="mt-2 text-sm leading-6 text-muted-foreground">{review.comment}</p><p className="mt-2 text-xs font-bold">{review.name}</p></article>)}</div></>}{hasPersistedProduct&&<form onSubmit={submitReview} className="mt-7 grid gap-3 border border-[#e8dfd2] bg-background p-5 sm:grid-cols-2"><h3 className="font-bold sm:col-span-2">Share your experience</h3><Input required placeholder="Your name" value={reviewForm.name} onChange={e=>setReviewForm({...reviewForm,name:e.target.value})}/><Input type="email" placeholder="Email (not published)" value={reviewForm.email} onChange={e=>setReviewForm({...reviewForm,email:e.target.value})}/><select className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={reviewForm.rating} onChange={e=>setReviewForm({...reviewForm,rating:Number(e.target.value)})}>{[5,4,3,2,1].map(value=><option key={value} value={value}>{value} stars</option>)}</select><Input required minLength={5} placeholder="Write your review" value={reviewForm.comment} onChange={e=>setReviewForm({...reviewForm,comment:e.target.value})}/><Button className="sm:col-span-2">Submit for review</Button>{reviewMessage&&<p className="text-sm text-muted-foreground sm:col-span-2">{reviewMessage}</p>}</form>}</div>
       </section>
 
       <div className="fixed inset-x-0 bottom-0 z-40 max-w-full border-t bg-background p-2.5 shadow-[0_-8px_25px_rgba(0,0,0,.08)] md:hidden"><div className="mx-auto grid w-full min-w-0 max-w-lg grid-cols-[72px_minmax(0,1fr)] items-center gap-2"><div className="min-w-0"><p className="text-xs text-muted-foreground">Total</p><p className="truncate text-lg font-bold text-primary">₹{product.price * quantity}</p></div><Button onClick={handleAddToCart} disabled={!product.inStock} className="h-12 min-w-0 rounded-none px-2 text-sm"><ShoppingBag className="mr-1.5 h-5 w-5 shrink-0" /><span className="truncate">Add {quantity} to cart</span></Button></div></div>

@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import ProductCard from '@/components/ProductCard';
-import { featuredProducts as fallbackFeaturedProducts } from '@/data/products';
 import { useBanners, useProducts, useReviews, useStoreSettings } from '@/hooks/useStoreData';
 import spiceMarketHero from '@/assets/spice-market-hero.jpg';
+import { LoadError, ProductGridSkeleton } from '@/components/StorefrontStates';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Homepage = () => {
   const fallbackTestimonials = [
@@ -121,11 +122,11 @@ const Homepage = () => {
     }
   ];
 
-  const { products: featuredProducts } = useProducts(fallbackFeaturedProducts);
+  const { products: featuredProducts, loading: productsLoading, error: productsError, refetch: refetchProducts } = useProducts();
   const { banners } = useBanners();
-  const { data: settings } = useStoreSettings();
-  const { reviews: apiReviews } = useReviews();
-  const testimonials = apiReviews.length ? apiReviews.map((review) => ({ name: review.name, location: 'Verified customer', rating: review.rating, text: review.comment, avatar: review.name.split(/\s+/).map((part) => part[0]).join('').slice(0,2).toUpperCase(), product: review.product, verified: true })) : fallbackTestimonials;
+  const { data: settings, loading: settingsLoading } = useStoreSettings();
+  const { reviews: apiReviews, loading: reviewsLoading, error: reviewsError, refetch: refetchReviews } = useReviews();
+  const testimonials = apiReviews.map((review) => ({ name: review.name, location: 'Verified customer', rating: review.rating, text: review.comment, avatar: review.name.split(/\s+/).map((part) => part[0]).join('').slice(0,2).toUpperCase(), product: review.product, verified: true }));
   const heroBanner = banners.find((banner) => banner.displayLocation === 'home');
 
   const stats = [
@@ -201,12 +202,7 @@ const Homepage = () => {
               </div>
             </div>
 
-            <h1 className="mb-5 text-[clamp(2.1rem,11vw,3rem)] font-bold leading-[1.02] text-foreground sm:mb-6 md:text-7xl">
-              {settings?.heroTitle || 'Ghar ka swaad, har bite mein pyaar.'}
-            </h1>
-            <p className="mx-auto mb-7 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-xl md:text-2xl">
-              {settings?.heroDescription || 'Discover the rich flavors of traditional Indian pickles, made with love and authentic recipes passed down through generations. Taste the heritage in every bite.'}
-            </p>
+            {settingsLoading ? <div className="mb-7 space-y-4" aria-label="Loading store introduction" aria-busy="true"><Skeleton className="mx-auto h-14 w-full max-w-2xl lg:mx-0"/><Skeleton className="mx-auto h-14 w-4/5 max-w-xl lg:mx-0"/><Skeleton className="mx-auto h-6 w-full max-w-2xl lg:mx-0"/><Skeleton className="mx-auto h-6 w-3/4 max-w-xl lg:mx-0"/></div> : <><h1 className="mb-5 text-[clamp(2.1rem,11vw,3rem)] font-bold leading-[1.02] text-foreground sm:mb-6 md:text-7xl">{settings?.heroTitle || 'Ghar ka swaad, har bite mein pyaar.'}</h1><p className="mx-auto mb-7 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-xl md:text-2xl">{settings?.heroDescription || 'Discover the rich flavors of traditional Indian pickles, made with love and authentic recipes passed down through generations. Taste the heritage in every bite.'}</p></>}
             
             <div className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
               <Button size="xl" className="w-full bg-gradient-primary px-5 shadow-elegant transition-all duration-300 hover:shadow-glow sm:w-auto sm:px-8">
@@ -254,11 +250,7 @@ const Homepage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {featuredProducts.slice(0, 8).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <div className="mb-16">{productsLoading ? <ProductGridSkeleton count={8}/> : productsError ? <LoadError title="Featured jars could not be loaded" message={productsError.message} onRetry={refetchProducts} className="mx-auto max-w-2xl"/> : featuredProducts.length ? <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">{featuredProducts.slice(0,8).map((product)=><ProductCard key={product.id} product={product}/>)}</div> : <div className="border-y py-12 text-center"><h3 className="text-xl font-bold">Fresh batches are coming soon.</h3><p className="mt-2 text-muted-foreground">Please check back for the next pantry release.</p></div>}</div>
 
           <div className="text-center">
             <Button size="lg" className="bg-gradient-spice hover:opacity-90 text-white shadow-elegant px-8">
@@ -346,6 +338,7 @@ const Homepage = () => {
 
           {/* Horizontal Scrollable Reviews */}
           <div className="relative">
+            {reviewsLoading ? <div className="flex gap-6 overflow-hidden" aria-label="Loading customer reviews" aria-busy="true">{Array.from({length:3}).map((_,index)=><div key={index} className="min-w-[300px] flex-1 border bg-white/80 p-6 sm:min-w-[350px]"><div className="flex gap-3"><Skeleton className="h-12 w-12 rounded-full"/><div className="flex-1"><Skeleton className="h-5 w-32"/><Skeleton className="mt-2 h-4 w-24"/></div></div><Skeleton className="mt-5 h-4 w-24"/><Skeleton className="mt-4 h-4 w-full"/><Skeleton className="mt-2 h-4 w-5/6"/><Skeleton className="mt-5 h-6 w-32"/></div>)}</div> : reviewsError ? <LoadError title="Customer reviews could not be loaded" message={reviewsError.message} onRetry={refetchReviews} className="mx-auto max-w-2xl"/> : testimonials.length ? <>
             <div className="flex overflow-x-auto gap-6 pb-6 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {testimonials.map((testimonial, index) => (
                 <Card key={index} className="min-w-[350px] md:min-w-[400px] flex-shrink-0 border-0 bg-white/90 backdrop-blur shadow-card hover:shadow-elegant transition-all duration-300 snap-start">
@@ -394,6 +387,7 @@ const Homepage = () => {
                 <div key={index} className="w-2 h-2 rounded-full bg-primary/20"></div>
               ))}
             </div>
+            </> : <div className="border-y py-12 text-center"><h3 className="text-xl font-bold">Customer stories are coming soon.</h3><p className="mt-2 text-muted-foreground">Be the first to share your experience with our aachar.</p></div>}
           </div>
 
           {/* View All Reviews Button */}

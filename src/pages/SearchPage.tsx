@@ -7,8 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ProductCard from '@/components/ProductCard';
-import { products } from '@/data/products';
-import { blogPosts } from '@/data/blogData';
+import { useBlogs, useProducts } from '@/hooks/useStoreData';
+import { BlogGridSkeleton, LoadError, ProductGridSkeleton } from '@/components/StorefrontStates';
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -16,10 +16,15 @@ const SearchPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('relevance');
   const [activeTab, setActiveTab] = useState('all');
+  const { products, loading: productsLoading, error: productsError, refetch: refetchProducts } = useProducts();
+  const { posts: blogPosts, loading: blogsLoading, error: blogsError, refetch: refetchBlogs } = useBlogs();
+  const loading = productsLoading || blogsLoading;
+  const error = productsError || blogsError;
+  const retry = () => { refetchProducts(); refetchBlogs(); };
 
   // Filter and search logic
   const filteredResults = useMemo(() => {
-    let results = { products: [], blogs: [] };
+    const results = { products: [], blogs: [] };
 
     if (!searchQuery.trim()) {
       return results;
@@ -60,7 +65,7 @@ const SearchPage = () => {
     }
 
     return results;
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [searchQuery, selectedCategory, sortBy, products, blogPosts]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -114,7 +119,7 @@ const SearchPage = () => {
           </form>
 
           {/* Results Summary */}
-          {searchQuery && (
+          {searchQuery && !loading && !error && (
             <div className="flex items-center justify-between mb-6">
               <p className="text-muted-foreground">
                 {totalResults > 0 
@@ -160,7 +165,11 @@ const SearchPage = () => {
         </div>
 
         {/* Results */}
-        {searchQuery && totalResults > 0 && (
+        {searchQuery && loading && <div className="space-y-12" aria-label="Searching products and articles" aria-busy="true"><ProductGridSkeleton count={4}/><BlogGridSkeleton count={3}/></div>}
+
+        {searchQuery && !loading && error && <LoadError title="Search is temporarily unavailable" message={error.message} onRetry={retry} className="mx-auto max-w-2xl" />}
+
+        {searchQuery && !loading && !error && totalResults > 0 && (
           <>
             {/* Tabs */}
             <div className="flex gap-4 mb-8 border-b">
@@ -249,7 +258,7 @@ const SearchPage = () => {
         )}
 
         {/* No Results */}
-        {searchQuery && totalResults === 0 && (
+        {searchQuery && !loading && !error && totalResults === 0 && (
           <div className="text-center py-16">
             <div className="max-w-md mx-auto">
               <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
