@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api';
 import type { Product } from '@/contexts/CartContext';
 import type { BlogPost } from '@/data/blogData';
@@ -16,30 +17,21 @@ type RemoteState<T> = {
 };
 
 function useRemote<T>(path:string, key:string, initialData:T): RemoteState<T> {
-  const [data,setData]=useState<T>(initialData);
-  const [loading,setLoading]=useState(true);
-  const [error,setError]=useState<Error|null>(null);
-  const [requestVersion,setRequestVersion]=useState(0);
-  const refetch=useCallback(()=>setRequestVersion((version)=>version+1),[]);
+  const query=useQuery<T,Error>({
+    queryKey:['store-data',path,key],
+    queryFn:async()=>{
+      const body=await apiRequest<Record<string,unknown>>(path);
+      if(!Object.prototype.hasOwnProperty.call(body,key)) throw new Error('The server returned an unexpected response.');
+      return body[key] as T;
+    },
+  });
 
-  useEffect(()=>{
-    let active=true;
-    setLoading(true);
-    setError(null);
-    apiRequest<Record<string,unknown>>(path)
-      .then((body)=>{
-        if(!active)return;
-        if(!Object.prototype.hasOwnProperty.call(body,key)) throw new Error('The server returned an unexpected response.');
-        setData(body[key] as T);
-      })
-      .catch((cause)=>{
-        if(active)setError(cause instanceof Error?cause:new Error('Unable to load this content.'));
-      })
-      .finally(()=>{if(active)setLoading(false)});
-    return()=>{active=false};
-  },[path,key,requestVersion]);
-
-  return {data,loading,error,refetch};
+  return {
+    data:query.data??initialData,
+    loading:query.isPending,
+    error:query.error,
+    refetch:()=>{void query.refetch()},
+  };
 }
 
 const mapProduct=(raw:any):Product=>{const variant=raw.variants?.find((item:any)=>item.isActive!==false)||raw.variants?.[0]||{};return{id:String(raw._id),slug:raw.slug,name:raw.title||raw.name,price:Number(variant.price||0),image:raw.images?.[0]||'/placeholder.svg',images:raw.images||[],description:raw.shortDescription||raw.description,category:raw.category?.name||raw.productType||'Aachar',subCategory:raw.subCategory?.name,weight:variant.size||`${raw.shipping?.weightKg||''} kg`,ingredients:raw.ingredients||[],shelfLife:raw.shipping?.shelfLife||'See label',inStock:Number(variant.inventory||0)>0,sku:variant.sku,seoTitle:raw.seoTitle||raw.searchEngine?.title,seoDescription:raw.seoDescription||raw.searchEngine?.description,seoKeywords:raw.seoKeywords||raw.searchEngine?.keywords||[]}};

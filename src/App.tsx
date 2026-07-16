@@ -28,7 +28,18 @@ import AccountPage from "./pages/AccountPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import PolicyPage from "./pages/PolicyPage";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Shared storefront data is reused by Header, SEO and the active page.
+      // A short freshness window prevents duplicate requests during navigation.
+      staleTime: 60_000,
+      gcTime: 10 * 60_000,
+      refetchOnWindowFocus: false,
+      retry: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
