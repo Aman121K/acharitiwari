@@ -17,6 +17,37 @@ const isConfigured = Boolean(
 
 let analyticsPromise: Promise<Analytics | null> | null = null;
 let lastPagePath = '';
+let desiredUserId: string | null | undefined;
+let appliedUserId: string | null | undefined;
+
+function safeUserId(value: unknown): string | null | undefined {
+  if (value === null) return null;
+  if (typeof value !== 'string') return undefined;
+  const userId = value.trim().slice(0, 256);
+  if (!userId) return undefined;
+  // User-ID must be an opaque internal identifier, never direct contact data.
+  if (/\S+@\S+\.\S+/.test(userId) || /^\+?\d[\d\s-]{7,}\d$/.test(userId)) return undefined;
+  return userId;
+}
+
+function getPersistedUserId(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  try {
+    const customer = JSON.parse(window.localStorage.getItem('customerUser') || 'null') as { id?: unknown } | null;
+    const userId = safeUserId(customer?.id);
+    return typeof userId === 'string' ? userId : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+async function applyAnalyticsUserId(analytics: Analytics) {
+  if (desiredUserId === undefined) desiredUserId = getPersistedUserId();
+  if (desiredUserId === undefined || desiredUserId === appliedUserId) return;
+  const { setUserId } = await import('firebase/analytics');
+  setUserId(analytics, desiredUserId);
+  appliedUserId = desiredUserId;
+}
 
 export function getAnalyticsConsent(): ConsentChoice {
   if (typeof window === 'undefined') return null;
@@ -57,6 +88,7 @@ async function loadAnalytics(): Promise<Analytics | null> {
     if (analytics) {
       const { setAnalyticsCollectionEnabled } = await import('firebase/analytics');
       setAnalyticsCollectionEnabled(analytics, true);
+      await applyAnalyticsUserId(analytics);
     }
     return analytics;
   }
@@ -67,10 +99,19 @@ async function loadAnalytics(): Promise<Analytics | null> {
     const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const analytics = initializeAnalytics(app, { config: { send_page_view: false } });
     setAnalyticsCollectionEnabled(analytics, true);
+    await applyAnalyticsUserId(analytics);
     return analytics;
   })().catch(() => null);
 
   return analyticsPromise;
+}
+
+export async function setAnalyticsUserId(userId: string | null) {
+  const normalizedUserId = safeUserId(userId);
+  if (normalizedUserId === undefined) return;
+  desiredUserId = normalizedUserId;
+  const analytics = await loadAnalytics();
+  if (analytics) await applyAnalyticsUserId(analytics);
 }
 
 export async function trackEvent(name: string, parameters: EventParameters = {}) {

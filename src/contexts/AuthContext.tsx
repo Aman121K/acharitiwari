@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
 import { apiRequest } from '@/lib/api';
-import { trackEvent } from '@/lib/analytics';
+import { setAnalyticsUserId, trackEvent } from '@/lib/analytics';
 
 export type Customer = { id:string; name:string; email:string; phone?:string; role:string };
 type AuthValue = { user:Customer|null; loading:boolean; login(email:string,password:string):Promise<void>; register(data:{name:string;email:string;phone:string;password:string}):Promise<void>; logout():void };
@@ -13,9 +13,9 @@ export function AuthProvider({children}:{children:ReactNode}) {
   const persist = (data:AuthResponse) => { localStorage.setItem('customerToken',data.token); localStorage.setItem('customerUser',JSON.stringify(data.user)); setUser(data.user); };
   const value = useMemo<AuthValue>(() => ({
     user, loading,
-    login: async (email,password) => { setLoading(true); try { persist(await apiRequest('/auth/login',{method:'POST',body:JSON.stringify({email,password})})); void trackEvent('login',{method:'email_password'}); } finally { setLoading(false); } },
-    register: async (details) => { setLoading(true); try { persist(await apiRequest('/auth/register',{method:'POST',body:JSON.stringify(details)})); void trackEvent('sign_up',{method:'email_password'}); } finally { setLoading(false); } },
-    logout: () => { localStorage.removeItem('customerToken'); localStorage.removeItem('customerUser'); setUser(null); void trackEvent('logout'); },
+    login: async (email,password) => { setLoading(true); try { const result = await apiRequest<AuthResponse>('/auth/login',{method:'POST',body:JSON.stringify({email,password})}); persist(result); void setAnalyticsUserId(result.user.id).then(() => trackEvent('login',{method:'email_password'})); } finally { setLoading(false); } },
+    register: async (details) => { setLoading(true); try { const result = await apiRequest<AuthResponse>('/auth/register',{method:'POST',body:JSON.stringify(details)}); persist(result); void setAnalyticsUserId(result.user.id).then(() => trackEvent('sign_up',{method:'email_password'})); } finally { setLoading(false); } },
+    logout: () => { localStorage.removeItem('customerToken'); localStorage.removeItem('customerUser'); setUser(null); void setAnalyticsUserId(null).then(() => trackEvent('logout')); },
   }), [user,loading]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
