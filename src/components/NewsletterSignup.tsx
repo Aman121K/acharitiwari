@@ -2,6 +2,7 @@ import { FormEvent, useId, useState } from 'react';
 import { ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 import { apiRequest } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { trackEvent } from '@/lib/analytics';
 
 type NewsletterSignupProps = {
   source: 'footer' | 'blog';
@@ -42,6 +43,8 @@ const NewsletterSignup = ({
       });
       setFormState('success');
       setFeedback(result.message || 'Please check your inbox to confirm your subscription.');
+      void trackEvent('generate_lead', { lead_source: `newsletter_${source}` });
+      void trackEvent('newsletter_signup', { source });
       setEmail('');
     } catch (error) {
       setFormState('error');

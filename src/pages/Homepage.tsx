@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShoppingBag, Truck, Award, Shield, Star, Users, Clock, Heart, CheckCircle, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { useBanners, useProducts, useReviews, useStoreSettings } from '@/hooks/u
 import spiceMarketHero from '@/assets/spice-market-hero.jpg';
 import { LoadError, ProductGridSkeleton } from '@/components/StorefrontStates';
 import { Skeleton } from '@/components/ui/skeleton';
+import { analyticsItem, trackEvent } from '@/lib/analytics';
 
 const Homepage = () => {
   const fallbackTestimonials = [
@@ -129,11 +130,22 @@ const Homepage = () => {
   const testimonials = apiReviews.map((review) => ({ name: review.name, location: 'Verified customer', rating: review.rating, text: review.comment, avatar: review.name.split(/\s+/).map((part) => part[0]).join('').slice(0,2).toUpperCase(), product: review.product, verified: true }));
   const heroBanner = banners.find((banner) => banner.displayLocation === 'home');
 
+  useEffect(() => {
+    if (heroBanner) void trackEvent('view_promotion', { promotion_id: heroBanner._id, promotion_name: heroBanner.title, creative_slot: 'homepage_hero' });
+  }, [heroBanner]);
+
+  useEffect(() => {
+    if (!productsLoading && featuredProducts.length) {
+      void trackEvent('view_item_list', { item_list_id: 'homepage_featured', item_list_name: 'Homepage featured products', items: featuredProducts.slice(0, 8).map((product, index) => analyticsItem(product, 1, index)) });
+    }
+  }, [featuredProducts, productsLoading]);
+
+  const averageRating = apiReviews.length ? (apiReviews.reduce((sum, review) => sum + review.rating, 0) / apiReviews.length).toFixed(1) : null;
   const stats = [
-    { number: "50,000+", label: "Happy Customers", icon: Users },
-    { number: "17+", label: "Pickle Varieties", icon: ShoppingBag },
-    { number: "4.8★", label: "Average Rating", icon: Star },
-    { number: "98%", label: "Customer Satisfaction", icon: Heart }
+    { number: 'Small-batch', label: 'Careful preparation', icon: Users },
+    { number: String(featuredProducts.length), label: 'Available varieties', icon: ShoppingBag },
+    { number: averageRating ? `${averageRating}★` : 'Verified', label: 'Customer reviews', icon: Star },
+    { number: 'Pan-India', label: 'Delivery coverage', icon: Heart }
   ];
 
   const benefits = [
@@ -194,7 +206,7 @@ const Homepage = () => {
             {/* Trust Badge */}
             <div className="mb-5 inline-flex max-w-full flex-wrap items-center justify-center gap-1.5 rounded-xl border border-primary/20 bg-white/90 px-3 py-2 backdrop-blur sm:mb-6 sm:rounded-full">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium text-gray-700">Trusted by 50,000+ customers</span>
+              <span className="text-sm font-medium text-gray-700">Traditional recipes, packed with care</span>
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
@@ -206,7 +218,7 @@ const Homepage = () => {
             
             <div className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
               <Button size="xl" className="w-full bg-gradient-primary px-5 shadow-elegant transition-all duration-300 hover:shadow-glow sm:w-auto sm:px-8">
-                <Link to="/products" className="flex items-center">
+                <Link to="/products" onClick={() => { if (heroBanner) void trackEvent('select_promotion', { promotion_id: heroBanner._id, promotion_name: heroBanner.title, creative_slot: 'homepage_hero' }); }} className="flex items-center">
                   Shop Now
                   <ArrowRight className="h-5 w-5 ml-2" />
                 </Link>
@@ -322,7 +334,7 @@ const Homepage = () => {
       </section>
 
       {/* Enhanced Testimonials Section - Horizontal Scrollable */}
-      <section className="bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 py-14 md:py-16 lg:py-20">
+      <section id="reviews" className="scroll-mt-24 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 py-14 md:py-16 lg:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-secondary/10 text-secondary border-secondary/20">
@@ -332,7 +344,7 @@ const Homepage = () => {
               What Our Customers Say
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Over 50,000 satisfied customers across India love our authentic pickles. Here's what they have to say about their experience.
+              Read verified customer notes about our pickles, packaging and delivery experience.
             </p>
           </div>
 
@@ -392,9 +404,11 @@ const Homepage = () => {
 
           {/* View All Reviews Button */}
           <div className="text-center mt-12">
-            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
-              View All Reviews
-              <ArrowRight className="h-4 w-4 ml-2" />
+            <Button asChild variant="outline" className="min-h-11 border-primary text-primary hover:bg-primary hover:text-white">
+              <Link to="/reviews">
+                View All Reviews
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </div>
         </div>

@@ -27,6 +27,9 @@ import Seo from "@/components/Seo";
 import AccountPage from "./pages/AccountPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import PolicyPage from "./pages/PolicyPage";
+import ReviewsPage from "./pages/ReviewsPage";
+import RouteAnalytics from "@/components/RouteAnalytics";
+import AnalyticsConsent from "@/components/AnalyticsConsent";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,6 +54,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
           <Seo />
+          <RouteAnalytics />
           <ScrollToTop />
           <div className="min-h-screen bg-background">
             <Header />
@@ -66,6 +70,7 @@ const App = () => (
               <Route path="/account" element={<AccountPage />} />
               <Route path="/about" element={<AboutUs />} />
               <Route path="/contact" element={<ContactUs />} />
+              <Route path="/reviews" element={<ReviewsPage />} />
               <Route path="/privacy-policy" element={<PolicyPage />} />
               <Route path="/terms-of-service" element={<PolicyPage />} />
               <Route path="/shipping-policy" element={<PolicyPage />} />
@@ -75,6 +80,7 @@ const App = () => (
             </Routes>
             <Footer />
           </div>
+          <AnalyticsConsent />
           </BrowserRouter>
         </ToastProvider>
       </CartProvider>

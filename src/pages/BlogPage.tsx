@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calendar, Clock, Heart, Search, User } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -8,12 +8,14 @@ import { Input } from '@/components/ui/input';
 import { BlogGridSkeleton, LoadError } from '@/components/StorefrontStates';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBlogs } from '@/hooks/useStoreData';
+import { safeSearchTerm, trackEvent } from '@/lib/analytics';
 
 const BlogPage = () => {
   const { posts: blogPosts, loading, error, refetch } = useBlogs();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Posts');
   const [likedPosts, setLikedPosts] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem('likedPosts') || '[]'); } catch { return []; } });
+  const trackedListKey = useRef('');
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   const categories = useMemo(() => Array.from(new Set(blogPosts.map((post) => post.category))), [blogPosts]);
@@ -23,9 +25,25 @@ const BlogPage = () => {
     return matchesSearch&&(selectedCategory==='All Posts'||post.category===selectedCategory);
   }),[blogPosts,searchQuery,selectedCategory]);
 
+  useEffect(() => {
+    if (loading || !filteredPosts.length) return;
+    const key = `${selectedCategory}|${safeSearchTerm(searchQuery)}|${filteredPosts.map((post) => post.id).join(',')}`;
+    if (trackedListKey.current === key) return;
+    const timer = window.setTimeout(() => {
+      trackedListKey.current = key;
+      void trackEvent('view_article_list', {
+        article_category: selectedCategory,
+        article_count: filteredPosts.length,
+      });
+      if (searchQuery.trim()) void trackEvent('search', { search_term: safeSearchTerm(searchQuery), content_type: 'article' });
+    }, 500);
+    return () => window.clearTimeout(timer);
+  }, [filteredPosts, loading, searchQuery, selectedCategory]);
+
   const handleLike = (postId:string) => {
     const updated=likedPosts.includes(postId)?likedPosts.filter((id)=>id!==postId):[...likedPosts,postId];
     setLikedPosts(updated);localStorage.setItem('likedPosts',JSON.stringify(updated));
+    void trackEvent('article_favorite', { item_id: postId, action: likedPosts.includes(postId) ? 'remove' : 'add' });
   };
 
   const articleCard=(post:typeof blogPosts[number])=><Card key={post.id} className="group product-card overflow-hidden">

@@ -17,8 +17,18 @@ import {
   Star
 } from 'lucide-react';
 import NewsletterSignup from '@/components/NewsletterSignup';
+import { useStoreSettings } from '@/hooks/useStoreData';
+import { openAnalyticsChoices } from '@/lib/privacyChoices';
+import { trackEvent } from '@/lib/analytics';
 
 const Footer = () => {
+  const { data: settings } = useStoreSettings();
+  const supportEmail = settings?.supportEmail || 'aacharitiwari@gmail.com';
+  const supportPhone = settings?.supportPhone || '+919877031481';
+  const phoneHref = `tel:${supportPhone.replace(/[^+\d]/g, '')}`;
+  const currentYear = new Date().getFullYear();
+  const trackSocial = (platform: string) => { void trackEvent('social_click', { platform, location: 'footer' }); };
+
   return (
     <footer className="mt-20 bg-[#17320d] text-white">
       {/* Newsletter Section */}
@@ -72,7 +82,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                <span className="text-sm text-gray-300">4.8/5 Rating</span>
+                <span className="text-sm text-gray-300">Customer Reviewed</span>
               </div>
             </div>
 
@@ -82,7 +92,9 @@ const Footer = () => {
                 href="https://www.facebook.com/aacharitiwari" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-all duration-300 hover:scale-110"
+                onClick={() => trackSocial('facebook')}
+                aria-label="Follow Achari Tiwari on Facebook"
+                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
               >
                 <Facebook className="h-5 w-5" />
               </a>
@@ -90,7 +102,9 @@ const Footer = () => {
                 href="https://www.instagram.com/aacharitiwari/" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-all duration-300 hover:scale-110"
+                onClick={() => trackSocial('instagram')}
+                aria-label="Follow Achari Tiwari on Instagram"
+                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
               >
                 <Instagram className="h-5 w-5" />
               </a>
@@ -98,7 +112,9 @@ const Footer = () => {
                 href="https://x.com/AachariTiwari" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-all duration-300 hover:scale-110"
+                onClick={() => trackSocial('x')}
+                aria-label="Follow Achari Tiwari on X"
+                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
               >
                 <Twitter className="h-5 w-5" />
               </a>
@@ -106,7 +122,9 @@ const Footer = () => {
                 href="https://www.youtube.com/@Aacharitiwari" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-primary transition-all duration-300 hover:scale-110"
+                onClick={() => trackSocial('youtube')}
+                aria-label="Subscribe to Achari Tiwari on YouTube"
+                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
               >
                 <Youtube className="h-5 w-5" />
               </a>
@@ -126,9 +144,9 @@ const Footer = () => {
                 { name: 'Reviews', href: '/reviews' }
               ].map((link) => (
                 <li key={link.name}>
-                  <Link 
+                  <Link
                     to={link.href} 
-                    className="text-gray-300 hover:text-primary transition-colors duration-200 flex items-center group"
+                    className="group inline-flex min-h-11 items-center text-gray-300 transition-colors duration-200 hover:text-primary"
                   >
                     <ArrowRight className="h-3 w-3 mr-2 opacity-0 group-hover:opacity-100 transition-opacity" />
                     {link.name}
@@ -151,13 +169,13 @@ const Footer = () => {
                 'Regional Specials'
               ].map((category) => (
                 <li key={category}>
-                  <a 
-                    href="#" 
-                    className="text-gray-300 hover:text-primary transition-colors duration-200 flex items-center group"
+                  <Link
+                    to={`/products?category=${encodeURIComponent(category)}`}
+                    className="group flex min-h-11 items-center text-gray-300 transition-colors duration-200 hover:text-[#e7bd78] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78]"
                   >
                     <ArrowRight className="h-3 w-3 mr-2 opacity-0 group-hover:opacity-100 transition-opacity" />
                     {category}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -171,9 +189,9 @@ const Footer = () => {
                 <MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                 <div>
                   <p className="text-gray-300 text-sm">
-                    123 Spice Market Street<br />
-                    Andheri West, Mumbai<br />
-                    Maharashtra 400001, India
+                    Corporate office: Saket, New Delhi<br />
+                    Manufacturing: Gopalganj, Bihar<br />
+                    Serving customers across India
                   </p>
                 </div>
               </div>
@@ -181,7 +199,7 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-primary" />
                 <div>
-                  <p className="text-gray-300 text-sm">+919877031481</p>
+                  <a href={phoneHref} onClick={() => { void trackEvent('contact_click', { method: 'phone', location: 'footer' }); }} className="inline-flex min-h-11 items-center text-sm text-gray-300 hover:text-[#e7bd78] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78]">{supportPhone}</a>
                   <p className="text-gray-400 text-xs">Mon-Sat 9AM-7PM</p>
                 </div>
               </div>
@@ -189,7 +207,7 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-primary" />
                 <div>
-                  <p className="text-gray-300 text-sm">aacharitiwari@gmail.com</p>
+                  <a href={`mailto:${supportEmail}`} onClick={() => { void trackEvent('contact_click', { method: 'email', location: 'footer' }); }} className="inline-flex min-h-11 break-all items-center text-sm text-gray-300 hover:text-[#e7bd78] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78]">{supportEmail}</a>
                   <p className="text-gray-400 text-xs">24/7 Support</p>
                 </div>
               </div>
@@ -228,21 +246,24 @@ const Footer = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400 text-sm">
-              © 2024 AachariTiwari. All rights reserved. Made with ❤️ in India.
+              © {currentYear} AachariTiwari. All rights reserved. Made with ❤️ in India.
             </p>
             <div className="flex flex-wrap justify-center md:justify-end space-x-6">
-              <Link to="/privacy-policy" className="text-gray-400 hover:text-primary transition-colors text-sm">
+              <Link to="/privacy-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 transition-colors hover:text-primary">
                 Privacy Policy
               </Link>
-              <Link to="/terms-of-service" className="text-gray-400 hover:text-primary transition-colors text-sm">
+              <Link to="/terms-of-service" className="inline-flex min-h-11 items-center text-sm text-gray-400 transition-colors hover:text-primary">
                 Terms of Service
               </Link>
-              <Link to="/shipping-policy" className="text-gray-400 hover:text-primary transition-colors text-sm">
+              <Link to="/shipping-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 transition-colors hover:text-primary">
                 Shipping Policy
               </Link>
-              <Link to="/refund-policy" className="text-gray-400 hover:text-primary transition-colors text-sm">
+              <Link to="/refund-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 transition-colors hover:text-primary">
                 Refund Policy
               </Link>
+              <button type="button" onClick={openAnalyticsChoices} className="min-h-11 text-sm text-gray-400 transition-colors hover:text-[#e7bd78] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78]">
+                Privacy choices
+              </button>
             </div>
           </div>
         </div>

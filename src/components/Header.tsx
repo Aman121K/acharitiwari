@@ -45,11 +45,11 @@ const Header = () => {
           <div className="flex items-center gap-4 text-xs text-white/90">
             <div className="flex items-center gap-1">
               <Star className="h-3.5 w-3.5 fill-yellow-300 text-yellow-300" />
-              <span>4.8★ Rated by 50k+ shoppers</span>
+              <span>Traditional recipes, carefully packed</span>
             </div>
             <div className="flex items-center gap-1">
               <Shield className="h-3.5 w-3.5" />
-              <span>Premium quality guaranteed</span>
+              <span>Secure checkout and order support</span>
             </div>
           </div>
         </div>

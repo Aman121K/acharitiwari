@@ -1,20 +1,43 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, Shield, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/CartContext';
+import { analyticsItem, trackEvent } from '@/lib/analytics';
 
 const CartPage = () => {
   const { state, dispatch } = useCart();
+  const cartViewTracked = useRef(false);
+
+  useEffect(() => {
+    if (cartViewTracked.current || !state.items.length) return;
+    cartViewTracked.current = true;
+    void trackEvent('view_cart', { currency: 'INR', value: state.total, items: state.items.map((item) => analyticsItem(item, item.quantity)) });
+  }, [state.items, state.total]);
 
   const updateQuantity = (productId: string, quantity: number) => {
+    const item = state.items.find((candidate) => candidate.id === productId);
+    if (item && quantity !== item.quantity) {
+      const difference = Math.abs(quantity - item.quantity);
+      void trackEvent(quantity > item.quantity ? 'add_to_cart' : 'remove_from_cart', {
+        currency: 'INR',
+        value: item.price * difference,
+        items: [analyticsItem(item, difference)],
+      });
+    }
     dispatch({ type: 'UPDATE_QUANTITY', productId, quantity });
   };
 
   const removeFromCart = (productId: string) => {
+    const item = state.items.find((candidate) => candidate.id === productId);
+    if (item) void trackEvent('remove_from_cart', { currency: 'INR', value: item.price * item.quantity, items: [analyticsItem(item, item.quantity)] });
     dispatch({ type: 'REMOVE_FROM_CART', productId });
+  };
+
+  const trackCheckout = () => {
+    void trackEvent('begin_checkout', { currency: 'INR', value: state.total, items: state.items.map((item) => analyticsItem(item, item.quantity)) });
   };
 
   if (state.items.length === 0) {
@@ -116,7 +139,7 @@ const CartPage = () => {
                 </div>
                 <div className="mt-6 space-y-3">
                   <Button asChild variant="spice" size="lg" className="w-full">
-                    <Link to="/checkout">
+                    <Link to="/checkout" onClick={trackCheckout}>
                       Proceed to checkout
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>

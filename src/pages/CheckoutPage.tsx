@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStoreSettings } from '@/hooks/useStoreData';
 import { apiRequest } from '@/lib/api';
+import { analyticsItem, trackEvent } from '@/lib/analytics';
 
 const CheckoutPage = () => {
   const { state, dispatch } = useCart();
@@ -72,6 +73,11 @@ const CheckoutPage = () => {
       if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/\D/g, '').slice(-10))) return setError('Enter a valid 10-digit mobile number.');
     }
     setError('');
+    if (step === 1) {
+      void trackEvent('add_shipping_info', { currency: 'INR', value: total, shipping_tier: 'standard', items: state.items.map((item) => analyticsItem(item, item.quantity)) });
+    } else if (step === 2) {
+      void trackEvent('add_payment_info', { currency: 'INR', value: total, payment_type: formData.paymentMethod === 'upi' ? 'UPI' : 'Cash on delivery', items: state.items.map((item) => analyticsItem(item, item.quantity)) });
+    }
     setStep(step + 1);
   };
 
@@ -79,7 +85,7 @@ const CheckoutPage = () => {
     setSubmitting(true);
     setError('');
     try {
-      const result = await apiRequest<any>('/orders', {
+      const result = await apiRequest<{ order:{ orderNumber:string }; guestAccessToken?:string }>('/orders', {
         method: 'POST',
         body: JSON.stringify({
           customer: { name: `${formData.firstName} ${formData.lastName}`.trim(), email: formData.email, phone: formData.phone },
@@ -99,6 +105,13 @@ const CheckoutPage = () => {
         ].slice(0, 20)));
       }
       setOrderNumber(result.order.orderNumber);
+      void trackEvent('purchase', {
+        transaction_id: result.order.orderNumber,
+        value: total,
+        shipping,
+        currency: 'INR',
+        items: state.items.map((item) => analyticsItem(item, item.quantity)),
+      });
       dispatch({ type: 'CLEAR_CART' });
       setStep(4);
       toast({ title: 'Order placed successfully!', description: `Order ${result.order.orderNumber} is confirmed.` });
@@ -107,6 +120,7 @@ const CheckoutPage = () => {
       setError(message === 'Failed to fetch' || /network|fetch/i.test(message)
         ? 'We couldn’t connect to the order service. Check your internet connection and try again.'
         : message || 'Unable to place your order. Please try again.');
+      void trackEvent('checkout_error', { stage: 'place_order', error_type: message === 'Failed to fetch' || /network|fetch/i.test(message) ? 'network' : 'server' });
     } finally {
       setSubmitting(false);
     }

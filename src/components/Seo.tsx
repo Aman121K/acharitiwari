@@ -5,39 +5,43 @@ import { products as fallbackProducts } from "@/data/products";
 import socialImage from "@/assets/spice-market-hero.jpg";
 import { useBlogs, useProducts, useStoreSettings } from "@/hooks/useStoreData";
 
-const SITE_NAME = "AachariTiwari";
-const SITE_URL = (import.meta.env.VITE_SITE_URL || "https://www.aacharitiwari.com").replace(/\/$/, "");
+const SITE_NAME = "Achari Tiwari";
+const SITE_URL = (import.meta.env.VITE_SITE_URL || (typeof window !== "undefined" ? window.location.origin : "https://acharitiwari.vercel.app")).replace(/\/$/, "");
 const DEFAULT_IMAGE = new URL(socialImage, `${SITE_URL}/`).href;
 
 const pages: Record<string, { title: string; description: string; noindex?: boolean }> = {
   "/": {
-    title: "Authentic Indian Pickles & Aachar Online | AachariTiwari",
-    description: "Shop 17+ varieties of authentic Indian aachar, including mango, lime, garlic and chilli pickles, made with traditional recipes and delivered across India.",
+    title: "Authentic Indian Pickles & Aachar Online | Achari Tiwari",
+    description: "Shop authentic Indian aachar, including mango, lime, garlic and chilli pickles, made with traditional recipes and delivered across India.",
   },
   "/products": {
-    title: "Buy Indian Pickles Online | AachariTiwari",
+    title: "Buy Indian Pickles Online | Achari Tiwari",
     description: "Explore traditional Indian pickles made with quality ingredients, aromatic spices and time-honoured recipes. Order aachar online across India.",
   },
   "/blog": {
-    title: "Aachar Recipes, Stories & Food Guides | AachariTiwari",
+    title: "Aachar Recipes, Stories & Food Guides | Achari Tiwari",
     description: "Read traditional pickle recipes, Indian food stories, preservation tips and guides to enjoying authentic homemade aachar.",
   },
   "/about": {
-    title: "About AachariTiwari | Traditional Indian Aachar",
-    description: "Learn how AachariTiwari preserves regional Indian pickle-making traditions through authentic recipes, quality ingredients and careful preparation.",
+    title: "About Achari Tiwari | Traditional Indian Aachar",
+    description: "Learn how Achari Tiwari preserves regional Indian pickle-making traditions through authentic recipes, quality ingredients and careful preparation.",
   },
   "/contact": {
-    title: "Contact AachariTiwari",
-    description: "Contact AachariTiwari for product questions, order support, delivery information or feedback about our authentic Indian pickles.",
+    title: "Contact Achari Tiwari",
+    description: "Contact Achari Tiwari for product questions, order support, delivery information or feedback about our authentic Indian pickles.",
   },
-  "/privacy-policy": { title: "Privacy Policy | AachariTiwari", description: "Read the AachariTiwari privacy policy and learn how we collect, use and protect your personal information." },
-  "/terms-of-service": { title: "Terms of Service | AachariTiwari", description: "Read the terms that apply when using the AachariTiwari website and purchasing our products." },
-  "/shipping-policy": { title: "Shipping Policy | AachariTiwari", description: "Learn about AachariTiwari order processing, shipping coverage, delivery estimates and packaging." },
-  "/refund-policy": { title: "Refund Policy | AachariTiwari", description: "Review the AachariTiwari refund and replacement policy for damaged, incorrect or quality-affected orders." },
-  "/cart": { title: "Shopping Cart | AachariTiwari", description: "Review the authentic Indian pickles in your AachariTiwari shopping cart.", noindex: true },
-  "/checkout": { title: "Secure Checkout | AachariTiwari", description: "Complete your AachariTiwari order securely.", noindex: true },
-  "/search": { title: "Search | AachariTiwari", description: "Search AachariTiwari products and articles.", noindex: true },
-  "/account": { title: "My Account | AachariTiwari", description: "Manage your AachariTiwari account and orders.", noindex: true },
+  "/reviews": {
+    title: "Customer Reviews | Achari Tiwari",
+    description: "Read approved customer reviews and experiences with Achari Tiwari's traditional Indian pickles and aachar.",
+  },
+  "/privacy-policy": { title: "Privacy Policy | Achari Tiwari", description: "Read the Achari Tiwari privacy policy and learn how we collect, use and protect your personal information." },
+  "/terms-of-service": { title: "Terms of Service | Achari Tiwari", description: "Read the terms that apply when using the Achari Tiwari website and purchasing our products." },
+  "/shipping-policy": { title: "Shipping Policy | Achari Tiwari", description: "Learn about Achari Tiwari order processing, shipping coverage, delivery estimates and packaging." },
+  "/refund-policy": { title: "Refund Policy | Achari Tiwari", description: "Review the Achari Tiwari refund and replacement policy for damaged, incorrect or quality-affected orders." },
+  "/cart": { title: "Shopping Cart | Achari Tiwari", description: "Review the authentic Indian pickles in your Achari Tiwari shopping cart.", noindex: true },
+  "/checkout": { title: "Secure Checkout | Achari Tiwari", description: "Complete your Achari Tiwari order securely.", noindex: true },
+  "/search": { title: "Search | Achari Tiwari", description: "Search Achari Tiwari products and articles.", noindex: true },
+  "/account": { title: "My Account | Achari Tiwari", description: "Manage your Achari Tiwari account and orders.", noindex: true },
 };
 
 function setMeta(selector: string, attributes: Record<string, string>) {
@@ -47,6 +51,14 @@ function setMeta(selector: string, attributes: Record<string, string>) {
     document.head.appendChild(element);
   }
   Object.entries(attributes).forEach(([name, value]) => element!.setAttribute(name, value));
+}
+
+function removeMeta(selector: string) {
+  document.head.querySelector(selector)?.remove();
+}
+
+function absoluteUrl(value: string) {
+  return new URL(value || "/", `${SITE_URL}/`).href;
 }
 
 export default function Seo() {
@@ -78,30 +90,48 @@ export default function Seo() {
         ? article.seoTitle || `${article.title} | ${SITE_NAME}`
         : staticPage?.title || (routeLoading ? `Loading | ${SITE_NAME}` : `Page Not Found | ${SITE_NAME}`);
     const description = product?.seoDescription || product?.description || article?.seoDescription || article?.excerpt || staticPage?.description || (routeLoading ? `Loading content from ${SITE_NAME}.` : "The requested page could not be found.");
-    const rawImage = product?.image || article?.image || DEFAULT_IMAGE;
-    const image = new URL(rawImage, `${SITE_URL}/`).href;
-    const canonical = `${SITE_URL}${pathname === "/" ? "/" : pathname}`;
-    const noindex = staticPage?.noindex || routeLoading || (!staticPage && !product && !article);
+    const socialTitle = (!product && !article && adminSeo?.ogTitle) || title;
+    const socialDescription = (!product && !article && adminSeo?.ogDescription) || description;
+    const rawImage = product?.image || article?.image || adminSeo?.ogImage || DEFAULT_IMAGE;
+    const image = absoluteUrl(rawImage);
+    const canonical = absoluteUrl(adminSeo?.canonical || (pathname === "/" ? "/" : pathname));
+    const protectedPage = Boolean(pages[pathname]?.noindex);
+    const noindex = protectedPage || routeLoading || (!staticPage && !product && !article) || adminSeo?.robots?.startsWith("noindex");
+    const robots = noindex
+      ? "noindex, follow"
+      : adminSeo?.robots || "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
     const type = product ? "product" : article ? "article" : "website";
+    const articleKeywords = article ? [article.focusKeyword, ...(article.tags || [])].filter(Boolean) as string[] : [];
+    const keywords = product?.seoKeywords?.length
+      ? product.seoKeywords
+      : articleKeywords.length
+        ? articleKeywords
+        : adminSeo?.keywords?.length
+          ? adminSeo.keywords
+          : storeSettings?.seoKeywords || [];
 
     document.title = title;
     setMeta('meta[name="description"]', { name: "description", content: description });
-    setMeta('meta[name="robots"]', { name: "robots", content: noindex ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" });
-    setMeta('meta[property="og:title"]', { property: "og:title", content: title });
-    setMeta('meta[property="og:description"]', { property: "og:description", content: description });
+    setMeta('meta[name="robots"]', { name: "robots", content: robots });
+    setMeta('meta[property="og:title"]', { property: "og:title", content: socialTitle });
+    setMeta('meta[property="og:description"]', { property: "og:description", content: socialDescription });
     setMeta('meta[property="og:type"]', { property: "og:type", content: type });
     setMeta('meta[property="og:url"]', { property: "og:url", content: canonical });
     setMeta('meta[property="og:image"]', { property: "og:image", content: image });
     setMeta('meta[property="og:site_name"]', { property: "og:site_name", content: SITE_NAME });
     setMeta('meta[property="og:locale"]', { property: "og:locale", content: "en_IN" });
     setMeta('meta[name="twitter:card"]', { name: "twitter:card", content: "summary_large_image" });
-    setMeta('meta[name="twitter:title"]', { name: "twitter:title", content: title });
-    setMeta('meta[name="twitter:description"]', { name: "twitter:description", content: description });
+    setMeta('meta[name="twitter:title"]', { name: "twitter:title", content: socialTitle });
+    setMeta('meta[name="twitter:description"]', { name: "twitter:description", content: socialDescription });
     setMeta('meta[name="twitter:image"]', { name: "twitter:image", content: image });
-    if (product?.seoKeywords?.length || storeSettings?.seoKeywords?.length) setMeta('meta[name="keywords"]', { name: "keywords", content: (product?.seoKeywords || storeSettings?.seoKeywords || []).join(', ') });
+    if (keywords.length) setMeta('meta[name="keywords"]', { name: "keywords", content: keywords.join(', ') });
+    else removeMeta('meta[name="keywords"]');
     if (product) {
       setMeta('meta[property="product:price:amount"]', { property: "product:price:amount", content: String(product.price) });
       setMeta('meta[property="product:price:currency"]', { property: "product:price:currency", content: "INR" });
+    } else {
+      removeMeta('meta[property="product:price:amount"]');
+      removeMeta('meta[property="product:price:currency"]');
     }
 
     let canonicalLink = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');

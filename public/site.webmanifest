@@ -1,31 +1,11 @@
 {
-    "name": "AachariTiwari - Authentic Indian Pickles",
-    "short_name": "AachariTiwari",
+    "name": "Achari Tiwari - Authentic Indian Pickles",
+    "short_name": "Achari Tiwari",
     "description": "Authentic Indian pickles and traditional aachar online store",
     "icons": [
         {
-            "src": "/favicon-16x16.png",
-            "sizes": "16x16",
-            "type": "image/png"
-        },
-        {
-            "src": "/favicon-32x32.png",
-            "sizes": "32x32",
-            "type": "image/png"
-        },
-        {
-            "src": "/apple-touch-icon.png",
-            "sizes": "180x180",
-            "type": "image/png"
-        },
-        {
-            "src": "/android-chrome-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "/android-chrome-512x512.png",
-            "sizes": "512x512",
+            "src": "/brand/achari-tiwari-logo.png",
+            "sizes": "1254x1254",
             "type": "image/png"
         }
     ],

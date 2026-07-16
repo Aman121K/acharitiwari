@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Search, Filter, X, SortAsc } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import ProductCard from '@/components/ProductCard';
 import { useBlogs, useProducts } from '@/hooks/useStoreData';
 import { BlogGridSkeleton, LoadError, ProductGridSkeleton } from '@/components/StorefrontStates';
+import { analyticsItem, safeSearchTerm, trackEvent } from '@/lib/analytics';
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -70,6 +71,7 @@ const SearchPage = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      void trackEvent('search', { search_term: safeSearchTerm(searchQuery) });
       setSearchParams({ q: searchQuery });
     }
   };
@@ -82,6 +84,16 @@ const SearchPage = () => {
   const totalResults = filteredResults.products.length + filteredResults.blogs.length;
 
   const categories = ['all', ...new Set(products.map(p => p.category))];
+
+  useEffect(() => {
+    const submittedQuery = searchParams.get('q');
+    if (loading || !submittedQuery || !filteredResults.products.length) return;
+    void trackEvent('view_item_list', {
+      item_list_id: 'site_search',
+      item_list_name: 'Product search results',
+      items: filteredResults.products.slice(0, 20).map((product, index) => analyticsItem(product, 1, index)),
+    });
+  }, [loading, searchParams, filteredResults.products]);
 
   return (
     <div className="min-h-screen py-8">

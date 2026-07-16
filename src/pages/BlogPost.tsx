@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useBlogs } from '@/hooks/useStoreData';
 import { ArticleSkeleton, LoadError } from '@/components/StorefrontStates';
 import NewsletterSignup from '@/components/NewsletterSignup';
+import { trackEvent } from '@/lib/analytics';
 
 const BlogPost = () => {
   const { posts: blogPosts, loading, error, refetch } = useBlogs();
@@ -26,6 +27,11 @@ const BlogPost = () => {
     }
   }, [id, post]);
 
+  useEffect(() => {
+    if (!post) return;
+    void trackEvent('select_content', { content_type: 'article', item_id: post.id, content_category: post.category });
+  }, [post]);
+
   const handleLike = () => {
     const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
     
@@ -35,6 +41,7 @@ const BlogPost = () => {
       localStorage.setItem('likedPosts', JSON.stringify(updatedLikes));
       setIsLiked(false);
       setLikeCount(prev => prev - 1);
+      void trackEvent('article_favorite', { item_id: post.id, action: 'remove' });
       toast({
         title: "Removed from favorites",
         description: "Post removed from your liked articles.",
@@ -45,6 +52,7 @@ const BlogPost = () => {
       localStorage.setItem('likedPosts', JSON.stringify(updatedLikes));
       setIsLiked(true);
       setLikeCount(prev => prev + 1);
+      void trackEvent('article_favorite', { item_id: post.id, action: 'add' });
       toast({
         title: "Added to favorites!",
         description: "Thank you for liking this article.",
@@ -53,6 +61,7 @@ const BlogPost = () => {
   };
 
   const handleShare = async () => {
+    void trackEvent('share', { method: navigator.share ? 'native' : 'clipboard', content_type: 'article', item_id: post.id });
     if (navigator.share) {
       try {
         await navigator.share({

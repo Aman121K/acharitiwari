@@ -12,6 +12,7 @@ import { useGlobalToast } from '@/contexts/ToastContext';
 import { useToast } from '@/hooks/use-toast';
 import { useProductReviews, useProducts } from '@/hooks/useStoreData';
 import { apiRequest } from '@/lib/api';
+import { analyticsItem, trackEvent } from '@/lib/analytics';
 import { Input } from '@/components/ui/input';
 import { LoadError } from '@/components/StorefrontStates';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,6 +34,10 @@ const ProductDetail = () => {
   const hasPersistedProduct = Boolean(product && /^[a-f\d]{24}$/i.test(product.id));
   const [selectedImage,setSelectedImage]=useState('');
   useEffect(()=>setSelectedImage(product?.image||''),[product?.id,product?.image]);
+  useEffect(() => {
+    if (!product) return;
+    void trackEvent('view_item', { currency: 'INR', value: product.price, items: [analyticsItem(product)] });
+  }, [product]);
   const { reviews, rating, loading: reviewsLoading, error: reviewsError, refresh: refreshReviews } = useProductReviews(hasPersistedProduct ? product?.id : undefined);
 
   if (productLoading) {
@@ -52,10 +57,22 @@ const ProductDetail = () => {
   const addSelectedQuantity = () => {
     for (let i = 0; i < quantity; i += 1) dispatch({ type: 'ADD_TO_CART', product });
   };
-  const handleAddToCart = () => { addSelectedQuantity(); showToast(product, quantity); };
-  const handleBuyNow = () => { addSelectedQuantity(); navigate('/checkout'); };
+  const handleAddToCart = () => {
+    addSelectedQuantity();
+    showToast(product, quantity);
+    void trackEvent('add_to_cart', { currency: 'INR', value: product.price * quantity, items: [analyticsItem(product, quantity)] });
+  };
+  const handleBuyNow = () => {
+    addSelectedQuantity();
+    const eventData = { currency: 'INR', value: product.price * quantity, items: [analyticsItem(product, quantity)] };
+    void trackEvent('add_to_cart', eventData);
+    void trackEvent('begin_checkout', eventData);
+    navigate('/checkout');
+  };
   const handleLike = () => {
-    setIsLiked((liked) => !liked);
+    const willBeLiked = !isLiked;
+    setIsLiked(willBeLiked);
+    void trackEvent(willBeLiked ? 'add_to_wishlist' : 'remove_from_wishlist', { currency: 'INR', value: product.price, items: [analyticsItem(product)] });
     toast({ title: isLiked ? 'Removed from wishlist' : 'Saved to wishlist', description: `${product.name} ${isLiked ? 'was removed.' : 'is saved for later.'}` });
   };
   const handleShare = async () => {
@@ -63,15 +80,17 @@ const ProductDetail = () => {
     try {
       if (navigator.share) await navigator.share({ title: product.name, text: product.description, url });
       else { await navigator.clipboard.writeText(url); toast({ title: 'Link copied', description: 'Share it with someone who loves a good achar.' }); }
+      void trackEvent('share', { method: navigator.share ? 'native_share' : 'clipboard', content_type: 'product', item_id: product.sku || product.id });
     } catch (error) {
       if (error instanceof Error && error.name !== 'AbortError') toast({ title: 'Could not share', description: 'Please try again.' });
     }
   };
   const checkDelivery = () => {
-    if (!/^\d{6}$/.test(pincode)) { setDeliveryMessage('Enter a valid 6-digit Indian pincode.'); return; }
+    if (!/^\d{6}$/.test(pincode)) { setDeliveryMessage('Enter a valid 6-digit Indian pincode.'); void trackEvent('check_delivery', { result: 'invalid' }); return; }
     setDeliveryMessage('Delivery available · Estimated in 2–5 business days');
+    void trackEvent('check_delivery', { result: 'available' });
   };
-  const submitReview=async(event:React.FormEvent)=>{event.preventDefault();if(!product||!hasPersistedProduct)return;setReviewMessage('');try{const body=await apiRequest<{message:string}>(`/products/${product.id}/reviews`,{method:'POST',body:JSON.stringify(reviewForm)});setReviewMessage(body.message);setReviewForm({name:'',email:'',rating:5,comment:''});void refreshReviews();}catch(error){setReviewMessage(error instanceof Error?error.message:'Unable to submit review')}};
+  const submitReview=async(event:React.FormEvent)=>{event.preventDefault();if(!product||!hasPersistedProduct)return;setReviewMessage('');try{const body=await apiRequest<{message:string}>(`/products/${product.id}/reviews`,{method:'POST',body:JSON.stringify(reviewForm)});setReviewMessage(body.message);void trackEvent('submit_review',{item_id:product.sku||product.id,rating:reviewForm.rating});setReviewForm({name:'',email:'',rating:5,comment:''});void refreshReviews();}catch(error){setReviewMessage(error instanceof Error?error.message:'Unable to submit review')}};
 
   const facts = [
     { icon: PackageCheck, label: product.weight, note: 'Net weight' },

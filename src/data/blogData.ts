@@ -21,6 +21,7 @@ export interface BlogPost {
   isLiked?: boolean;
   seoTitle?: string;
   seoDescription?: string;
+  focusKeyword?: string;
 }
 
 export const blogPosts: BlogPost[] = [
