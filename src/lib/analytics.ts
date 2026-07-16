@@ -1,6 +1,7 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import type { Analytics } from 'firebase/analytics';
 import type { Product } from '@/contexts/CartContext';
+import { firebaseConfig } from '@/lib/firebaseConfig';
 
 export const ANALYTICS_CONSENT_KEY = 'achari-analytics-consent';
 export const ANALYTICS_CONSENT_EVENT = 'achari:analytics-consent-changed';
@@ -8,21 +9,10 @@ export const ANALYTICS_CONSENT_EVENT = 'achari:analytics-consent-changed';
 type ConsentChoice = 'granted' | 'denied' | null;
 type EventParameters = Record<string, unknown>;
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-};
-
 const isConfigured = Boolean(
   firebaseConfig.apiKey
   && firebaseConfig.projectId
-  && firebaseConfig.appId
-  && firebaseConfig.measurementId,
+  && firebaseConfig.appId,
 );
 
 let analyticsPromise: Promise<Analytics | null> | null = null;
