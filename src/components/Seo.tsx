@@ -52,26 +52,36 @@ function setMeta(selector: string, attributes: Record<string, string>) {
 export default function Seo() {
   const { pathname } = useLocation();
   const { data: storeSettings } = useStoreSettings();
-  const { products } = useProducts(fallbackProducts);
-  const { posts: blogPosts } = useBlogs(fallbackPosts);
+  const { products, loading: productsLoading } = useProducts(fallbackProducts);
+  const { posts: blogPosts, loading: blogsLoading } = useBlogs(fallbackPosts);
 
   useEffect(() => {
     const productMatch = pathname.match(/^\/product\/([^/]+)$/);
     const articleMatch = pathname.match(/^\/blog\/([^/]+)$/);
-    const product = productMatch ? products.find((item) => item.id === productMatch[1]) : undefined;
-    const article = articleMatch ? blogPosts.find((post) => post.id === articleMatch[1]) : undefined;
+    const routeValue = productMatch?.[1] || articleMatch?.[1];
+    let routeId = routeValue;
+    try {
+      routeId = routeValue ? decodeURIComponent(routeValue) : routeValue;
+    } catch {
+      // Keep the original route value when it contains malformed URI encoding.
+    }
+    const product = productMatch
+      ? products.find((item) => item.id === routeId || item.slug === routeId)
+      : undefined;
+    const article = articleMatch ? blogPosts.find((post) => post.id === routeId) : undefined;
+    const routeLoading = Boolean((productMatch && productsLoading) || (articleMatch && blogsLoading));
     const adminSeo = storeSettings?.pageSeo?.[pathname];
     const staticPage = adminSeo || (pathname === "/" && storeSettings ? { title: storeSettings.seoTitle, description: storeSettings.seoDescription } : pages[pathname]);
     const title = product
       ? product.seoTitle || `${product.name} – Buy Online | ${SITE_NAME}`
       : article
         ? article.seoTitle || `${article.title} | ${SITE_NAME}`
-        : staticPage?.title || `Page Not Found | ${SITE_NAME}`;
-    const description = product?.seoDescription || product?.description || article?.seoDescription || article?.excerpt || staticPage?.description || "The requested page could not be found.";
+        : staticPage?.title || (routeLoading ? `Loading | ${SITE_NAME}` : `Page Not Found | ${SITE_NAME}`);
+    const description = product?.seoDescription || product?.description || article?.seoDescription || article?.excerpt || staticPage?.description || (routeLoading ? `Loading content from ${SITE_NAME}.` : "The requested page could not be found.");
     const rawImage = product?.image || article?.image || DEFAULT_IMAGE;
     const image = new URL(rawImage, `${SITE_URL}/`).href;
     const canonical = `${SITE_URL}${pathname === "/" ? "/" : pathname}`;
-    const noindex = staticPage?.noindex || (!staticPage && !product && !article);
+    const noindex = staticPage?.noindex || routeLoading || (!staticPage && !product && !article);
     const type = product ? "product" : article ? "article" : "website";
 
     document.title = title;
@@ -132,7 +142,7 @@ export default function Seo() {
       script.text = JSON.stringify(schema);
       document.head.appendChild(script);
     }
-  }, [pathname, storeSettings, products, blogPosts]);
+  }, [pathname, storeSettings, products, blogPosts, productsLoading, blogsLoading]);
 
   return null;
 }
