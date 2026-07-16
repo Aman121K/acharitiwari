@@ -9,7 +9,5 @@ export const firebaseConfig: FirebaseOptions = {
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'acharitiwari-bd237.firebasestorage.app',
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '31876276721',
   appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:31876276721:web:ea26740c42cbc0cbf0e450',
-  // Optional for recent Firebase SDKs: Analytics fetches it from the linked
-  // Google Analytics property when it is not supplied at build time.
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || undefined,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-PMNHZJSCM0',
 };
