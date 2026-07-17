@@ -8,6 +8,8 @@ export interface Product {
   image: string;
   description: string;
   category: string;
+  categoryId?: string;
+  categorySlug?: string;
   weight: string;
   ingredients: string[];
   shelfLife: string;
@@ -15,6 +17,8 @@ export interface Product {
   slug?: string;
   images?: string[];
   subCategory?: string;
+  subCategoryId?: string;
+  subCategorySlug?: string;
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string[];

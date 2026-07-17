@@ -17,12 +17,13 @@ import {
   Star
 } from 'lucide-react';
 import NewsletterSignup from '@/components/NewsletterSignup';
-import { useStoreSettings } from '@/hooks/useStoreData';
+import { useCategories, useStoreSettings } from '@/hooks/useStoreData';
 import { openAnalyticsChoices } from '@/lib/privacyChoices';
 import { trackEvent } from '@/lib/analytics';
 
 const Footer = () => {
   const { data: settings } = useStoreSettings();
+  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
   const supportEmail = settings?.supportEmail || 'aacharitiwari@gmail.com';
   const supportPhone = settings?.supportPhone || '+919877031481';
   const phoneHref = `tel:${supportPhone.replace(/[^+\d]/g, '')}`;
@@ -160,24 +161,19 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-bold text-white mb-6">Categories</h4>
             <ul className="space-y-3">
-              {[
-                'Mango Pickles',
-                'Chili Pickles', 
-                'Lime Pickles',
-                'Garlic Pickles',
-                'Mixed Pickles',
-                'Regional Specials'
-              ].map((category) => (
-                <li key={category}>
+              {categoriesLoading ? Array.from({ length: 4 }).map((_, index) => (
+                <li key={index} className="h-11 animate-pulse bg-white/10" aria-hidden="true" />
+              )) : categories.length ? categories.map((category) => (
+                <li key={category._id}>
                   <Link
-                    to={`/products?category=${encodeURIComponent(category)}`}
+                    to={`/products?category=${encodeURIComponent(category.slug)}`}
                     className="group flex min-h-11 items-center text-gray-300 transition-colors duration-200 hover:text-[#e7bd78] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78]"
                   >
                     <ArrowRight className="h-3 w-3 mr-2 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {category}
+                    {category.name}
                   </Link>
                 </li>
-              ))}
+              )) : <li className="text-sm leading-6 text-gray-400">{categoriesError ? 'Categories are temporarily unavailable.' : 'New categories are coming soon.'}</li>}
             </ul>
           </div>
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, RotateCcw, Search, ShieldCheck, SlidersHorizontal, Truck } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
-import { useProducts } from '@/hooks/useStoreData';
+import { useCategories, useProducts, type StoreCategory } from '@/hooks/useStoreData';
 import { LoadError, ProductGridSkeleton } from '@/components/StorefrontStates';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams } from 'react-router-dom';
@@ -11,42 +11,43 @@ type SortMode = 'featured' | 'name' | 'price-low' | 'price-high';
 
 const ProductsPage = () => {
   const { products, loading, error, refetch } = useProducts();
+  const { categories, loading: categoriesLoading } = useCategories();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategoryId, setSelectedCategoryId] = useState('all');
   const [sortBy, setSortBy] = useState<SortMode>('featured');
   const [inStockOnly, setInStockOnly] = useState(false);
   const trackedListKey = useRef('');
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
-  const categories = useMemo(() => {
-    const counts = new Map<string, number>();
-    products.forEach((product) => counts.set(product.category, (counts.get(product.category) || 0) + 1));
-    return Array.from(counts, ([name, count]) => ({ name, count }));
-  }, [products]);
-
   const requestedCategory = searchParams.get('category')?.trim() || '';
+  const selectedCategory = categories.find((category) => category._id === selectedCategoryId);
+  const categoryFilterLoading = Boolean(requestedCategory) && categoriesLoading;
+  const contentLoading = loading || categoryFilterLoading;
 
   useEffect(() => {
-    if (loading) return;
+    if (categoriesLoading) return;
     if (!requestedCategory) {
-      setSelectedCategory('All');
+      setSelectedCategoryId('all');
       return;
     }
 
-    const matchingCategory = categories.find((category) => category.name.toLocaleLowerCase() === requestedCategory.toLocaleLowerCase());
+    const normalizedCategory = requestedCategory.toLocaleLowerCase();
+    const matchingCategory = categories.find((category) => (
+      category._id === requestedCategory
+      || category.slug.toLocaleLowerCase() === normalizedCategory
+      || category.name.toLocaleLowerCase() === normalizedCategory
+    ));
     if (matchingCategory) {
-      setSelectedCategory(matchingCategory.name);
+      setSelectedCategoryId(matchingCategory._id);
       setSearchTerm('');
       return;
     }
 
-    // Footer categories can be broader than the current database taxonomy.
-    // Treat an unknown category as a useful product search instead of a broken page.
-    setSelectedCategory('All');
-    setSearchTerm(requestedCategory);
-  }, [categories, loading, requestedCategory]);
+    setSelectedCategoryId('missing');
+    setSearchTerm('');
+  }, [categories, categoriesLoading, requestedCategory]);
 
   const filteredProducts = useMemo(() => {
     const query = searchTerm.trim().toLocaleLowerCase();
@@ -55,7 +56,9 @@ const ProductsPage = () => {
         const searchable = [product.name, product.description, product.category, product.subCategory]
           .filter(Boolean).join(' ').toLocaleLowerCase();
         return (!query || searchable.includes(query))
-          && (selectedCategory === 'All' || product.category === selectedCategory)
+          && (selectedCategoryId === 'all' || (selectedCategoryId !== 'missing' && (
+            product.categoryId === selectedCategoryId || product.category === selectedCategory?.name
+          )))
           && (!inStockOnly || product.inStock);
       })
       .sort((a, b) => {
@@ -64,38 +67,39 @@ const ProductsPage = () => {
         if (sortBy === 'name') return a.name.localeCompare(b.name);
         return 0;
       });
-  }, [products, searchTerm, selectedCategory, sortBy, inStockOnly]);
+  }, [products, searchTerm, selectedCategory, selectedCategoryId, sortBy, inStockOnly]);
 
-  const hasFilters = Boolean(searchTerm || selectedCategory !== 'All' || inStockOnly || sortBy !== 'featured');
+  const hasFilters = Boolean(searchTerm || selectedCategoryId !== 'all' || inStockOnly || sortBy !== 'featured');
 
   useEffect(() => {
-    if (loading || !filteredProducts.length) return;
-    const key = `${selectedCategory}|${sortBy}|${inStockOnly}|${safeSearchTerm(searchTerm)}|${filteredProducts.map((item) => item.id).join(',')}`;
+    if (contentLoading || !filteredProducts.length) return;
+    const categoryName = selectedCategory?.name || 'All products';
+    const key = `${selectedCategoryId}|${sortBy}|${inStockOnly}|${safeSearchTerm(searchTerm)}|${filteredProducts.map((item) => item.id).join(',')}`;
     if (trackedListKey.current === key) return;
     const timer = window.setTimeout(() => {
       trackedListKey.current = key;
       void trackEvent('view_item_list', {
-        item_list_id: selectedCategory === 'All' ? 'all_products' : selectedCategory.toLowerCase().replace(/\s+/g, '_'),
-        item_list_name: selectedCategory === 'All' ? 'All products' : selectedCategory,
+        item_list_id: selectedCategory?.slug || 'all_products',
+        item_list_name: categoryName,
         items: filteredProducts.slice(0, 20).map((product, index) => analyticsItem(product, 1, index)),
       });
       if (searchTerm.trim()) void trackEvent('search', { search_term: safeSearchTerm(searchTerm) });
     }, 500);
     return () => window.clearTimeout(timer);
-  }, [filteredProducts, inStockOnly, loading, searchTerm, selectedCategory, sortBy]);
+  }, [contentLoading, filteredProducts, inStockOnly, searchTerm, selectedCategory, selectedCategoryId, sortBy]);
 
-  const selectCategory = (category: string) => {
-    setSelectedCategory(category);
+  const selectCategory = (category: StoreCategory | null) => {
+    setSelectedCategoryId(category?._id || 'all');
     setSearchTerm('');
     const nextParams = new URLSearchParams(searchParams);
-    if (category === 'All') nextParams.delete('category');
-    else nextParams.set('category', category);
+    if (!category) nextParams.delete('category');
+    else nextParams.set('category', category.slug);
     setSearchParams(nextParams);
-    void trackEvent('product_filter', { filter_type: 'category', filter_value: category });
+    void trackEvent('product_filter', { filter_type: 'category', filter_value: category?.slug || 'all' });
   };
   const resetFilters = () => {
     setSearchTerm('');
-    setSelectedCategory('All');
+    setSelectedCategoryId('all');
     setInStockOnly(false);
     setSortBy('featured');
     const nextParams = new URLSearchParams(searchParams);
@@ -143,10 +147,10 @@ const ProductsPage = () => {
           </div>
           <nav aria-label="Product categories" className="mt-3 -mx-4 overflow-x-auto px-4 scrollbar-hide">
             <div className="flex min-w-max items-end gap-2 sm:min-w-0 sm:flex-wrap">
-              {loading ? Array.from({length:4}).map((_,index)=><Skeleton key={index} className="h-11 w-28 rounded-none" />) : [{ name: 'All', count: products.length }, ...categories].map((category) => {
-                const selected = selectedCategory === category.name;
-                return <button key={category.name} type="button" aria-pressed={selected} onClick={() => selectCategory(category.name)} className={`min-h-11 border px-3.5 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${selected ? 'border-primary bg-primary text-primary-foreground shadow-[inset_0_-3px_0_#aa6a16]' : 'border-border bg-[#fffdf8] text-foreground hover:border-primary'}`}><span className="text-sm font-bold">{category.name === 'All' ? 'All jars' : category.name}</span><span className={`ml-2 text-[10px] ${selected ? 'text-white/70' : 'text-muted-foreground'}`}>{category.count}</span></button>;
-              })}
+              {categoriesLoading ? Array.from({length:4}).map((_,index)=><Skeleton key={index} className="h-11 w-28 rounded-none" />) : <>
+                <button type="button" aria-pressed={selectedCategoryId === 'all'} onClick={() => selectCategory(null)} className={`min-h-11 border px-3.5 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${selectedCategoryId === 'all' ? 'border-primary bg-primary text-primary-foreground shadow-[inset_0_-3px_0_#aa6a16]' : 'border-border bg-[#fffdf8] text-foreground hover:border-primary'}`}><span className="text-sm font-bold">All jars</span><span className={`ml-2 text-[10px] ${selectedCategoryId === 'all' ? 'text-white/70' : 'text-muted-foreground'}`}>{products.length}</span></button>
+                {categories.map((category) => { const selected = selectedCategoryId === category._id; return <button key={category._id} type="button" aria-pressed={selected} onClick={() => selectCategory(category)} className={`min-h-11 border px-3.5 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${selected ? 'border-primary bg-primary text-primary-foreground shadow-[inset_0_-3px_0_#aa6a16]' : 'border-border bg-[#fffdf8] text-foreground hover:border-primary'}`}><span className="text-sm font-bold">{category.name}</span><span className={`ml-2 text-[10px] ${selected ? 'text-white/70' : 'text-muted-foreground'}`}>{category.productCount}</span></button>; })}
+              </>}
             </div>
           </nav>
         </div>
@@ -154,11 +158,11 @@ const ProductsPage = () => {
 
       <section className="container mx-auto px-4 pt-7" aria-live="polite">
         <div className="mb-5 flex min-h-10 flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
-          {loading ? <Skeleton className="h-5 w-28" /> : <div><p className="text-sm text-muted-foreground"><strong className="text-base text-foreground">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'jar' : 'jars'} found</p>{requestedCategory && selectedCategory === 'All' && <p className="mt-1 text-xs text-muted-foreground">Showing the closest matches for “{requestedCategory}”.</p>}</div>}
+          {contentLoading ? <Skeleton className="h-5 w-28" /> : <div><p className="text-sm text-muted-foreground"><strong className="text-base text-foreground">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'jar' : 'jars'} found</p>{requestedCategory && selectedCategoryId === 'missing' && <p className="mt-1 text-xs text-destructive">The category “{requestedCategory}” is not available.</p>}</div>}
           {hasFilters && <button onClick={resetFilters} className="flex min-h-10 items-center gap-2 text-sm font-bold text-accent underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><RotateCcw className="h-4 w-4" /> Reset filters</button>}
         </div>
 
-        {loading ? (
+        {contentLoading ? (
           <ProductGridSkeleton />
         ) : error ? (
           <LoadError title="The pantry could not be loaded" message={error.message} onRetry={refetch} className="mx-auto max-w-2xl" />
