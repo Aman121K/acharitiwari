@@ -109,11 +109,11 @@ const ProductDetail = () => {
       <section className="container mx-auto min-w-0 px-3 py-7 sm:px-4 lg:py-12">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(420px,.98fr)] lg:gap-14">
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <div className="relative overflow-hidden border border-[#e8dfd2] bg-[#f4eee3] shadow-[0_18px_60px_-38px_rgba(67,35,21,.45)]">
-              <img src={selectedImage||product.image} alt={`${product.name} jar`} className="aspect-square h-full w-full object-cover transition-transform duration-700 hover:scale-[1.025] motion-reduce:transition-none" />
+            <div className="relative aspect-[4/3] overflow-hidden border border-[#e8dfd2] bg-[#f4eee3] p-3 shadow-[0_18px_60px_-38px_rgba(67,35,21,.45)] sm:p-5">
+              <img src={selectedImage||product.image} alt={`${product.name} jar`} className="h-full w-full object-contain" />
               <div className="absolute left-4 top-4 flex items-center gap-2 bg-[#fffaf0] px-3 py-2 text-xs font-bold text-primary shadow-sm"><Award className="h-4 w-4" /> Small-batch quality</div>
             </div>
-            <div className="mt-3 flex flex-wrap gap-3">{(product.images?.length?product.images:[product.image]).map((image,index)=><button key={image} type="button" onClick={()=>setSelectedImage(image)} aria-label={`View ${product.name} image ${index+1}`} className={`h-20 w-20 overflow-hidden border-2 bg-muted p-1 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${selectedImage===image?'border-primary':'border-transparent'}`}><img src={image} alt="" className="h-full w-full object-cover" /></button>)}</div>
+            <div className="mt-3 flex flex-wrap gap-3">{(product.images?.length?product.images:[product.image]).map((image,index)=><button key={image} type="button" onClick={()=>setSelectedImage(image)} aria-label={`View ${product.name} image ${index+1}`} className={`h-20 w-20 overflow-hidden border-2 bg-[#f4eee3] p-1.5 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${selectedImage===image?'border-primary':'border-transparent'}`}><img src={image} alt="" className="h-full w-full object-contain" /></button>)}</div>
           </div>
 
           <div className="min-w-0">

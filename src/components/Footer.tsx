@@ -44,10 +44,10 @@ const Footer = () => {
       </div>
 
       {/* Main Footer Content */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 items-start gap-x-8 gap-y-10 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(140px,.8fr)_minmax(170px,1fr)_minmax(260px,1.25fr)]">
           {/* Brand Section */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6">
             <div className="flex items-center space-x-3">
               <div className="h-24 w-24 overflow-hidden rounded-lg border border-[#c88a2b]/50 bg-[#fff8ed] shadow-glow">
                 <img 
@@ -94,7 +94,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 onClick={() => trackSocial('facebook')}
                 aria-label="Follow Achari Tiwari on Facebook"
-                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
+                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-[#8f1715] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
               >
                 <Facebook className="h-5 w-5" />
               </a>
@@ -104,7 +104,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 onClick={() => trackSocial('instagram')}
                 aria-label="Follow Achari Tiwari on Instagram"
-                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
+                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-[#8f1715] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
               >
                 <Instagram className="h-5 w-5" />
               </a>
@@ -114,7 +114,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 onClick={() => trackSocial('x')}
                 aria-label="Follow Achari Tiwari on X"
-                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
+                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-[#8f1715] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
               >
                 <Twitter className="h-5 w-5" />
               </a>
@@ -124,7 +124,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 onClick={() => trackSocial('youtube')}
                 aria-label="Subscribe to Achari Tiwari on YouTube"
-                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
+                className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-800 transition-all duration-300 hover:scale-105 hover:bg-[#8f1715] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17320d]"
               >
                 <Youtube className="h-5 w-5" />
               </a>
@@ -133,8 +133,8 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-bold text-white mb-6">Quick Links</h4>
-            <ul className="space-y-3">
+            <h4 className="mb-5 text-lg font-bold leading-7 text-white">Quick Links</h4>
+            <ul className="space-y-1">
               {[
                 { name: 'Home', href: '/' },
                 { name: 'Products', href: '/products' },
@@ -146,7 +146,7 @@ const Footer = () => {
                 <li key={link.name}>
                   <Link
                     to={link.href} 
-                    className="inline-flex min-h-11 items-center text-gray-300 underline-offset-4 transition-colors duration-200 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                    className="inline-flex py-1.5 text-gray-200 underline-offset-4 transition-colors duration-200 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                   >
                     {link.name}
                   </Link>
@@ -157,15 +157,15 @@ const Footer = () => {
 
           {/* Categories */}
           <div>
-            <h4 className="text-lg font-bold text-white mb-6">Categories</h4>
-            <ul className="space-y-3">
+            <h4 className="mb-5 text-lg font-bold leading-7 text-white">Categories</h4>
+            <ul className="space-y-1">
               {categoriesLoading ? Array.from({ length: 4 }).map((_, index) => (
                 <li key={index} className="h-11 animate-pulse bg-white/10" aria-hidden="true" />
               )) : categories.length ? categories.map((category) => (
                 <li key={category._id}>
                   <Link
                     to={`/products?category=${encodeURIComponent(category.slug)}`}
-                    className="inline-flex min-h-11 items-center text-gray-300 underline-offset-4 transition-colors duration-200 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                    className="inline-flex py-1.5 text-gray-200 underline-offset-4 transition-colors duration-200 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                   >
                     {category.name}
                   </Link>
@@ -176,10 +176,10 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-lg font-bold text-white mb-6">Contact Info</h4>
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+            <h4 className="mb-5 text-lg font-bold leading-7 text-white">Contact Info</h4>
+            <div className="space-y-3">
+              <div className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-3">
+                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-[#e7bd78]" />
                 <div>
                   <p className="text-gray-300 text-sm">
                     Corporate office: Saket, New Delhi<br />
@@ -189,27 +189,27 @@ const Footer = () => {
                 </div>
               </div>
               
-              <div className="flex items-center space-x-3">
-                <Phone className="h-4 w-4 text-primary" />
+              <div className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-3">
+                <Phone className="mt-1 h-5 w-5 text-[#e7bd78]" />
                 <div>
-                  <a href={phoneHref} onClick={() => { void trackEvent('contact_click', { method: 'phone', location: 'footer' }); }} className="inline-flex min-h-11 items-center text-sm text-gray-300 underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">{supportPhone}</a>
-                  <p className="text-gray-400 text-xs">Mon-Sat 9AM-7PM</p>
+                  <a href={phoneHref} onClick={() => { void trackEvent('contact_click', { method: 'phone', location: 'footer' }); }} className="inline-flex py-1 text-sm text-gray-200 underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">{supportPhone}</a>
+                  <p className="text-gray-300 text-xs">Mon-Sat 9AM-7PM</p>
                 </div>
               </div>
               
-              <div className="flex items-center space-x-3">
-                <Mail className="h-4 w-4 text-primary" />
+              <div className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-3">
+                <Mail className="mt-1 h-5 w-5 text-[#e7bd78]" />
                 <div>
-                  <a href={`mailto:${supportEmail}`} onClick={() => { void trackEvent('contact_click', { method: 'email', location: 'footer' }); }} className="inline-flex min-h-11 break-all items-center text-sm text-gray-300 underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">{supportEmail}</a>
-                  <p className="text-gray-400 text-xs">24/7 Support</p>
+                  <a href={`mailto:${supportEmail}`} onClick={() => { void trackEvent('contact_click', { method: 'email', location: 'footer' }); }} className="inline-flex break-all py-1 text-sm text-gray-200 underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">{supportEmail}</a>
+                  <p className="text-gray-300 text-xs">24/7 Support</p>
                 </div>
               </div>
               
-              <div className="flex items-center space-x-3">
-                <Clock className="h-4 w-4 text-primary" />
+              <div className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-3">
+                <Clock className="mt-1 h-5 w-5 text-[#e7bd78]" />
                 <div>
                   <p className="text-gray-300 text-sm font-medium">Business Hours</p>
-                  <p className="text-gray-400 text-xs">
+                  <p className="text-gray-300 text-xs">
                     Mon-Sat: 9:00 AM - 7:00 PM<br />
                     Sunday: 10:00 AM - 6:00 PM
                   </p>
@@ -220,14 +220,14 @@ const Footer = () => {
         </div>
 
         {/* Payment Methods */}
-        <div className="border-t border-gray-700 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-4">
+        <div className="mt-10 border-t border-gray-700 pt-6">
+          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+            <div className="flex flex-wrap items-center gap-3">
               <span className="text-gray-300 text-sm">Payment options:</span>
-              <div className="flex items-center gap-2 text-sm font-semibold"><span className="rounded border border-[#c88a2b]/50 px-3 py-1">UPI</span><span className="rounded border border-[#c88a2b]/50 px-3 py-1">Cash on Delivery</span></div>
+              <div className="flex flex-wrap items-center gap-2 text-sm font-semibold"><span className="rounded border border-[#c88a2b]/50 px-3 py-1">UPI</span><span className="rounded border border-[#c88a2b]/50 px-3 py-1">Cash on Delivery</span></div>
             </div>
             
-            <div className="text-gray-400 text-sm">
+            <div className="text-sm text-gray-300">
               🔒 Secure SSL Encrypted Payments
             </div>
           </div>
@@ -237,24 +237,24 @@ const Footer = () => {
       {/* Bottom Bar */}
       <div className="bg-black/50 border-t border-gray-700">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-gray-400 text-sm">
+          <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center">
+            <p className="text-sm text-gray-300">
               © {currentYear} AachariTiwari. All rights reserved. Made with ❤️ in India.
             </p>
-            <div className="flex flex-wrap justify-center md:justify-end space-x-6">
-              <Link to="/privacy-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
+            <div className="flex flex-wrap gap-x-6 gap-y-1 md:justify-end">
+              <Link to="/privacy-policy" className="inline-flex min-h-11 items-center text-sm text-gray-300 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
                 Privacy Policy
               </Link>
-              <Link to="/terms-of-service" className="inline-flex min-h-11 items-center text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
+              <Link to="/terms-of-service" className="inline-flex min-h-11 items-center text-sm text-gray-300 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
                 Terms of Service
               </Link>
-              <Link to="/shipping-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
+              <Link to="/shipping-policy" className="inline-flex min-h-11 items-center text-sm text-gray-300 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
                 Shipping Policy
               </Link>
-              <Link to="/refund-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
+              <Link to="/refund-policy" className="inline-flex min-h-11 items-center text-sm text-gray-300 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
                 Refund Policy
               </Link>
-              <button type="button" onClick={openAnalyticsChoices} className="min-h-11 text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
+              <button type="button" onClick={openAnalyticsChoices} className="min-h-11 text-sm text-gray-300 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
                 Privacy choices
               </button>
             </div>

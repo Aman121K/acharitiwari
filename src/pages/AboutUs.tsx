@@ -35,7 +35,8 @@ const AboutUs = () => {
         <div className="absolute inset-0 z-0">
           <img
             src={spiceMarketHero}
-            alt="AachariTiwari Story - From Bihar to Your Home"
+            alt=""
+            aria-hidden="true"
             className="w-full h-full object-cover opacity-40"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/30"></div>

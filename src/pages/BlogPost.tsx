@@ -161,11 +161,11 @@ const BlogPost = () => {
           </div>
 
           {/* Featured Image */}
-          <div className="aspect-video rounded-lg overflow-hidden mb-8">
+          <div className="mb-8 aspect-[4/3] overflow-hidden rounded-lg bg-[#f4eee3] p-3">
             <img
               src={post.image}
               alt={post.title}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-contain"
             />
           </div>
         </header>
@@ -200,11 +200,11 @@ const BlogPost = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedPosts.map((relatedPost) => (
                 <Card key={relatedPost.id} className="group hover:shadow-lg transition-smooth">
-                  <div className="aspect-video overflow-hidden">
+                  <div className="aspect-[4/3] overflow-hidden bg-[#f4eee3] p-2">
                     <img
                       src={relatedPost.image}
                       alt={relatedPost.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-smooth"
+                      className="h-full w-full object-contain"
                     />
                   </div>
                   <CardContent className="p-4">

@@ -240,11 +240,11 @@ const SearchPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredResults.blogs.map(post => (
                     <Card key={post.id} className="group hover:shadow-lg transition-smooth">
-                      <div className="aspect-video overflow-hidden">
+                      <div className="aspect-[4/3] overflow-hidden bg-[#f4eee3] p-2">
                         <img
                           src={post.image}
                           alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-smooth"
+                          className="h-full w-full object-contain"
                         />
                       </div>
                       <CardContent className="p-6">

@@ -111,11 +111,11 @@ const GlobalAddToCartToast: React.FC<GlobalAddToCartToastProps> = ({
         <div className="flex space-x-3">
           {/* Product Image */}
           <div className="flex-shrink-0">
-            <div className="w-14 h-14 rounded-md overflow-hidden bg-gray-100">
+            <div className="h-14 w-14 overflow-hidden rounded-md bg-[#f4eee3] p-1">
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-contain"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIHZpZXdCb3g9IjAgMCA1NiA1NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNi45MTY3IDI4SDM5LjA4MzMiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPHA+PC9wYXRoPgo8L3N2Zz4K';

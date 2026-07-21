@@ -190,7 +190,8 @@ const Homepage = () => {
         <div className="absolute inset-0 z-0">
           <img
             src={heroBanner?.image || spiceMarketHero}
-            alt="Spice Market"
+            alt=""
+            aria-hidden="true"
             className="h-full w-full object-cover opacity-20"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/30"></div>

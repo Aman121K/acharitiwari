@@ -75,7 +75,7 @@ const CartPage = () => {
               <Card key={item.id} className="min-w-0 overflow-hidden border-border/70 bg-white/85 shadow-card">
                 <CardContent className="p-4 sm:p-5">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                    <img src={item.image} alt={item.name} className="h-24 w-full rounded-2xl object-cover sm:h-24 sm:w-24" />
+                    <div className="aspect-[4/3] w-full shrink-0 overflow-hidden rounded-2xl bg-[#f4eee3] p-2 sm:h-24 sm:w-32"><img src={item.image} alt={item.name} className="h-full w-full object-contain" /></div>
 
                     <div className="flex-1 space-y-2">
                       <div className="flex min-w-0 items-start justify-between gap-3">
