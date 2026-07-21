@@ -13,7 +13,6 @@ import {
   Award,
   Truck,
   CreditCard,
-  ArrowRight,
   Star
 } from 'lucide-react';
 import NewsletterSignup from '@/components/NewsletterSignup';
@@ -147,9 +146,8 @@ const Footer = () => {
                 <li key={link.name}>
                   <Link
                     to={link.href} 
-                    className="group inline-flex min-h-11 items-center text-gray-300 transition-colors duration-200 hover:text-primary"
+                    className="inline-flex min-h-11 items-center text-gray-300 underline-offset-4 transition-colors duration-200 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                   >
-                    <ArrowRight className="h-3 w-3 mr-2 opacity-0 group-hover:opacity-100 transition-opacity" />
                     {link.name}
                   </Link>
                 </li>
@@ -167,9 +165,8 @@ const Footer = () => {
                 <li key={category._id}>
                   <Link
                     to={`/products?category=${encodeURIComponent(category.slug)}`}
-                    className="group flex min-h-11 items-center text-gray-300 transition-colors duration-200 hover:text-[#e7bd78] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78]"
+                    className="inline-flex min-h-11 items-center text-gray-300 underline-offset-4 transition-colors duration-200 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                   >
-                    <ArrowRight className="h-3 w-3 mr-2 opacity-0 group-hover:opacity-100 transition-opacity" />
                     {category.name}
                   </Link>
                 </li>
@@ -195,7 +192,7 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-primary" />
                 <div>
-                  <a href={phoneHref} onClick={() => { void trackEvent('contact_click', { method: 'phone', location: 'footer' }); }} className="inline-flex min-h-11 items-center text-sm text-gray-300 hover:text-[#e7bd78] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78]">{supportPhone}</a>
+                  <a href={phoneHref} onClick={() => { void trackEvent('contact_click', { method: 'phone', location: 'footer' }); }} className="inline-flex min-h-11 items-center text-sm text-gray-300 underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">{supportPhone}</a>
                   <p className="text-gray-400 text-xs">Mon-Sat 9AM-7PM</p>
                 </div>
               </div>
@@ -203,7 +200,7 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-primary" />
                 <div>
-                  <a href={`mailto:${supportEmail}`} onClick={() => { void trackEvent('contact_click', { method: 'email', location: 'footer' }); }} className="inline-flex min-h-11 break-all items-center text-sm text-gray-300 hover:text-[#e7bd78] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78]">{supportEmail}</a>
+                  <a href={`mailto:${supportEmail}`} onClick={() => { void trackEvent('contact_click', { method: 'email', location: 'footer' }); }} className="inline-flex min-h-11 break-all items-center text-sm text-gray-300 underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">{supportEmail}</a>
                   <p className="text-gray-400 text-xs">24/7 Support</p>
                 </div>
               </div>
@@ -245,19 +242,19 @@ const Footer = () => {
               © {currentYear} AachariTiwari. All rights reserved. Made with ❤️ in India.
             </p>
             <div className="flex flex-wrap justify-center md:justify-end space-x-6">
-              <Link to="/privacy-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 transition-colors hover:text-primary">
+              <Link to="/privacy-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
                 Privacy Policy
               </Link>
-              <Link to="/terms-of-service" className="inline-flex min-h-11 items-center text-sm text-gray-400 transition-colors hover:text-primary">
+              <Link to="/terms-of-service" className="inline-flex min-h-11 items-center text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
                 Terms of Service
               </Link>
-              <Link to="/shipping-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 transition-colors hover:text-primary">
+              <Link to="/shipping-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
                 Shipping Policy
               </Link>
-              <Link to="/refund-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 transition-colors hover:text-primary">
+              <Link to="/refund-policy" className="inline-flex min-h-11 items-center text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
                 Refund Policy
               </Link>
-              <button type="button" onClick={openAnalyticsChoices} className="min-h-11 text-sm text-gray-400 transition-colors hover:text-[#e7bd78] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e7bd78]">
+              <button type="button" onClick={openAnalyticsChoices} className="min-h-11 text-sm text-gray-400 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
                 Privacy choices
               </button>
             </div>

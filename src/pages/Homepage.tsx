@@ -217,13 +217,13 @@ const Homepage = () => {
             {settingsLoading ? <div className="mb-7 space-y-4" aria-label="Loading store introduction" aria-busy="true"><Skeleton className="mx-auto h-14 w-full max-w-2xl lg:mx-0"/><Skeleton className="mx-auto h-14 w-4/5 max-w-xl lg:mx-0"/><Skeleton className="mx-auto h-6 w-full max-w-2xl lg:mx-0"/><Skeleton className="mx-auto h-6 w-3/4 max-w-xl lg:mx-0"/></div> : <><h1 className="mb-5 text-[clamp(2.1rem,11vw,3rem)] font-bold leading-[1.02] text-foreground sm:mb-6 md:text-7xl">{settings?.heroTitle || 'Ghar ka swaad, har bite mein pyaar.'}</h1><p className="mx-auto mb-7 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-xl md:text-2xl">{settings?.heroDescription || 'Discover the rich flavors of traditional Indian pickles, made with love and authentic recipes passed down through generations. Taste the heritage in every bite.'}</p></>}
             
             <div className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start">
-              <Button size="xl" className="w-full bg-gradient-primary px-5 shadow-elegant transition-all duration-300 hover:shadow-glow sm:w-auto sm:px-8">
+              <Button asChild size="xl" className="w-full bg-gradient-primary px-5 shadow-elegant transition-all duration-300 hover:shadow-glow sm:w-auto sm:px-8">
                 <Link to="/products" onClick={() => { if (heroBanner) void trackEvent('select_promotion', { promotion_id: heroBanner._id, promotion_name: heroBanner.title, creative_slot: 'homepage_hero' }); }} className="flex items-center">
                   Shop Now
                   <ArrowRight className="h-5 w-5 ml-2" />
                 </Link>
               </Button>
-              <Button variant="outline" size="xl" className="w-full border-2 border-primary/30 px-5 hover:bg-primary/5 sm:w-auto sm:px-8">
+              <Button asChild variant="outline" size="xl" className="w-full border-2 border-primary/30 px-5 text-foreground hover:bg-primary/5 hover:text-primary sm:w-auto sm:px-8">
                 <Link to="/about" className="flex items-center">
                   Our Story
                   <Heart className="h-5 w-5 ml-2" />
@@ -265,7 +265,7 @@ const Homepage = () => {
           <div className="mb-16">{productsLoading ? <ProductGridSkeleton count={8}/> : productsError ? <LoadError title="Featured jars could not be loaded" message={productsError.message} onRetry={refetchProducts} className="mx-auto max-w-2xl"/> : featuredProducts.length ? <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">{featuredProducts.slice(0,8).map((product)=><ProductCard key={product.id} product={product}/>)}</div> : <div className="border-y py-12 text-center"><h3 className="text-xl font-bold">Fresh batches are coming soon.</h3><p className="mt-2 text-muted-foreground">Please check back for the next pantry release.</p></div>}</div>
 
           <div className="text-center">
-            <Button size="lg" className="bg-gradient-spice hover:opacity-90 text-white shadow-elegant px-8">
+            <Button asChild size="lg" className="bg-gradient-spice hover:opacity-90 text-white shadow-elegant px-8">
               <Link to="/products" className="flex items-center">
                 View All Products
                 <ArrowRight className="h-5 w-5 ml-2" />
@@ -425,13 +425,13 @@ const Homepage = () => {
             Join thousands of satisfied customers who have made our pickles a part of their daily meals. Experience the authentic flavors and traditional recipes that have been cherished for generations.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="xl" className="bg-white text-primary hover:bg-gray-100 shadow-elegant px-8">
+            <Button asChild size="xl" className="bg-white text-primary hover:bg-gray-100 shadow-elegant px-8">
               <Link to="/products" className="flex items-center">
                 Start Shopping
                 <ArrowRight className="h-5 w-5 ml-2" />
               </Link>
             </Button>
-            <Button variant="outline" size="xl" className="border-2 border-white text-white hover:bg-white/10 px-8">
+            <Button asChild variant="outline" size="xl" className="border-2 border-white bg-transparent px-8 text-white hover:bg-white/10 hover:text-white">
               <Link to="/about" className="flex items-center">
                 Our Story
                 <Heart className="h-5 w-5 ml-2" />

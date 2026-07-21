@@ -84,16 +84,16 @@ const Header = () => {
             </nav>
 
             <div className="flex shrink-0 items-center gap-0.5 sm:gap-2">
-              <Button asChild variant="ghost" size="icon" className="hidden sm:flex hover:bg-primary/10 hover:text-primary">
+              <Button asChild variant="ghost" size="icon" className="hidden text-foreground hover:bg-primary/10 hover:text-primary sm:flex">
                 <Link to="/search">
                   <Search className="h-4 w-4" />
                 </Link>
               </Button>
-              <Button variant="ghost" size="icon" className="hidden sm:flex hover:bg-primary/10 hover:text-primary">
+              <Button variant="ghost" size="icon" className="hidden text-foreground hover:bg-primary/10 hover:text-primary sm:flex">
                 <Heart className="h-4 w-4" />
               </Button>
-              <Button asChild variant="ghost" size="icon" className="hidden sm:flex hover:bg-primary/10 hover:text-primary"><Link to="/account" aria-label="Account"><UserRound className="h-4 w-4" /></Link></Button>
-              <Button asChild variant="ghost" size="icon" className="relative h-11 w-11 hover:bg-primary/10 hover:text-primary">
+              <Button asChild variant="ghost" size="icon" className="hidden text-foreground hover:bg-primary/10 hover:text-primary sm:flex"><Link to="/account" aria-label="Account"><UserRound className="h-4 w-4" /></Link></Button>
+              <Button asChild variant="ghost" size="icon" className="relative h-11 w-11 text-foreground hover:bg-primary/10 hover:text-primary">
                 <Link to="/cart" aria-label={`Cart with ${state.itemCount} items`}>
                   <ShoppingCart className="h-5 w-5" />
                   {state.itemCount > 0 && (
@@ -103,7 +103,7 @@ const Header = () => {
                   )}
                 </Link>
               </Button>
-              <Button variant="ghost" size="icon" className="h-11 w-11 lg:hidden" aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'} aria-expanded={isMobileMenuOpen} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              <Button variant="ghost" size="icon" className="h-11 w-11 text-foreground hover:bg-primary/10 hover:text-primary lg:hidden" aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'} aria-expanded={isMobileMenuOpen} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
                 {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </div>
