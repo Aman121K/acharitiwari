@@ -4,6 +4,7 @@ import { ShoppingCart, Menu, Search, Heart, Phone, Mail, X, Star, Shield, Sparkl
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useStoreSettings } from '@/hooks/useStoreData';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 const Header = () => {
   const location = useLocation();
@@ -11,6 +12,7 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { data: settings } = useStoreSettings();
+  const { ids: wishlistIds } = useWishlist();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,8 +91,8 @@ const Header = () => {
                   <Search className="h-4 w-4" />
                 </Link>
               </Button>
-              <Button variant="ghost" size="icon" className="hidden text-foreground hover:bg-primary/10 hover:text-primary sm:flex">
-                <Heart className="h-4 w-4" />
+              <Button asChild variant="ghost" size="icon" className="relative hidden text-foreground hover:bg-primary/10 hover:text-primary sm:flex">
+                <Link to="/wishlist" aria-label={`Liked products${wishlistIds.length ? `, ${wishlistIds.length} saved` : ''}`}><Heart className={`h-4 w-4 ${wishlistIds.length ? 'fill-primary text-primary' : ''}`} />{wishlistIds.length > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">{wishlistIds.length}</span>}</Link>
               </Button>
               <Button asChild variant="ghost" size="icon" className="hidden text-foreground hover:bg-primary/10 hover:text-primary sm:flex"><Link to="/account" aria-label="Account"><UserRound className="h-4 w-4" /></Link></Button>
               <Button asChild variant="ghost" size="icon" className="relative h-11 w-11 text-foreground hover:bg-primary/10 hover:text-primary">
@@ -120,6 +122,7 @@ const Header = () => {
                   </Link>
                 ))}
                 <Link to="/account" onClick={() => setIsMobileMenuOpen(false)} className="rounded-xl px-4 py-3 text-sm font-medium text-foreground hover:bg-muted">Account / Sign in</Link>
+                <Link to="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex min-h-12 items-center justify-between rounded-xl px-4 py-3 text-sm font-medium text-foreground hover:bg-muted"><span className="flex items-center gap-3"><Heart className={`h-4 w-4 ${wishlistIds.length ? 'fill-primary text-primary' : ''}`}/>Liked products</span>{wishlistIds.length > 0 && <span className="rounded-full bg-primary px-2 py-0.5 text-xs text-white">{wishlistIds.length}</span>}</Link>
                 <div className="mt-3 rounded-2xl border border-accent/20 bg-gradient-to-r from-accent/10 to-primary/10 p-3 text-center text-sm text-muted-foreground">
                   {settings?.announcement || 'Free delivery on orders above ₹699'}
                 </div>

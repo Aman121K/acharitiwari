@@ -30,6 +30,8 @@ import PolicyPage from "./pages/PolicyPage";
 import ReviewsPage from "./pages/ReviewsPage";
 import RouteAnalytics from "@/components/RouteAnalytics";
 import AnalyticsConsent from "@/components/AnalyticsConsent";
+import { WishlistProvider } from "@/contexts/WishlistContext";
+import WishlistPage from "./pages/WishlistPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,6 +49,7 @@ const queryClient = new QueryClient({
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+    <WishlistProvider>
     <TooltipProvider>
       <CartProvider>
         <ToastProvider>
@@ -68,6 +71,7 @@ const App = () => (
               <Route path="/blog/:id" element={<BlogPost />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/account" element={<AccountPage />} />
+              <Route path="/wishlist" element={<WishlistPage />} />
               <Route path="/about" element={<AboutUs />} />
               <Route path="/contact" element={<ContactUs />} />
               <Route path="/reviews" element={<ReviewsPage />} />
@@ -85,6 +89,7 @@ const App = () => (
         </ToastProvider>
       </CartProvider>
     </TooltipProvider>
+    </WishlistProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

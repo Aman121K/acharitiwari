@@ -16,6 +16,7 @@ import { analyticsItem, trackEvent } from '@/lib/analytics';
 import { Input } from '@/components/ui/input';
 import { LoadError } from '@/components/StorefrontStates';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -24,13 +25,14 @@ const ProductDetail = () => {
   const { toast } = useToast();
   const { showToast } = useGlobalToast();
   const [quantity, setQuantity] = useState(1);
-  const [isLiked, setIsLiked] = useState(false);
+  const { contains, toggle, updatingId } = useWishlist();
   const [pincode, setPincode] = useState('');
   const [deliveryMessage, setDeliveryMessage] = useState('');
   const [reviewForm,setReviewForm]=useState({name:'',email:'',rating:5,comment:''});
   const [reviewMessage,setReviewMessage]=useState('');
   const { products, loading: productLoading, error: productError, refetch: refetchProducts } = useProducts();
   const product = id ? products.find((item) => item.id === id || item.slug === id) : null;
+  const isLiked = product ? contains(product.id) : false;
   const hasPersistedProduct = Boolean(product && /^[a-f\d]{24}$/i.test(product.id));
   const [selectedImage,setSelectedImage]=useState('');
   useEffect(()=>setSelectedImage(product?.image||''),[product?.id,product?.image]);
@@ -69,11 +71,12 @@ const ProductDetail = () => {
     void trackEvent('begin_checkout', eventData);
     navigate('/checkout');
   };
-  const handleLike = () => {
-    const willBeLiked = !isLiked;
-    setIsLiked(willBeLiked);
-    void trackEvent(willBeLiked ? 'add_to_wishlist' : 'remove_from_wishlist', { currency: 'INR', value: product.price, items: [analyticsItem(product)] });
-    toast({ title: isLiked ? 'Removed from wishlist' : 'Saved to wishlist', description: `${product.name} ${isLiked ? 'was removed.' : 'is saved for later.'}` });
+  const handleLike = async () => {
+    try {
+      const liked = await toggle(product.id);
+      void trackEvent(liked ? 'add_to_wishlist' : 'remove_from_wishlist', { currency: 'INR', value: product.price, items: [analyticsItem(product)] });
+      toast({ title: liked ? 'Saved to wishlist' : 'Removed from wishlist', description: `${product.name} ${liked ? 'is saved for later.' : 'was removed.'}` });
+    } catch (error) { toast({ title:'Could not update wishlist', description:error instanceof Error ? error.message : 'Please try again.' }); }
   };
   const handleShare = async () => {
     const url = `${window.location.origin}/product/${product.id}`;
@@ -163,6 +166,7 @@ const ProductDetail = () => {
               <div className="mt-3 grid gap-2 border-t border-[#e8dfd2] pt-3 min-[380px]:grid-cols-2">
                 <Button
                   onClick={handleLike}
+                  disabled={updatingId === product.id}
                   variant="outline"
                   className={`h-12 min-w-0 rounded-sm border-[#dfd3c2] px-3 font-semibold ${isLiked ? 'border-primary/40 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary' : 'bg-background text-foreground hover:border-primary/40 hover:bg-[#f7efdf] hover:text-primary'}`}
                   aria-label={isLiked ? 'Remove from wishlist' : 'Save product for later'}
