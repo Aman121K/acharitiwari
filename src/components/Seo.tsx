@@ -101,7 +101,7 @@ export default function Seo() {
       ? "noindex, follow"
       : adminSeo?.robots || "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
     const type = product ? "product" : article ? "article" : "website";
-    const articleKeywords = article ? [article.focusKeyword, ...(article.tags || [])].filter(Boolean) as string[] : [];
+    const articleKeywords = article ? [article.focusKeyword, ...(article.secondaryKeywords || []), ...(article.tags || [])].filter(Boolean) as string[] : [];
     const keywords = product?.seoKeywords?.length
       ? product.seoKeywords
       : articleKeywords.length
@@ -155,7 +155,7 @@ export default function Seo() {
             brand: { "@type": "Brand", name: SITE_NAME },
             offers: { "@type": "Offer", url: canonical, priceCurrency: "INR", price: product.price, availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" },
           }
-        : {
+        : article!.schemaMarkup || {
             "@context": "https://schema.org",
             "@type": "BlogPosting",
             headline: article!.title,
@@ -169,7 +169,7 @@ export default function Seo() {
       const script = document.createElement("script");
       script.id = "route-structured-data";
       script.type = "application/ld+json";
-      script.text = JSON.stringify(schema);
+      script.text = JSON.stringify(Array.isArray(schema) ? schema : Object.values(schema).every(value => value && typeof value === 'object' && '@context' in value) ? Object.values(schema) : schema);
       document.head.appendChild(script);
     }
   }, [pathname, storeSettings, products, blogPosts, productsLoading, blogsLoading]);

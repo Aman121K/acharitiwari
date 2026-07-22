@@ -22,6 +22,14 @@ export interface BlogPost {
   seoTitle?: string;
   seoDescription?: string;
   focusKeyword?: string;
+  secondaryKeywords?: string[];
+  relatedProductSlugs?: string[];
+  relatedBlogSlugs?: string[];
+  faq?: { question: string; answer: string }[];
+  imageAlt?: string;
+  imageCaption?: string;
+  imageTitle?: string;
+  schemaMarkup?: Record<string, unknown>;
 }
 
 export const blogPosts: BlogPost[] = [

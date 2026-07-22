@@ -164,10 +164,12 @@ const BlogPost = () => {
           <div className="mb-8 aspect-[4/3] overflow-hidden rounded-lg bg-[#f4eee3] p-3">
             <img
               src={post.image}
-              alt={post.title}
+              alt={post.imageAlt || post.title}
+              title={post.imageTitle}
               className="h-full w-full object-contain"
             />
           </div>
+          {post.imageCaption && <p className="-mt-6 mb-8 text-center text-sm text-muted-foreground">{post.imageCaption}</p>}
         </header>
 
         {/* Article Content */}
