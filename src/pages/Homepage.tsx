@@ -8,6 +8,7 @@ import mixedAachar from '@/assets/mixed-aachar-collection.jpg';
 import { LoadError, ProductGridSkeleton } from '@/components/StorefrontStates';
 import { Skeleton } from '@/components/ui/skeleton';
 import { analyticsItem, trackEvent } from '@/lib/analytics';
+import WhatsAppFab from '@/components/WhatsAppFab';
 
 const Homepage = () => {
   const { products, loading: productsLoading, error: productsError, refetch: refetchProducts } = useProducts();
@@ -99,6 +100,7 @@ const Homepage = () => {
       </section>
 
       <section className="px-5 pb-20 sm:px-10 lg:pb-28"><div className="relative mx-auto max-w-7xl overflow-hidden bg-[#8f1715] px-7 py-14 text-white sm:px-14 lg:py-20"><div className="absolute right-0 top-0 h-full w-1/3 border-l border-white/15 bg-[radial-gradient(circle_at_center,rgba(255,255,255,.09)_1px,transparent_1px)] [background-size:18px_18px]"/><div className="relative max-w-3xl"><Sparkles className="h-6 w-6 text-[#e4bc73]"/><h2 className="mt-5 font-display text-4xl leading-tight sm:text-6xl">Bring a little more flavour to the table.</h2><p className="mt-5 max-w-xl text-white/75">Find a jar for everyday meals, festive spreads or a thoughtful pantry gift.</p><Link to="/products" className="mt-8 inline-flex min-h-12 items-center gap-5 bg-[#fffaf1] px-6 text-sm font-semibold text-[#201b15] hover:bg-white">Choose your jar <ArrowRight className="h-4 w-4"/></Link></div></div></section>
+      <WhatsAppFab />
     </div>
   );
 };
