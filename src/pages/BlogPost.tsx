@@ -104,27 +104,28 @@ const BlogPost = () => {
     .slice(0, 3);
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <main className="blog-reading-page min-h-screen pb-16 pt-6 sm:pt-10">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6">
         {/* Back Button */}
-        <div className="mb-6">
-          <Link to="/blog" className="inline-flex items-center text-muted-foreground hover:text-primary transition-smooth">
+        <div className="mb-8 border-b border-border/70 pb-4">
+          <Link to="/blog" className="inline-flex items-center gap-2 text-sm font-semibold text-primary underline-offset-4 transition-colors hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Blog
+            All pantry stories
           </Link>
         </div>
 
         {/* Article Header */}
-        <header className="mb-8">
-          <div className="mb-4">
-            <Badge variant="default" className="mb-4">{post.category}</Badge>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
+        <header className="mx-auto mb-10 max-w-5xl text-center">
+          <div className="mb-5">
+            <Badge variant="outline" className="mb-5 border-secondary/60 bg-secondary/10 px-3 py-1 font-bold uppercase tracking-[0.16em] text-primary">{post.category}</Badge>
+            <h1 className="mx-auto max-w-4xl text-4xl font-bold leading-[1.08] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-6xl">
               {post.title}
             </h1>
+            {post.excerpt && <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl">{post.excerpt}</p>}
           </div>
 
           {/* Author & Meta Info */}
-          <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-6">
+          <div className="mb-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
             <div className="flex items-center">
               <User className="h-4 w-4 mr-2" />
               <span>{post.author}</span>
@@ -144,44 +145,47 @@ const BlogPost = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-4 mb-8">
+          <div className="mb-9 flex items-center justify-center gap-3">
             <Button
               variant={isLiked ? "default" : "outline"}
               size="sm"
               onClick={handleLike}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              aria-label={isLiked ? 'Remove article from favorites' : 'Add article to favorites'}
             >
               <Heart className={`h-4 w-4 ${isLiked ? 'fill-white' : ''}`} />
               {likeCount}
             </Button>
-            <Button variant="outline" size="sm" onClick={handleShare}>
+            <Button variant="outline" size="sm" onClick={handleShare} className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
               <Share2 className="h-4 w-4 mr-2" />
               Share
             </Button>
           </div>
 
           {/* Featured Image */}
-          <div className="mb-8 aspect-[4/3] overflow-hidden rounded-lg bg-[#f4eee3] p-3">
+          <figure className="mb-10">
+          <div className="aspect-[16/9] overflow-hidden rounded-sm border border-border/80 bg-[#f4eee3] p-2 shadow-elegant sm:p-3">
             <img
               src={post.image}
               alt={post.imageAlt || post.title}
               title={post.imageTitle}
-              className="h-full w-full object-contain"
+              className="h-full w-full object-cover"
             />
           </div>
-          {post.imageCaption && <p className="-mt-6 mb-8 text-center text-sm text-muted-foreground">{post.imageCaption}</p>}
+          {post.imageCaption && <figcaption className="mt-3 text-center text-sm italic text-muted-foreground">{post.imageCaption}</figcaption>}
+          </figure>
         </header>
 
         {/* Article Content */}
-        <article className="prose prose-lg max-w-none mb-12">
+        <article className="article-paper mx-auto mb-14 max-w-3xl">
           <div 
             dangerouslySetInnerHTML={{ __html: post.content }}
-            className="text-foreground space-y-6"
+            className="article-content"
           />
         </article>
 
         {/* Tags */}
-        <div className="mb-8">
+        <div className="mx-auto mb-8 max-w-3xl border-y border-border/70 py-6">
           <div className="flex items-center gap-2 mb-4">
             <Tag className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium text-muted-foreground">Tags:</span>
@@ -198,10 +202,10 @@ const BlogPost = () => {
         {/* Related Posts */}
         {relatedPosts.length > 0 && (
           <section className="mt-16">
-            <h2 className="text-2xl font-bold text-foreground mb-8">Related Articles</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="mb-8 flex items-center gap-4"><span className="h-px flex-1 bg-secondary/60" /><h2 className="text-2xl font-bold text-foreground sm:text-3xl">More from the pantry</h2><span className="h-px flex-1 bg-secondary/60" /></div>
+            <div className={`grid grid-cols-1 gap-6 ${relatedPosts.length === 2 ? 'md:grid-cols-2' : relatedPosts.length >= 3 ? 'md:grid-cols-3' : ''}`}>
               {relatedPosts.map((relatedPost) => (
-                <Card key={relatedPost.id} className="group hover:shadow-lg transition-smooth">
+                <Card key={relatedPost.id} className="group relative overflow-hidden hover:shadow-lg transition-smooth">
                   <div className="aspect-[4/3] overflow-hidden bg-[#f4eee3] p-2">
                     <img
                       src={relatedPost.image}
@@ -221,7 +225,7 @@ const BlogPost = () => {
                       <Clock className="h-3 w-3 mr-1" />
                       <span>{relatedPost.readTime}</span>
                     </div>
-                    <Link to={`/blog/${relatedPost.id}`} className="absolute inset-0" />
+                    <Link to={`/blog/${relatedPost.id}`} className="absolute inset-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset" aria-label={`Read ${relatedPost.title}`} />
                   </CardContent>
                 </Card>
               ))}
@@ -238,7 +242,7 @@ const BlogPost = () => {
           className="mt-16"
         />
       </div>
-    </div>
+    </main>
   );
 };
 
