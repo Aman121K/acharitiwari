@@ -8,12 +8,7 @@ import {
   Mail, 
   Phone, 
   MapPin, 
-  Clock,
-  Shield,
-  Award,
-  Truck,
-  CreditCard,
-  Star
+  Clock
 } from 'lucide-react';
 import NewsletterSignup from '@/components/NewsletterSignup';
 import { useCategories, useStoreSettings } from '@/hooks/useStoreData';
@@ -30,21 +25,21 @@ const Footer = () => {
   const trackSocial = (platform: string) => { void trackEvent('social_click', { platform, location: 'footer' }); };
 
   return (
-    <footer className="mt-20 bg-[#17320d] text-white">
+    <footer className="bg-[#11240b] text-white">
       {/* Newsletter Section */}
-      <div className="border-y border-[#c88a2b]/30 bg-[#8f1715]">
+      <div className="border-y border-[#c88a2b]/30 bg-[#17320d]">
         <div className="container mx-auto px-4 py-12">
           <NewsletterSignup
             source="footer"
             variant="band"
-            title="Stay Updated with Our Latest Offers"
-            description="Get first taste of new jars, seasonal offers and traditional recipes delivered from our kitchen to your inbox."
+            title="Letters from the Achari kitchen"
+            description="New batches, seasonal recipes and quiet pantry notes, sent occasionally."
           />
         </div>
       </div>
 
       {/* Main Footer Content */}
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 items-start gap-x-8 gap-y-10 md:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(140px,.8fr)_minmax(170px,1fr)_minmax(260px,1.25fr)]">
           {/* Brand Section */}
           <div className="space-y-6">
@@ -57,34 +52,14 @@ const Footer = () => {
                 />
               </div>
               <div className="flex flex-col">
-                <h3 className="text-2xl font-bold text-white">Achari Tiwari</h3>
+                <h3 className="font-display text-3xl text-white">Achari Tiwari</h3>
                 <p className="text-sm uppercase tracking-[0.18em] text-[#e7bd78]">Taste of tradition</p>
               </div>
             </div>
             
             <p className="text-gray-300 leading-relaxed max-w-md">
-              Bringing you the finest traditional Indian pickles and aachar, made with love and authentic recipes passed down through generations. Experience the true taste of India.
+              Traditional Indian pickles and aachar, thoughtfully prepared and carefully packed for tables across India.
             </p>
-
-            {/* Trust Indicators */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2">
-                <Shield className="h-4 w-4 text-green-400" />
-                <span className="text-sm text-gray-300">100% Authentic</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Award className="h-4 w-4 text-yellow-400" />
-                <span className="text-sm text-gray-300">Premium Quality</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Truck className="h-4 w-4 text-blue-400" />
-                <span className="text-sm text-gray-300">Fast Delivery</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                <span className="text-sm text-gray-300">Customer Reviewed</span>
-              </div>
-            </div>
 
             {/* Social Links */}
             <div className="flex space-x-4">
@@ -201,7 +176,7 @@ const Footer = () => {
                 <Mail className="mt-1 h-5 w-5 text-[#e7bd78]" />
                 <div>
                   <a href={`mailto:${supportEmail}`} onClick={() => { void trackEvent('contact_click', { method: 'email', location: 'footer' }); }} className="inline-flex break-all py-1 text-sm text-gray-200 underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">{supportEmail}</a>
-                  <p className="text-gray-300 text-xs">24/7 Support</p>
+                  <p className="text-gray-300 text-xs">Email support</p>
                 </div>
               </div>
               

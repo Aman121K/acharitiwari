@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Menu, Search, Heart, Phone, Mail, X, Star, Shield, Sparkles, UserRound } from 'lucide-react';
+import { ShoppingCart, Menu, Search, Heart, X, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useStoreSettings } from '@/hooks/useStoreData';
@@ -32,44 +32,20 @@ const Header = () => {
 
   return (
     <>
-      <div className="hidden bg-primary py-2 text-sm text-primary-foreground md:block">
-        <div className="container mx-auto flex items-center justify-between px-4">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <Phone className="h-3.5 w-3.5" />
-              <span>{settings?.supportPhone || '+91 79730 70600'}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail className="h-3.5 w-3.5" />
-              <span>{settings?.supportEmail || 'aacharitiwari@gmail.com'}</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 text-xs text-white/90">
-            <div className="flex items-center gap-1">
-              <Star className="h-3.5 w-3.5 fill-yellow-300 text-yellow-300" />
-              <span>Traditional recipes, carefully packed</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Shield className="h-3.5 w-3.5" />
-              <span>Secure checkout and order support</span>
-            </div>
-          </div>
-        </div>
+      <div className="border-b border-[#b58235]/35 bg-[#17320d] py-2 text-center text-[10px] font-semibold uppercase tracking-[.18em] text-[#f2d49b] sm:text-[11px]">
+        {settings?.announcement || 'Traditional recipes · Carefully packed · Delivered across India'}
       </div>
 
-      <header className={`sticky top-0 z-50 border-b border-secondary/30 transition-all duration-300 ${isScrolled ? 'bg-[#fff8ed]/95 shadow-elegant backdrop-blur-xl' : 'bg-[#fff8ed]'}`}>
-        <div className="container mx-auto px-3 py-2.5 sm:px-4 sm:py-3">
+      <header className={`sticky top-0 z-50 border-b border-[#c9b896] transition-all duration-300 ${isScrolled ? 'bg-[#fffaf1]/95 shadow-[0_10px_30px_-24px_#201b15] backdrop-blur' : 'bg-[#fffaf1]'}`}>
+        <div className="mx-auto max-w-[1440px] px-3 py-2 sm:px-6">
           <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-3">
             <Link to="/" className="group flex min-w-0 flex-1 items-center gap-2 min-[380px]:gap-2.5 sm:gap-3" aria-label="Achari Tiwari home">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-secondary/40 bg-[#fff8ed] shadow-card min-[380px]:h-14 min-[380px]:w-14 sm:h-16 sm:w-16">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden border-r border-[#c9b896] pr-2 sm:h-12 sm:w-12">
                 <img src="/brand/achari-tiwari-logo.png" alt="Achari Tiwari" className="h-full w-full object-contain" />
               </div>
               <div className="flex min-w-0 flex-col">
-                <span className="truncate text-base font-bold leading-tight tracking-tight text-foreground min-[350px]:text-lg sm:text-2xl">Achari <span className="text-accent">Tiwari</span></span>
-                <p className="hidden items-center gap-1 text-sm text-muted-foreground min-[390px]:flex">
-                  <Sparkles className="h-3.5 w-3.5 text-accent" />
-                  Taste of tradition
-                </p>
+                <span className="truncate font-display text-xl leading-none tracking-tight text-foreground sm:text-2xl">Achari <span className="text-accent">Tiwari</span></span>
+                <p className="hidden text-[9px] font-semibold uppercase tracking-[.18em] text-muted-foreground min-[390px]:block">Taste of tradition</p>
               </div>
             </Link>
 
@@ -78,7 +54,7 @@ const Header = () => {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${item.active ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted hover:text-primary'}`}
+                  className={`border-b px-3 py-3 text-[11px] font-semibold uppercase tracking-[.12em] transition-all ${item.active ? 'border-[#8f1715] text-[#8f1715]' : 'border-transparent text-foreground hover:border-[#b58235] hover:text-primary'}`}
                 >
                   {item.name}
                 </Link>
