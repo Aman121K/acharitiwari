@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useReducer, ReactNode } from 'react';
 import { apiRequest } from '@/lib/api';
+import { customerVariantLabel, customerVariantSize, type ProductVariant } from '@/lib/productVariants';
 
 export interface Product {
   id: string;
@@ -23,10 +24,19 @@ export interface Product {
   seoDescription?: string;
   seoKeywords?: string[];
   sku?: string;
+  variants?: ProductVariant[];
+  variantSku?: string;
+  variantLabel?: string;
+  variantSize?: string;
+  inventory?: number;
 }
 
 export interface CartItem extends Product {
   quantity: number;
+  lineId: string;
+  variantSku?: string;
+  variantLabel: string;
+  variantSize?: string;
 }
 
 interface CartState {
@@ -37,8 +47,8 @@ interface CartState {
 
 type CartAction =
   | { type: 'ADD_TO_CART'; product: Product }
-  | { type: 'REMOVE_FROM_CART'; productId: string }
-  | { type: 'UPDATE_QUANTITY'; productId: string; quantity: number }
+  | { type: 'REMOVE_FROM_CART'; lineId: string }
+  | { type: 'UPDATE_QUANTITY'; lineId: string; quantity: number }
   | { type: 'CLEAR_CART' };
 
 const CartContext = createContext<{
@@ -49,11 +59,13 @@ const CartContext = createContext<{
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_TO_CART': {
-      const existingItem = state.items.find(item => item.id === action.product.id);
+      const lineId = createLineId(action.product.id, action.product.sku);
+      const existingItem = state.items.find(item => item.lineId === lineId);
       
       if (existingItem) {
+        if(existingItem.quantity>=Math.max(0,existingItem.inventory??25))return state;
         const updatedItems = state.items.map(item =>
-          item.id === action.product.id
+          item.lineId === lineId
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -68,50 +80,51 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       
       return {
         ...state,
-        items: [...state.items, { ...action.product, quantity: 1 }],
+        items: [...state.items, { ...action.product, lineId, variantSku:action.product.variantSku||action.product.sku, variantLabel:action.product.variantLabel||action.product.weight||'Standard pack', variantSize:action.product.variantSize, quantity: 1 } as CartItem],
         total: state.total + action.product.price,
         itemCount: state.itemCount + 1,
       };
     }
     
     case 'REMOVE_FROM_CART': {
-      const itemToRemove = state.items.find(item => item.id === action.productId);
+      const itemToRemove = state.items.find(item => item.lineId === action.lineId);
       if (!itemToRemove) return state;
       
       return {
         ...state,
-        items: state.items.filter(item => item.id !== action.productId),
+        items: state.items.filter(item => item.lineId !== action.lineId),
         total: state.total - (itemToRemove.price * itemToRemove.quantity),
         itemCount: state.itemCount - itemToRemove.quantity,
       };
     }
     
     case 'UPDATE_QUANTITY': {
-      const item = state.items.find(item => item.id === action.productId);
+      const item = state.items.find(item => item.lineId === action.lineId);
       if (!item) return state;
       
-      const quantityDiff = action.quantity - item.quantity;
+      const cappedQuantity=Math.min(action.quantity,Math.max(1,item.inventory??25));
+      const cappedDiff=cappedQuantity-item.quantity;
       
       if (action.quantity === 0) {
         return {
           ...state,
-          items: state.items.filter(item => item.id !== action.productId),
+          items: state.items.filter(item => item.lineId !== action.lineId),
           total: state.total - (item.price * item.quantity),
           itemCount: state.itemCount - item.quantity,
         };
       }
       
       const updatedItems = state.items.map(item =>
-        item.id === action.productId
-          ? { ...item, quantity: action.quantity }
+        item.lineId === action.lineId
+          ? { ...item, quantity: cappedQuantity }
           : item
       );
       
       return {
         ...state,
         items: updatedItems,
-        total: state.total + (item.price * quantityDiff),
-        itemCount: state.itemCount + quantityDiff,
+        total: state.total + (item.price * cappedDiff),
+        itemCount: state.itemCount + cappedDiff,
       };
     }
     
@@ -133,6 +146,8 @@ const initialState: CartState = {
   itemCount: 0,
 };
 
+export const createLineId = (productId:string, sku?:string) => `${productId}::${sku?.trim() || 'legacy'}`;
+
 export const getCartSessionId = () => {
   const existing = window.localStorage.getItem('achari-cart-session');
   if (existing) return existing;
@@ -147,7 +162,10 @@ const getInitialState = (): CartState => {
   if (typeof window === 'undefined') return initialState;
   try {
     const saved = window.localStorage.getItem('achari-cart');
-    return saved ? JSON.parse(saved) : initialState;
+    if (!saved) return initialState;
+    const parsed=JSON.parse(saved) as Partial<CartState>;
+    const items=(Array.isArray(parsed.items)?parsed.items:[]).filter((item):item is CartItem=>Boolean(item&&item.id)).map(item=>({...item,lineId:item.lineId||createLineId(item.id,item.variantSku||item.sku),variantSku:item.variantSku||item.sku,variantLabel:customerVariantLabel({label:item.variantLabel,size:item.variantSize||item.weight}),variantSize:customerVariantSize({size:item.variantSize||item.weight}),quantity:Math.max(1,Number(item.quantity)||1),price:Math.max(0,Number(item.price)||0)}));
+    return {items,total:items.reduce((sum,item)=>sum+item.price*item.quantity,0),itemCount:items.reduce((sum,item)=>sum+item.quantity,0)};
   } catch {
     return initialState;
   }
@@ -163,7 +181,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         method: 'PUT',
         body: JSON.stringify({
           sessionId: getCartSessionId(),
-          items: state.items.map(item => ({ productId: item.id, name: item.name, price: item.price, quantity: item.quantity, image: item.image, sku: item.sku })),
+          items: state.items.map(item => ({ productId: item.id, name: item.name, price: item.price, quantity: item.quantity, image: item.image, sku:item.variantSku||item.sku, variantLabel:item.variantLabel, variantSize:item.variantSize })),
         }),
       }).catch(() => undefined);
     }, 600);

@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useBlogs } from '@/hooks/useStoreData';
 import { ArticleSkeleton, LoadError } from '@/components/StorefrontStates';
 import NewsletterSignup from '@/components/NewsletterSignup';
+import ArticleListen from '@/components/ArticleListen';
 import { trackEvent } from '@/lib/analytics';
 
 const BlogPost = () => {
@@ -145,7 +146,7 @@ const BlogPost = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="mb-9 flex items-center justify-center gap-3">
+          <div className="mb-9 flex flex-wrap items-center justify-center gap-3">
             <Button
               variant={isLiked ? "default" : "outline"}
               size="sm"
@@ -160,6 +161,12 @@ const BlogPost = () => {
               <Share2 className="h-4 w-4 mr-2" />
               Share
             </Button>
+            <ArticleListen
+              articleId={post.id}
+              title={post.title}
+              excerpt={post.excerpt}
+              content={post.content}
+            />
           </div>
 
           {/* Featured Image */}

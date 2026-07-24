@@ -139,7 +139,7 @@ export const analyticsItem = (product: Product, quantity = 1, index?: number) =>
   item_brand: 'Achari Tiwari',
   item_category: product.category,
   item_category2: product.subCategory,
-  item_variant: product.weight,
+  item_variant: 'variantLabel' in product && typeof product.variantLabel==='string' ? product.variantLabel : product.weight,
   price: product.price,
   quantity,
   ...(typeof index === 'number' ? { index } : {}),

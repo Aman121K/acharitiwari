@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import type { Product } from './CartContext';
+import { Link } from 'react-router-dom';
 
 interface ToastData {
   product: Product;
@@ -87,28 +88,29 @@ const GlobalAddToCartToast: React.FC<GlobalAddToCartToastProps> = ({
 
   return (
     <div className="fixed top-4 right-4 z-[9999] animate-in slide-in-from-right duration-300">
-      <div className="bg-white rounded-lg shadow-2xl border border-gray-200 p-4 max-w-sm w-80">
+      <div className="relative w-80 max-w-sm border border-[#c9b896] bg-[#fff8ed] p-4 shadow-[0_18px_50px_-24px_rgba(37,55,30,.55)]">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors duration-200"
+          aria-label="Close cart confirmation"
+          className="absolute right-1 top-1 z-10 flex h-11 w-11 items-center justify-center text-[#665746] transition hover:bg-[#eee4d3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b58a3c]"
         >
           <X className="h-3 w-3 text-gray-600" />
         </button>
 
         {/* Success Header */}
         <div className="flex items-center space-x-2 mb-3">
-          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+          <div className="flex h-8 w-8 items-center justify-center bg-[#173d23]">
             <CheckCircle className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h4 className="font-semibold text-green-700 text-sm">Added to Cart!</h4>
+            <h4 className="text-sm font-semibold text-[#173d23]">Added to cart</h4>
             <p className="text-xs text-gray-500">Item successfully added</p>
           </div>
         </div>
 
         {/* Product Details */}
-        <div className="flex space-x-3">
+        <Link to="/cart" onClick={onClose} className="flex space-x-3 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label={`View ${product.name}, ${product.weight}, in cart`}>
           {/* Product Image */}
           <div className="flex-shrink-0">
             <div className="h-14 w-14 overflow-hidden rounded-md bg-[#f4eee3] p-1">
@@ -141,10 +143,10 @@ const GlobalAddToCartToast: React.FC<GlobalAddToCartToastProps> = ({
               <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200 px-1 py-0">
                 ✓ In Stock
               </Badge>
-              <span className="text-xs text-gray-500">{product.weight}</span>
+              <span className="text-xs text-gray-500">{product.variantLabel||product.weight}{product.variantSize&&product.variantSize!==(product.variantLabel||product.weight)?` · ${product.variantSize}`:''}</span>
             </div>
           </div>
-        </div>
+        </Link>
 
         {/* Quick Action */}
         <div className="mt-3 pt-2 border-t border-gray-100">
@@ -152,10 +154,10 @@ const GlobalAddToCartToast: React.FC<GlobalAddToCartToastProps> = ({
             <span className="text-xs text-gray-500">
               {quantity > 1 ? `Total: ₹${product.price * quantity}` : 'Added to your cart'}
             </span>
-            <div className="flex items-center text-xs text-primary">
+            <Link to="/cart" onClick={onClose} className="flex min-h-11 items-center text-xs font-bold text-primary underline underline-offset-4">
               <ShoppingCart className="h-3 w-3 mr-1" />
               <span>View Cart</span>
-            </div>
+            </Link>
           </div>
         </div>
 

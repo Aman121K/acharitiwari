@@ -17,8 +17,8 @@ const CartPage = () => {
     void trackEvent('view_cart', { currency: 'INR', value: state.total, items: state.items.map((item) => analyticsItem(item, item.quantity)) });
   }, [state.items, state.total]);
 
-  const updateQuantity = (productId: string, quantity: number) => {
-    const item = state.items.find((candidate) => candidate.id === productId);
+  const updateQuantity = (lineId: string, quantity: number) => {
+    const item = state.items.find((candidate) => candidate.lineId === lineId);
     if (item && quantity !== item.quantity) {
       const difference = Math.abs(quantity - item.quantity);
       void trackEvent(quantity > item.quantity ? 'add_to_cart' : 'remove_from_cart', {
@@ -27,13 +27,13 @@ const CartPage = () => {
         items: [analyticsItem(item, difference)],
       });
     }
-    dispatch({ type: 'UPDATE_QUANTITY', productId, quantity });
+    dispatch({ type: 'UPDATE_QUANTITY', lineId, quantity });
   };
 
-  const removeFromCart = (productId: string) => {
-    const item = state.items.find((candidate) => candidate.id === productId);
+  const removeFromCart = (lineId: string) => {
+    const item = state.items.find((candidate) => candidate.lineId === lineId);
     if (item) void trackEvent('remove_from_cart', { currency: 'INR', value: item.price * item.quantity, items: [analyticsItem(item, item.quantity)] });
-    dispatch({ type: 'REMOVE_FROM_CART', productId });
+    dispatch({ type: 'REMOVE_FROM_CART', lineId });
   };
 
   const trackCheckout = () => {
@@ -72,7 +72,7 @@ const CartPage = () => {
         <div className="grid gap-8 lg:grid-cols-[1.6fr_0.9fr]">
           <div className="space-y-4">
             {state.items.map((item) => (
-              <Card key={item.id} className="min-w-0 overflow-hidden border-border/70 bg-white/85 shadow-card">
+              <Card key={item.lineId} className="min-w-0 overflow-hidden border-border/70 bg-white/85 shadow-card">
                 <CardContent className="p-4 sm:p-5">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <div className="aspect-[4/3] w-full shrink-0 overflow-hidden rounded-2xl bg-[#f4eee3] p-2 sm:h-24 sm:w-32"><img src={item.image} alt={item.name} className="h-full w-full object-contain" /></div>
@@ -87,23 +87,24 @@ const CartPage = () => {
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Sparkles className="h-4 w-4 text-accent" />
-                        {item.weight} • {item.shelfLife}
+                        <strong className="text-foreground">{item.variantLabel}</strong>{item.variantSize&&item.variantSize!==item.variantLabel?` · ${item.variantSize}`:''} • {item.shelfLife}
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
                       <div className="flex items-center rounded-full border border-border bg-background p-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>
+                        <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => updateQuantity(item.lineId, item.quantity - 1)} disabled={item.quantity <= 1}>
                           <Minus className="h-4 w-4" />
                         </Button>
                         <span className="min-w-8 text-center text-sm font-semibold">{item.quantity}</span>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
+                        <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => updateQuantity(item.lineId, item.quantity + 1)} disabled={item.inventory!=null&&item.quantity>=item.inventory}>
                           <Plus className="h-4 w-4" />
                         </Button>
                       </div>
+                      {item.inventory!=null&&item.quantity>=item.inventory?<p className="text-xs font-medium text-[#8b1e2d]" aria-live="polite">Only {item.inventory} available</p>:null}
                       <div className="text-right">
                         <p className="text-lg font-semibold text-foreground">₹{item.price * item.quantity}</p>
-                        <Button variant="ghost" size="sm" onClick={() => removeFromCart(item.id)} className="text-destructive hover:text-destructive">
+                        <Button variant="ghost" size="sm" onClick={() => removeFromCart(item.lineId)} className="text-destructive hover:text-destructive">
                           <Trash2 className="mr-1 h-4 w-4" /> Remove
                         </Button>
                       </div>

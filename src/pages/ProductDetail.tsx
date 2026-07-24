@@ -17,6 +17,8 @@ import { Input } from '@/components/ui/input';
 import { LoadError } from '@/components/StorefrontStates';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { VariantPicker } from '@/components/VariantPicker';
+import { getDefaultVariant, productWithVariant, type ProductVariant } from '@/lib/productVariants';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,7 +37,10 @@ const ProductDetail = () => {
   const isLiked = product ? contains(product.id) : false;
   const hasPersistedProduct = Boolean(product && /^[a-f\d]{24}$/i.test(product.id));
   const [selectedImage,setSelectedImage]=useState('');
+  const [selectedVariant,setSelectedVariant]=useState<ProductVariant>();
   useEffect(()=>setSelectedImage(product?.image||''),[product?.id,product?.image]);
+  useEffect(()=>setSelectedVariant(getDefaultVariant(product?.variants||[])),[product?.id,product?.variants]);
+  useEffect(()=>setQuantity(current=>Math.min(current,Math.max(1,selectedVariant?.inventory||1))),[selectedVariant?.sku,selectedVariant?.inventory]);
   useEffect(() => {
     if (!product) return;
     void trackEvent('view_item', { currency: 'INR', value: product.price, items: [analyticsItem(product)] });
@@ -54,19 +59,20 @@ const ProductDetail = () => {
     return <main className="min-h-[65vh] grid place-items-center px-4"><div className="text-center"><p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Nothing in this jar</p><h1 className="mt-3 text-3xl font-bold">Product not found</h1><Button asChild className="mt-6"><Link to="/products"><ArrowLeft className="mr-2 h-4 w-4" />Back to products</Link></Button></div></main>;
   }
 
-  const mrp = Math.ceil((product.price * 1.18) / 10) * 10;
-  const savings = mrp - product.price;
+  const chosenProduct=selectedVariant?productWithVariant(product,selectedVariant):product;
+  const mrp = selectedVariant?.compareAtPrice || Math.ceil((chosenProduct.price * 1.18) / 10) * 10;
+  const savings = Math.max(0,mrp - chosenProduct.price);
   const addSelectedQuantity = () => {
-    for (let i = 0; i < quantity; i += 1) dispatch({ type: 'ADD_TO_CART', product });
+    for (let i = 0; i < quantity; i += 1) dispatch({ type: 'ADD_TO_CART', product:chosenProduct });
   };
   const handleAddToCart = () => {
     addSelectedQuantity();
-    showToast(product, quantity);
-    void trackEvent('add_to_cart', { currency: 'INR', value: product.price * quantity, items: [analyticsItem(product, quantity)] });
+    showToast(chosenProduct, quantity);
+    void trackEvent('add_to_cart', { currency: 'INR', value: chosenProduct.price * quantity, items: [analyticsItem(chosenProduct, quantity)] });
   };
   const handleBuyNow = () => {
     addSelectedQuantity();
-    const eventData = { currency: 'INR', value: product.price * quantity, items: [analyticsItem(product, quantity)] };
+    const eventData = { currency: 'INR', value: chosenProduct.price * quantity, items: [analyticsItem(chosenProduct, quantity)] };
     void trackEvent('add_to_cart', eventData);
     void trackEvent('begin_checkout', eventData);
     navigate('/checkout');
@@ -96,7 +102,7 @@ const ProductDetail = () => {
   const submitReview=async(event:React.FormEvent)=>{event.preventDefault();if(!product||!hasPersistedProduct)return;setReviewMessage('');try{const body=await apiRequest<{message:string}>(`/products/${product.id}/reviews`,{method:'POST',body:JSON.stringify(reviewForm)});setReviewMessage(body.message);void trackEvent('submit_review',{item_id:product.sku||product.id,rating:reviewForm.rating});setReviewForm({name:'',email:'',rating:5,comment:''});void refreshReviews();}catch(error){setReviewMessage(error instanceof Error?error.message:'Unable to submit review')}};
 
   const facts = [
-    { icon: PackageCheck, label: product.weight, note: 'Net weight' },
+    { icon: PackageCheck, label: chosenProduct.weight, note: 'Net weight' },
     { icon: Clock3, label: product.shelfLife, note: 'Shelf life' },
     { icon: Leaf, label: 'Natural', note: 'Traditional ingredients' },
   ];
@@ -122,7 +128,7 @@ const ProductDetail = () => {
           <div className="min-w-0">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-bold uppercase tracking-[.2em] text-primary">{product.category}</p>
-              <Badge variant="outline" className={product.inStock ? 'border-green-700/30 text-green-800' : 'border-destructive/30 text-destructive'}>{product.inStock ? 'In stock' : 'Out of stock'}</Badge>
+              <Badge variant="outline" className={chosenProduct.inStock ? 'border-green-700/30 text-green-800' : 'border-destructive/30 text-destructive'}>{chosenProduct.inStock ? 'In stock' : 'Out of stock'}</Badge>
             </div>
             <h1 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">{product.name}</h1>
             <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
@@ -132,11 +138,13 @@ const ProductDetail = () => {
             <p className="mt-6 text-lg leading-8 text-muted-foreground">{product.description}</p>
 
             <div className="mt-6 flex flex-wrap items-end gap-3 border-y border-[#e8dfd2] py-5">
-              <span className="text-3xl font-bold text-primary">₹{product.price}</span>
+              <span className="text-3xl font-bold text-primary">₹{chosenProduct.price}</span>
               <span className="pb-1 text-sm text-muted-foreground line-through">MRP ₹{mrp}</span>
               <span className="mb-1 bg-[#f4e6c3] px-2 py-1 text-xs font-bold text-[#715008]">Save ₹{savings}</span>
               <span className="w-full text-xs text-muted-foreground">Inclusive of all taxes</span>
             </div>
+
+            {product.variants?.length ? <div className="mt-7"><VariantPicker variants={product.variants} value={selectedVariant?.sku||selectedVariant?.id} onChange={setSelectedVariant}/></div> : null}
 
             <dl className="mt-6 grid grid-cols-3 divide-x border border-[#e8dfd2] bg-background">
               {facts.map(({ icon: Icon, label, note }) => <div key={label} className="px-3 py-4 text-center"><Icon className="mx-auto h-5 w-5 text-primary" /><dt className="mt-2 text-sm font-bold">{label}</dt><dd className="mt-1 text-[11px] leading-tight text-muted-foreground">{note}</dd></div>)}
@@ -147,17 +155,18 @@ const ProductDetail = () => {
               <div className="flex h-11 w-36 items-center justify-between border border-input bg-background">
                 <button aria-label="Decrease quantity" type="button" disabled={quantity === 1} onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="grid h-full w-11 place-items-center hover:bg-muted disabled:opacity-30"><Minus className="h-4 w-4" /></button>
                 <span aria-live="polite" className="font-bold">{quantity}</span>
-                <button aria-label="Increase quantity" type="button" disabled={quantity === 10} onClick={() => setQuantity((q) => Math.min(10, q + 1))} className="grid h-full w-11 place-items-center hover:bg-muted disabled:opacity-30"><Plus className="h-4 w-4" /></button>
+                <button aria-label="Increase quantity" type="button" disabled={quantity >= Math.min(10,selectedVariant?.inventory??0)} onClick={() => setQuantity((q) => Math.min(10,selectedVariant?.inventory??0,q + 1))} className="grid h-full w-11 place-items-center hover:bg-muted disabled:opacity-30"><Plus className="h-4 w-4" /></button>
               </div>
+              {selectedVariant?.inventory ? <p className="mt-2 text-xs text-muted-foreground">Only {selectedVariant.inventory} available in this pack.</p> : null}
             </div>
 
             <div className="mt-5 border border-[#dfd3c2] bg-[#fffaf0] p-3 shadow-[0_14px_34px_-28px_rgba(67,35,21,.55)] sm:p-4">
               <div className="grid gap-2 min-[380px]:grid-cols-2">
-                <Button onClick={handleAddToCart} disabled={!product.inStock} size="lg" className="h-14 rounded-sm px-4 text-base font-semibold shadow-[0_8px_20px_-14px_rgba(20,70,18,.9)]">
+                <Button onClick={handleAddToCart} disabled={!chosenProduct.inStock} size="lg" className="h-14 rounded-sm px-4 text-base font-semibold shadow-[0_8px_20px_-14px_rgba(20,70,18,.9)]">
                   <ShoppingBag className="mr-2 h-5 w-5 shrink-0" />
-                  <span>{product.inStock ? 'Add to cart' : 'Out of stock'}</span>
+                  <span>{chosenProduct.inStock ? 'Add to cart' : 'Out of stock'}</span>
                 </Button>
-                <Button onClick={handleBuyNow} disabled={!product.inStock} size="lg" variant="outline" className="h-14 rounded-sm border-primary bg-background px-4 text-base font-semibold text-primary hover:bg-primary hover:text-primary-foreground">
+                <Button onClick={handleBuyNow} disabled={!chosenProduct.inStock} size="lg" variant="outline" className="h-14 rounded-sm border-primary bg-background px-4 text-base font-semibold text-primary hover:bg-primary hover:text-primary-foreground">
                   <span>Buy now</span>
                   <ChevronRight className="ml-2 h-5 w-5 shrink-0" />
                 </Button>
@@ -228,7 +237,7 @@ const ProductDetail = () => {
         <div id="reviews" className="scroll-mt-24"><p className="text-xs font-bold uppercase tracking-[.2em] text-primary">Customer confidence</p>{reviewsLoading ? <div className="mt-4" aria-label="Loading reviews" aria-busy="true"><div className="flex items-end gap-4"><Skeleton className="h-16 w-24"/><div className="space-y-2"><Skeleton className="h-4 w-28"/><Skeleton className="h-4 w-44"/></div></div><div className="mt-6 space-y-3">{Array.from({length:3}).map((_,index)=><div key={index} className="border bg-background p-4"><Skeleton className="h-4 w-24"/><Skeleton className="mt-3 h-4 w-full"/><Skeleton className="mt-2 h-4 w-3/4"/></div>)}</div></div> : reviewsError ? <LoadError title="Reviews are temporarily unavailable" message={reviewsError.message} onRetry={refreshReviews} className="mt-5" /> : <><div className="mt-3 flex items-end gap-4"><span className="text-6xl font-bold">{rating?rating.toFixed(1):'—'}</span><div className="pb-1">{rating > 0 && <div className="flex text-[#b86c00]">{[0,1,2,3,4].map((n) => <Star key={n} className="h-4 w-4 fill-current" />)}</div>}<p className="mt-1 text-sm text-muted-foreground">{reviews.length ? `Based on ${reviews.length} approved reviews` : 'Be the first to review this jar'}</p></div></div><div className="mt-6 space-y-3">{reviews.slice(0,4).map((review)=><article key={review._id} className="border border-[#e8dfd2] bg-background p-4"><div className="flex text-[#b86c00]">{Array.from({length:review.rating}).map((_,n)=><Star key={n} className="h-3.5 w-3.5 fill-current"/>)}</div><p className="mt-2 text-sm leading-6 text-muted-foreground">{review.comment}</p><p className="mt-2 text-xs font-bold">{review.name}</p></article>)}</div></>}{hasPersistedProduct&&<form onSubmit={submitReview} className="mt-7 grid gap-3 border border-[#e8dfd2] bg-background p-5 sm:grid-cols-2"><h3 className="font-bold sm:col-span-2">Share your experience</h3><Input required placeholder="Your name" value={reviewForm.name} onChange={e=>setReviewForm({...reviewForm,name:e.target.value})}/><Input type="email" placeholder="Email (not published)" value={reviewForm.email} onChange={e=>setReviewForm({...reviewForm,email:e.target.value})}/><select className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={reviewForm.rating} onChange={e=>setReviewForm({...reviewForm,rating:Number(e.target.value)})}>{[5,4,3,2,1].map(value=><option key={value} value={value}>{value} stars</option>)}</select><Input required minLength={5} placeholder="Write your review" value={reviewForm.comment} onChange={e=>setReviewForm({...reviewForm,comment:e.target.value})}/><Button className="sm:col-span-2">Submit for review</Button>{reviewMessage&&<p className="text-sm text-muted-foreground sm:col-span-2">{reviewMessage}</p>}</form>}</div>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 max-w-full border-t border-[#dfd3c2] bg-[#fffaf0] px-3 pb-[max(.625rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-10px_30px_rgba(67,35,21,.12)] md:hidden"><div className="mx-auto grid w-full min-w-0 max-w-lg grid-cols-[76px_minmax(0,1fr)] items-center gap-2.5"><div className="min-w-0"><p className="text-[11px] font-medium text-muted-foreground">Total</p><p className="truncate text-lg font-bold leading-tight text-primary">₹{product.price * quantity}</p></div><Button onClick={handleAddToCart} disabled={!product.inStock} className="h-12 min-w-0 rounded-sm px-3 text-sm font-semibold shadow-[0_8px_20px_-14px_rgba(20,70,18,.9)]"><ShoppingBag className="mr-1.5 h-5 w-5 shrink-0" /><span className="truncate">{product.inStock ? `Add ${quantity} to cart` : 'Out of stock'}</span></Button></div></div>
+      <div className="fixed inset-x-0 bottom-0 z-40 max-w-full border-t border-[#dfd3c2] bg-[#fffaf0] px-3 pb-[max(.625rem,env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-10px_30px_rgba(67,35,21,.12)] md:hidden"><div className="mx-auto grid w-full min-w-0 max-w-lg grid-cols-[76px_minmax(0,1fr)] items-center gap-2.5"><div className="min-w-0"><p className="text-[11px] font-medium text-muted-foreground">Total</p><p className="truncate text-lg font-bold leading-tight text-primary">₹{chosenProduct.price * quantity}</p></div><Button onClick={handleAddToCart} disabled={!chosenProduct.inStock} className="h-12 min-w-0 rounded-sm px-3 text-sm font-semibold shadow-[0_8px_20px_-14px_rgba(20,70,18,.9)]"><ShoppingBag className="mr-1.5 h-5 w-5 shrink-0" /><span className="truncate">{chosenProduct.inStock ? `Add ${quantity} to cart` : 'Out of stock'}</span></Button></div></div>
     </main>
   );
 };

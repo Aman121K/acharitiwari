@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, Check, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCart, type Product } from '@/contexts/CartContext';
 import { useGlobalToast } from '@/contexts/ToastContext';
 import { analyticsItem, trackEvent } from '@/lib/analytics';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { VariantPicker } from '@/components/VariantPicker';
+import { getDefaultVariant, getListingPrice, productWithVariant, type ProductVariant } from '@/lib/productVariants';
 
 interface ProductCardProps { product: Product }
 
@@ -12,15 +15,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { showToast } = useGlobalToast();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
+  const variants=useMemo(()=>product.variants||[],[product.variants]);
+  const [pickerOpen,setPickerOpen]=useState(false);
+  const [selected,setSelected]=useState<ProductVariant|undefined>(()=>getDefaultVariant(variants));
+  useEffect(()=>setSelected(getDefaultVariant(variants)),[product.id,variants]);
   const detailPath = `/product/${product.slug || product.id}`;
 
-  const addToCart = () => {
-    dispatch({ type: 'ADD_TO_CART', product });
-    showToast(product, 1);
-    void trackEvent('add_to_cart', { currency: 'INR', value: product.price, items: [analyticsItem(product)] });
+  const addSelected = (variant=selected) => {
+    if(!variant?.inStock)return;
+    const chosen=productWithVariant(product,variant);
+    dispatch({ type: 'ADD_TO_CART', product:chosen });
+    showToast(chosen, 1);
+    void trackEvent('add_to_cart', { currency: 'INR', value: chosen.price, items: [analyticsItem(chosen)] });
+    setPickerOpen(false);
     setJustAdded(true);
     window.setTimeout(() => setJustAdded(false), 1400);
   };
+  const addToCart=()=>variants.length>1?setPickerOpen(true):addSelected(getDefaultVariant(variants));
   const trackSelection = () => {
     void trackEvent('select_item', { item_list_id: 'product_grid', item_list_name: 'Product grid', items: [analyticsItem(product)] });
   };
@@ -32,7 +43,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <img src={product.image} alt={`${product.name} – ${product.weight} jar`} loading="lazy" onLoad={() => setImageLoaded(true)} onError={() => setImageLoaded(true)} className={`h-full w-full object-contain drop-shadow-[0_18px_15px_rgba(60,35,10,.18)] transition duration-500 group-hover:scale-[1.04] ${imageLoaded ? 'opacity-100' : 'opacity-0'}`} />
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/35 to-transparent" />
         <span className={`absolute left-3 top-3 border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.12em] ${product.inStock ? 'border-white/40 bg-primary text-white' : 'border-white/40 bg-accent text-white'}`}>{product.inStock ? 'In stock' : 'Out of stock'}</span>
-        <span className="absolute bottom-3 right-3 bg-[#fff8ed] px-2 py-1 text-[11px] font-bold text-foreground">{product.weight}</span>
+        <span className="absolute bottom-3 right-3 bg-[#fff8ed] px-2 py-1 text-[11px] font-bold text-foreground">{variants.length>1?`${variants.length} pack sizes`:product.weight}</span>
       </Link>
 
       <div className="flex flex-1 flex-col py-4">
@@ -42,13 +53,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </Link>
         <p className="mt-2 line-clamp-2 text-sm leading-5 text-muted-foreground">{product.description}</p>
         <div className="mt-auto flex items-end justify-between gap-3 pt-4">
-          <div><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Price</span><p className="font-display text-2xl text-primary">₹{product.price.toLocaleString('en-IN')}</p></div>
+          <div><span className="text-[10px] uppercase tracking-wider text-muted-foreground">{variants.length>1?'From':'Price'}</span><p className="font-display text-2xl text-primary">₹{getListingPrice(variants,product.price).toLocaleString('en-IN')}</p></div>
           <Link to={detailPath} onClick={trackSelection} className="flex min-h-11 items-center gap-1 text-sm font-bold text-foreground underline decoration-border underline-offset-4 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Details <ArrowUpRight className="h-4 w-4" /></Link>
         </div>
         <button type="button" onClick={addToCart} disabled={!product.inStock} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 bg-primary px-4 text-sm font-extrabold text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground">
           {justAdded ? <><Check className="h-4 w-4" /> Added to cart</> : <><ShoppingBag className="h-4 w-4" /> {product.inStock ? 'Add to cart' : 'Currently unavailable'}</>}
         </button>
       </div>
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}><DialogContent className="max-w-lg border-[#c9b896] bg-[#fcf7ed] p-0"><div className="border-b border-[#d8c9af] bg-[#173d23] px-6 py-5 text-[#fff8e8]"><DialogHeader><DialogTitle className="font-display text-3xl">Select your jar</DialogTitle><DialogDescription className="text-[#fff8e8]/75">Choose a pack size for {product.name}.</DialogDescription></DialogHeader></div><div className="p-6"><VariantPicker variants={variants} value={selected?.sku||selected?.id} onChange={setSelected}/><button type="button" onClick={()=>addSelected()} disabled={!selected?.inStock} className="mt-5 min-h-12 w-full bg-primary px-4 font-bold text-primary-foreground disabled:opacity-50"><ShoppingBag className="mr-2 inline h-4 w-4"/>Add {selected?.label||'pack'} · ₹{selected?.price.toLocaleString('en-IN')}</button></div></DialogContent></Dialog>
     </article>
   );
 };

@@ -57,7 +57,7 @@ const CheckoutPage = () => {
           sessionId: getCartSessionId(),
           checkoutStarted: true,
           customer: { name: `${formData.firstName} ${formData.lastName}`.trim(), email: formData.email, phone: formData.phone },
-          items: state.items.map(item => ({ productId: item.id, name: item.name, price: item.price, quantity: item.quantity, image: item.image, sku: item.sku })),
+          items: state.items.map(item => ({ productId: item.id, name: item.name, price: item.price, quantity: item.quantity, image: item.image, sku:item.variantSku||item.sku, variantLabel:item.variantLabel, variantSize:item.variantSize })),
         }),
       }).catch(() => undefined);
     }, 700);
@@ -90,7 +90,7 @@ const CheckoutPage = () => {
         body: JSON.stringify({
           customer: { name: `${formData.firstName} ${formData.lastName}`.trim(), email: formData.email, phone: formData.phone },
           shippingAddress: { street: formData.address, line2: formData.address2, city: formData.city, state: formData.state, zipCode: formData.pincode, country: 'India' },
-          items: state.items.map((item) => ({ productId: item.id, name: item.name, price: item.price, quantity: item.quantity, image: item.image })),
+          items: state.items.map((item) => ({ productId: item.id, sku:item.variantSku||item.sku, quantity: item.quantity })),
           paymentMethod: formData.paymentMethod === 'upi' ? 'upi' : 'cash_on_delivery',
           notes: formData.notes,
           marketingAccepted: formData.marketingAccepted,
